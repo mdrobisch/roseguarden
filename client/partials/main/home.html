@@ -1,0 +1,48 @@
+<div class="jumbotron">
+
+    <h2>Welcome to RoseGuarden</h2>
+
+    <img src="images/RoseGuarden.png" height="180" alt="" class="center-block" >
+
+
+    <p></p>
+
+    <div> {{message}}</div>
+
+
+     <div class="alert alert-info" ng-show="isLoading">
+        Loading data ...
+        <img src="images/loading.gif" >
+    </div>
+
+     <div class="alert alert-danger" ng-show="showError">
+        Loading data failed.
+    </div>
+
+    <div>
+        <button type="button" class="btn btn-warning btn-lg round"
+                ng-repeat="door in doors" ng-click="requestOpening(door)" ng-disabled="isAllowed(door)">Open {{door.name}}
+        </button>
+    </div>
+
+</div>
+
+<div ng-show="!isLoading">
+    <div ng-controller="HomeTabCtrl"  class="nav nav-tabs center-block centered-pills" >
+        <ul class ="nav nav-pills ">
+            <li ng-repeat="tab in tabs"
+                ng-class="{active:tab.active}"
+                ng-click="onClickTab(tab)">
+                <a class="width170px">
+                    <i class="glyphicon {{tab.glyphicon}}"></i> <br>
+                    {{tab.title}}
+                </a>
+            </li>
+        </ul>
+        <div>
+            <hr class="divider" />
+            <div ng-include="currentTab.template"></div>
+        </div>
+
+    </div>
+</div>

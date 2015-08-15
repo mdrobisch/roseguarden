@@ -1,0 +1,101 @@
+<div ng-controller="AdminDoorsCtrl"   >
+    <table class="table table-striped">
+        <thead >
+            <tr>
+                <th>name</th>
+                <th>address</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr>
+                <td> <input type="text" ng-model="newdoor.name" class="form-control"> </td>
+                <td> <input type="text" ng-model="newdoor.address" class="form-control"> </td>
+                <td>
+                    <button type="button" ng-click="addDoorItem()" class="btn btn-sm btn-success">
+                        <i class="glyphicon glyphicon-plus">
+                        </i> Add
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <table st-table="displayedCollection" st-safe-src="rowCollection" class="table table-striped">
+        <thead >
+            <tr>
+                <th st-sort="name" align="center">name</th>
+                <th st-sort="address">address</th>
+                <th st-sort="doorSlot">valid keys</th>
+                <th>actions</th>
+            </tr>
+            <tr>
+                <th colspan="4"><input st-search="" class="form-control" placeholder="global search ..." type="text"/></th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr st-select-row="row" st-select-mode="single" ng-repeat="row in displayedCollection">
+                <td>
+                    {{row.name}}
+                </td>
+                <td>{{row.address}}</td>
+                <td>
+                    <button ng-show="row.local == 0 && row.keyMask == -1" " popover-placement="right" tooltip="update valid keys" class="btn btn-default">
+                        <i class="glyphicon glyphicon-question-sign "></i>
+                    </button>
+                    <span ng-show="row.keyMask != -1">
+                        <a ng-show="row.keyMask | bitwiseAnd : 1" class="btn btn-default gliphicons-small" tooltip="red key" >
+                            <i class="glyphicon glyphicon-thumbs-up gliphicon-red" ></i>
+                        </a>
+                        <a ng-show="row.keyMask | bitwiseAnd : 2" class="btn btn-default gliphicons-small" tooltip="green key">
+                            <i class="glyphicon glyphicon-thumbs-up gliphicon-green" ></i>
+                        </a>
+                        <a ng-show="row.keyMask | bitwiseAnd : 4" class="btn btn-default gliphicons-small" tooltip="black key">
+                            <i class="glyphicon glyphicon-thumbs-up gliphicon-black" ></i>
+                        </a>
+                        <a ng-show="row.keyMask | bitwiseAnd : 8" class="btn btn-default gliphicons-small" tooltip="pink key">
+                            <i class="glyphicon glyphicon-thumbs-up gliphicon-pink" ></i>
+                        </a>
+                        <a ng-show="row.keyMask | bitwiseAnd : 16" class="btn btn-default gliphicons-small" tooltip="marine key">
+                            <i class="glyphicon glyphicon-thumbs-up gliphicon-marine"></i>
+                        </a>
+                        <a ng-show="row.keyMask | bitwiseAnd : 32" class="btn btn-default gliphicons-small" tooltip="orange key">
+                            <i class="glyphicon glyphicon-thumbs-up gliphicon-orange"></i>
+                        </a>
+                        <a ng-show="row.keyMask | bitwiseAnd : 64" class="btn btn-default gliphicons-small" tooltip="olive key">
+                            <i class="glyphicon glyphicon-thumbs-up gliphicon-olive"></i>
+                        </a>
+                        <a ng-show="row.keyMask | bitwiseAnd : 128" class="btn btn-default gliphicons-small" tooltip="purple key">
+                            <i class="glyphicon glyphicon-thumbs-up gliphicon-purple"></i>
+                        </a>
+                    </span>
+                </td>
+
+                <td>
+                    <button ng-show="row.local == 1" popover-placement="right" popover="local" class="btn btn-default">
+                        <i class="glyphicon glyphicon-star-empty"></i>
+                    </button>
+                    <button ng-show="row.local == 0" type="button" ng-click="" class="btn btn-sm btn-success" tooltip="Synchronize user">
+                        <i class="glyphicon glyphicon-share-alt"></i>
+                    </button>
+                    <button ng-show="row.local == 0" type="button" ng-click="" class="btn btn-sm btn-success" tooltip="Update valid keys">
+                        <i class="glyphicon glyphicon-refresh"></i>
+                    </button>
+                    <button ng-show="row.local == 0" type="button" ng-click="removeItem(row)" class="btn btn-sm btn-danger" tooltip="Remove door">
+                        <i class="glyphicon glyphicon-remove-circle"></i>
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+
+        <tfoot>
+            <tr>
+                <td colspan="4" class="text-center">
+                    <div st-pagination="" st-items-by-page="itemsByPage" st-displayed-pages="7"></div>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+
+</div>

@@ -1,0 +1,48 @@
+<div class="jumbotron">
+
+    <h2>Welcome to #Rosenwerk</h2>
+
+    <img src="images/RoseGuarden.png" height="180" alt="" class="center-block" >
+
+
+    <!--
+    <div class="alert alert-info">
+        Username: test<br />
+        Password: test
+    </div>
+    -->
+
+    <p>
+
+    </p>
+
+    <div ng-show="error" class="alert alert-danger">{{error}}</div>
+    <form name="form" ng-submit="login()" role="form">
+        <div class="form-group">
+            <label for="email">eMail</label>
+            <i class="fa fa-key"></i>
+            <input type="text" name="email" id="email" class="form-control" ng-model="credentials.email" required />
+            <span ng-show="form.email.$dirty && form.email.$error.required" class="help-block">eMail-address is required</span>
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <i class="fa fa-lock"></i>
+            <input type="password" name="password" id="password" class="form-control" ng-model="credentials.password" required />
+            <span ng-show="form.password.$dirty && form.password.$error.required" class="help-block">Password is required</span>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" ng-disabled="form.$invalid || dataLoading" class="btn btn-danger">Login</button>
+            <img ng-if="dataLoading" src="images/loading.gif" >
+        </div>
+
+        <p>
+
+        </p>
+
+        <div>
+            <a href="#/lostpassword">Lost password?</a>
+        </div>
+
+    </form>
+</div>

@@ -1,0 +1,53 @@
+RoseGuardenApp.controller('HomeCtrl', function($q, $scope, Door, AuthService, OpeningRequest, User) {
+
+    $scope.message = '';
+    $scope.isLoading = true;
+    $scope.showError = false;
+
+    $scope.doors = [
+        //{name: 'outer door', licenseMask: 0x01, address:'192.168.1.168'},
+        //{name: 'inner door', licenseMask: 0x00, address:'192.168.6.168'}
+    ];
+
+    $scope.isAllowed = function(door) {
+        if((door.keyMask & $scope.user.key)  != 0)
+            return false;
+        else
+            return true;
+    }
+
+
+
+
+    $scope.requestOpening = function (door) {
+        $scope.message = 'Request send to the door (' + door.address +  ')';
+        var me = this;
+        deferred = $q.defer();
+        OpeningRequest.create(null, door.address).then(function() {
+            return deferred.resolve();
+        }, function(response) {
+            return deferred.reject(response);
+        });
+        return deferred.promise
+    }
+
+
+    // starts here
+    AuthService.loadCurrentUser().then(function(user) {
+        $scope.user = user;
+
+        Door.get().then(function(doors) {
+            $scope.doors = doors;
+            $scope.isLoading = false;
+        }, function(response) {
+            $scope.showError = true;
+            $scope.isLoading = false;
+        });
+    }, function(response) {
+
+    });
+
+
+
+
+})

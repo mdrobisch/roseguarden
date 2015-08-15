@@ -1,0 +1,12 @@
+Welcome {{ user.firstName }},
+You successfully registered to the RoseGuarden.
+Now you will be able to login to our system.
+To get entry to the doors of RosenWerk you have to get activated.
+Please contact a RoseGuarden admin for this purpose.
+
+Here is a short list of admins you pleased to contact
+ - Mathias Röder
+ - Marcus Drobisch
+
+Regards,
+The RoseGuarden admin

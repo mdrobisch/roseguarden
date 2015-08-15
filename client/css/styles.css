@@ -1,0 +1,148 @@
+.msg-error {
+    display: block;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    color:#F00;
+}
+
+.credits div {
+    margin-top: 50px;
+}
+
+hr.divider  {
+    margin-top: 1px;
+}
+
+.centered-pills {
+    text-align: center
+}
+.centered-pills ul.nav-pills {
+    display: inline-block
+}
+.centered-pills li {
+    display: inline
+
+}
+.centered-pills a {
+    float: left;
+    width: 80px;
+}
+
+
+.dropdown-menu li {
+  display: inherit;
+}
+
+.dropdown-menu a {
+    width: auto;
+    float: none;
+}
+
+.center-modal {
+    position: fixed;
+    top: 10%;
+    left: 18.5%;
+    z-index: 1050;
+    width: 80%;
+    height: 80%;
+    margin-left: -10%;
+}
+
+.gliphicon-red, .gliphicon-red a {
+  color: OrangeRed;
+}
+
+.gliphicon-green, .gliphicon-green a {
+  color: YellowGreen;
+}
+
+.gliphicon-black, .gliphicon-black a {
+  color: Black;
+}
+
+.gliphicon-pink, .gliphicon-pink a {
+  color: DeepPink;
+}
+
+.gliphicon-marine, .gliphicon-marine a {
+  color: DarkSlateBlue;
+}
+
+.gliphicon-orange, .gliphicon-orange a {
+  color: DarkOrange;
+}
+
+.gliphicon-olive, .gliphicon-olive a {
+  color: DarkOliveGreen;
+}
+
+.gliphicon-purple, .gliphicon-purple a {
+  color: DarkMagenta ;
+}
+
+.gliphicon-yellow, .gliphicon-yellow a {
+  color: Gold ;
+}
+
+.gliphicon-gray, .gliphicon-gray a {
+  color: darkslategray ;
+}
+
+.gliphicon-aqua, .gliphicon-aqua a {
+  color: LightSkyBlue  ;
+}
+
+.gliphicon-brown, .gliphicon-brown a {
+  color: Sienna  ;
+}
+
+
+a.gliphicons {
+    float: none;
+    width: inherit;
+}
+
+a.gliphicons-small {
+    float: none;
+    width: 32px;
+}
+
+a.width170px {
+    width: 170px;
+}
+
+* html .centered-pills ul.nav-pills, *+html .centered-pills ul.nav-pills {
+    display: inline
+}
+
+.table > tbody > tr > td {
+    vertical-align: middle;
+}
+
+
+.nav-pills > li.active > a {
+    background-color:gray;
+}
+
+
+.nav-pills > li.active > a:hover {
+    background-color:gray;
+}
+
+.nav-pills > li.active > a:focus {
+    background-color:gray;
+}
+
+.btn {
+    padding: 5px 8px
+}
+
+.btn-lg.round {
+    border-radius: 24px;
+    margin: 20px;
+}
+
+.table > thead > tr > th {
+    text-align: center;
+
+}

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1" />
+    <title>RoseGuarden</title>
+
+    <link rel="stylesheet" type="text/css" href="./bower_components/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="./css/theme.css">
+    <link rel="stylesheet" type="text/css" href="./css/styles.css">
+    <link rel="stylesheet" type="text/css" href="./css/jumbotron-narrow.css">
+
+</head>
+<body class="jumbotron-narrow">
+
+    <div class="container">
+        <div class="header">#
+            <ul class ="nav nav-pills pull-right">
+                <li role="presentation" class="active">
+                    <a href="#">Home</a>
+                </li>
+                <li> <a href="#">Register</a> </li>
+                <li> <a href="#">Admin</a> </li>
+            </ul>
+
+                <nav class="blog-nav">
+                    <a class="nav nav-pills" href="#"</a>
+                    <a class="nav nav-pills" href="#/sessions/create" ng-hide="isLoggedIn" ng-class="{active: isActive('/sessions/create')}">Login</a>
+                    <a class="blog-nav-item" href="#/sessions/destroy" ng-show="isLoggedIn">Logout</a>
+                    <a class="blog-nav-item" href="#/users/create" ng-class="{active: isActive('/users/create')}">Register</a>
+                    <a class="blog-nav-item" href="#/posts/create" ng-show="isLoggedIn" ng-class="{active: isActive('/posts/create')}">Create a post</a>
+                </nav>
+
+        </div>
+    </div>
+
+</body>
+</html>
+
+    <script type="text/javascript" src="./bower_components/angularjs/angular.js"></script>
+    <script type="text/javascript" src="./bower_components/angular-route/angular-route.js"></script>
+    <script type="text/javascript" src="./bower_components/lodash/dist/lodash.js"></script>
+    <script type="text/javascript" src="./bower_components/restangular/dist/restangular.js"></script>
+    <script type="text/javascript" src="./bower_components/angular-local-storage/angular-local-storage.js"></script>
+
+    <script type="text/javascript" src="./js/main.js"></script>
+    <script type="text/javascript" src="./js/controllers/ApplicationCtrl.js"></script>
+
+
+
+----- tabset ui.angular
+
+  <tabset type="pills" justified="true">
+      <tab  ng-repeat="tab in tabs" heading="{{tab.title}}" active="tab.active" template="tab.template" disable="tab.disabled"  >
+           <div ng-include="tab.template"></div>
+      </tab>
+  </tabset>

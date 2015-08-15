@@ -1,0 +1,114 @@
+<div ng-controller="AdminUsersCtrl"   >
+    <table st-table="displayedCollection" st-safe-src="rowCollection" class="table table-striped"">
+        <thead >
+            <tr>
+                <th st-sort="firstName">user</th>
+                <th st-sort="registrationDate">registered</th>
+                <th st-sort="lastLoginDate">last login</th>
+                <th st-sort="validationDateEnd">valid period</th>
+                <th st-sort="validationTimeStart">valid time</th>
+                <th st-sort="keyMask"> keys & licenses</th>
+                <th>actions</th>
+            </tr>
+            <tr>
+                <th colspan="7"><input st-search="" class="form-control" placeholder="global search ..." type="text"/></th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr st-select-row="row" st-select-mode="single" ng-repeat="row in displayedCollection">
+                <td>
+
+                    <span> {{row.firstName}} {{row.lastName}} </span> <br>
+                    <a href="mailto:{{row.mail}}" class="btn btn-default gliphicons" >
+                        <i class="glyphicon glyphicon-envelope"></i>
+                    </a>
+                    <button popover-placement="right" popover="{{row.phone}}" class="btn btn-default">
+                        <i class="glyphicon glyphicon-phone-alt"></i>
+                    </button>
+                    <button ng-show="row.role == 1" popover-placement="right" popover="Admin" class="btn btn-default">
+                        <i class="glyphicon glyphicon-star-empty"></i>
+                    </button>
+                    <button ng-show="row.cardid" popover-placement="right" popover="{{row.cardid}}" class="btn btn-default">
+                        <i class="glyphicon glyphicon-credit-card"></i>
+                    </button>
+                    <button ng-show="row.budget != 0.00" popover-placement="right" popover="{{row.budget | number:2}}€" class="btn btn-default">
+                        <i class="glyphicon glyphicon-euro"></i>
+                    </button>
+
+                </td>
+                <td>
+                    {{row.registrationDate | date:'yyyy-MM-dd'}}
+                </td>
+                <td>{{row.lastLoginDate | date:'yyyy-MM-dd'}}</td>
+                <td>
+                        {{row.validationDateStart | date:'yyyy/MM/dd'}}
+                        to
+                        {{row.validationDateEnd | date:'yyyy/MM/dd'}}
+                </td>
+                <td>
+                        {{row.validationTimeStart | date:'HH:mm'}}
+                        to
+                        {{row.validationTimeEnd | date:'HH:mm'}}
+
+                        <br>
+
+                        (
+                        <span ng-show="row.validationDaysMask | bitwiseAnd : 1">Mo</span>
+                        <span ng-show="row.validationDaysMask | bitwiseAnd : 2">Tu</span>
+                        <span ng-show="row.validationDaysMask | bitwiseAnd : 4">We</span>
+                        <span ng-show="row.validationDaysMask | bitwiseAnd : 8">Th</span>
+                        <span ng-show="row.validationDaysMask | bitwiseAnd : 16">Fr</span>
+                        <span ng-show="row.validationDaysMask | bitwiseAnd : 32">Sa</span>
+                        <span ng-show="row.validationDaysMask | bitwiseAnd : 64">Su</span>
+                        )
+                </td>
+                <td>
+                        <i ng-show="row.licenseMask | bitwiseAnd : 1"  class="glyphicon glyphicon-credit-card gliphicon-red" tooltip="red licence"></i>
+                        <i ng-show="row.licenseMask | bitwiseAnd : 2"  class="glyphicon glyphicon-credit-card gliphicon-green" tooltip="green licence"></i>
+                        <i ng-show="row.licenseMask | bitwiseAnd : 4"  class="glyphicon glyphicon-credit-card gliphicon-black" tooltip="black licence"></i>
+                        <i ng-show="row.licenseMask | bitwiseAnd : 8"  class="glyphicon glyphicon-credit-card gliphicon-pink" tooltip="pink licence"></i>
+                        <i ng-show="row.licenseMask | bitwiseAnd : 16"  class="glyphicon glyphicon-credit-card gliphicon-marine" tooltip="marine licence"></i>
+                        <i ng-show="row.licenseMask | bitwiseAnd : 32"  class="glyphicon glyphicon-credit-card gliphicon-orange" tooltip="orange licence"></i>
+                        <i ng-show="row.licenseMask | bitwiseAnd : 64"  class="glyphicon glyphicon-credit-card gliphicon-olive" tooltip="olive licence"></i>
+                        <i ng-show="row.licenseMask | bitwiseAnd : 128"  class="glyphicon glyphicon-credit-card gliphicon-purple" tooltip="purple licence"></i>
+
+                        <i ng-show="row.keyMask | bitwiseAnd : 1"  class="glyphicon glyphicon-thumbs-up gliphicon-red" tooltip="red key"></i>
+                        <i ng-show="row.keyMask | bitwiseAnd : 2"  class="glyphicon glyphicon-thumbs-up gliphicon-green" tooltip="green key"></i>
+                        <i ng-show="row.keyMask | bitwiseAnd : 4"  class="glyphicon glyphicon-thumbs-up gliphicon-black" tooltip="black key"></i>
+                        <i ng-show="row.keyMask | bitwiseAnd : 8"  class="glyphicon glyphicon-thumbs-up gliphicon-pink" tooltip="pink key"></i>
+                        <i ng-show="row.keyMask | bitwiseAnd : 16"  class="glyphicon glyphicon-thumbs-up gliphicon-marine" tooltip="marine key"></i>
+                        <i ng-show="row.keyMask | bitwiseAnd : 32"  class="glyphicon glyphicon-thumbs-up gliphicon-orange" tooltip="orange key"></i>
+                        <i ng-show="row.keyMask | bitwiseAnd : 64"  class="glyphicon glyphicon-thumbs-up gliphicon-olive" tooltip="olive key"></i>
+                        <i ng-show="row.keyMask | bitwiseAnd : 128"  class="glyphicon glyphicon-thumbs-up gliphicon-purple" tooltip="purple key"></i>
+
+
+                </td>
+                <td>
+                    <div class="btn-group" dropdown is-open="status.isopen">
+                        <button id="single-button" type="button"  class="btn btn-sm btn-danger" dropdown-toggle tooltip="configure user">
+                            <i class="glyphicon glyphicon-cog"></i>
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li role="menuitem"><a >Setup key validation</a></li>
+                            <li role="menuitem"><a >Update budget</a></li>
+                            <li ng-show="row.role == 0" role="menuitem"><a >Set admin rights</a></li>
+                            <li ng-show="row.role == 1" role="menuitem"><a >Remove admin rights</a></li>
+                            <li class="divider"></li>
+                            <li role="menuitem"><a ng-click="removeItem(row)">Remove user</a></li>
+                        </ul>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+
+        <tfoot>
+            <tr>
+                <td colspan="6" class="text-center">
+                    <div st-pagination="" st-items-by-page="itemsByPage" st-displayed-pages="10"></div>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</div>

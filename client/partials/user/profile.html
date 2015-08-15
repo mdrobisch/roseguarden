@@ -1,0 +1,135 @@
+<div ng-controller="UserProfileCtrl">
+
+     <div class="alert alert-success" ng-show="showSuccess">
+        {{success}}
+    </div>
+
+     <div class="alert alert-danger" ng-show="showError">
+        {{error}}
+    </div>
+
+    <form name="form" ng-submit="updateProfile()" role="form" class="form-horizontal" >
+
+
+        <div class="form-group" ng-show="user.license">
+            <label class="col-xs-3 control-label">Licenses</label>
+        </div>
+
+        <div class="form-group">
+            <label class="col-xs-3 control-label center-block">Keys</label>
+            <div class="col-xs-8">
+                <a ng-show="user.key | bitwiseAnd : 1" class="btn btn-default gliphicons-small" tooltip="red key" >
+                    <i class="glyphicon glyphicon-thumbs-up gliphicon-red" ></i>
+                </a>
+                <a ng-show="user.key | bitwiseAnd : 2" class="btn btn-default gliphicons-small" tooltip="green key">
+                    <i class="glyphicon glyphicon-thumbs-up gliphicon-green" ></i>
+                </a>
+                <a ng-show="user.key | bitwiseAnd : 4" class="btn btn-default gliphicons-small" tooltip="black key">
+                    <i class="glyphicon glyphicon-thumbs-up gliphicon-black" ></i>
+                </a>
+                <a ng-show="user.key | bitwiseAnd : 8" class="btn btn-default gliphicons-small" tooltip="pink key">
+                    <i class="glyphicon glyphicon-thumbs-up gliphicon-pink" ></i>
+                </a>
+                <a ng-show="user.key | bitwiseAnd : 16" class="btn btn-default gliphicons-small" tooltip="marine key">
+                    <i class="glyphicon glyphicon-thumbs-up gliphicon-marine"></i>
+                </a>
+                <a ng-show="user.key | bitwiseAnd : 32" class="btn btn-default gliphicons-small" tooltip="orange key">
+                    <i class="glyphicon glyphicon-thumbs-up gliphicon-orange"></i>
+                </a>
+                <a ng-show="user.key | bitwiseAnd : 64" class="btn btn-default gliphicons-small" tooltip="olive key">
+                    <i class="glyphicon glyphicon-thumbs-up gliphicon-olive"></i>
+                </a>
+                <a  ng-show="user.key | bitwiseAnd : 128" class="btn btn-default gliphicons-small" tooltip="purple key">
+                    <i class="glyphicon glyphicon-thumbs-up gliphicon-purple"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-xs-3 control-label">Bugdet</label>
+            <div class="col-xs-8">
+                <label class="control-label">0,00€</label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="email" class="col-xs-3 control-label">eMail</label>
+            <div class="col-xs-8">
+                <input type="email" name="email" id="email" class="form-control" ng-disabled="true" ng-model="user.email" required />
+                <span ng-show="form.email1.$dirty && form.email1.$error.required" class="help-block">eMail is required</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="firstName" class="col-xs-3 control-label">First name</label>
+            <div class="col-xs-8">
+                <input type="text" name="firstName" id="firstName" class="form-control" ng-model="user.firstName" required />
+                <span ng-show="form.firstName.$dirty && form.firstName.$error.required" class="help-block">First name is required</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="lastName" class="col-xs-3 control-label">Last name</label>
+            <i class="fa fa-key"></i>
+            <div class="col-xs-8">
+                <input type="text" name="lastName" id="lastName" class="form-control" ng-model="user.lastName" required />
+                <span ng-show="form.lastName.$dirty && form.lastName.$error.required" class="help-block">Last name is required</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="phone" class="col-xs-3 control-label">Phone number</label>
+            <i class="fa fa-key"></i>
+            <div class="col-xs-8">
+                <input type="text" name="phone" id="phone" class="form-control" ng-model="user.phone" required />
+                <span ng-show="form.phone.$dirty && form.phone.$error.required" class="help-block">Phone number is required</span>
+            </div>
+        </div>
+
+        <div class="form-group col-md-pull-8">
+            <button type="submit" ng-disabled="form.$invalid || profileUpdatePending" class="btn btn-success">Update profile</button>
+            <img ng-if="profileUpdatePending" src="images/loading.gif" >
+        </div>
+    </form>
+
+    <p>
+
+    </p>
+
+
+     <form name="passwordform" ng-submit="changepassword()" role="form" class="form-horizontal" >
+        <div class="form-group">
+            <label for="oldpassword" class="col-xs-3 control-label">Password</label>
+            <div class="col-xs-8">
+                <input type="password" name="oldpassword" id="oldpassword" class="form-control" ng-model="pwd.oldpassword" required />
+                <span ng-show="passwordform.oldpassword.$dirty && passwordform.oldpassword.$error.required" class="help-block">Old password is required</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="password" class="col-xs-3 control-label">New Password</label>
+            <div class="col-xs-8">
+                <input type="password" name="password" id="password" class="form-control" ng-model="pwd.password" required />
+                <span ng-show="passwordform.password.$dirty && passwordform.password.$error.required" class="help-block">Password is required</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="password2" class="col-xs-3 control-label"> Repeat new password</label>
+            <i class="fa fa-lock"></i>
+            <div class="col-xs-8">
+                <input type="password" name="password2" id="password2" class="form-control" ng-model="pwd.password2"  value-match="pwd.password" required />
+                <span class="msg-error " ng-show="passwordform.password2.$dirty && passwordform.password2.$error.unique">Passwords don't match.</span>
+            </div>
+        </div>
+
+        <div class="form-actions" class="col-xs-3 control-label">
+            <button type="submit" ng-disabled="passwordform.$invalid || passwordUpdatePending" class="btn btn-success">Change password</button>
+            <img ng-if="passwordUpdatePending" src="images/loading.gif" >
+        </div>
+    </form>
+
+    <p>
+
+    </p>
+</div>

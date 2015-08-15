@@ -1,0 +1,23 @@
+
+--------- Set nav-tabs center aligned
+
+.nav-tabs > li, .nav-pills > li {
+    float:none;
+    display:inline-block;
+    *display:inline; /* ie7 fix */
+     zoom:1; /* hasLayout ie7 trigger */
+}
+
+.nav-tabs, .nav-pills {
+    text-align:center;
+}
+
+
+.nav-pills > li.active > a {
+    background-color:red;
+}
+// This changes the color of the active
+
+.nav-pills>li.active>a:hover {
+    background-color:red;
+}

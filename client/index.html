@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head lang="en" >
+    <meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1" />
+    <title>RoseGuarden</title>
+
+    <link rel="stylesheet" type="text/css" href="./bower_components/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="./bower_components/flag-icon-css/css/flag-icon.css">
+    <link rel="stylesheet" type="text/css" href="./css/theme.css">
+    <link rel="stylesheet" type="text/css" href="./css/styles.css">
+    <link rel="stylesheet" type="text/css" href="./css/jumbotron-narrow.css">
+
+
+</head>
+
+  <body ng-app="RoseGuardenApp" ng-controller="ApplicationCtrl"  class="jumbotron-narrow">
+
+    <div class="container">
+        <div class="header">
+            <ul class ="nav nav-pills pull-right">
+                <li ng-class="{ active: isActive('/')}" >
+                    <a href="#/"> Home </a>
+                </li>
+                <li ng-class="{ active: isActive('/admin')}" ng-show="isLoggedIn && isAdmin">
+                    <a href="#admin"> Admin </a>
+                </li>
+                <li ng-hide="isLoggedIn">
+                    <a href="#login"> Login </a>
+                </li>
+                <li ng-show="isLoggedIn">
+                    <a href="#logout"> Logout </a>
+                </li>
+                <li ng-hide="isLoggedIn">
+                    <a href="#register"> Register </a>
+                </li>
+            </ul>
+            <p>
+
+            </p>
+        </div>
+
+        <div ng-view></div>
+
+    </div>
+
+    <div class="credits text-center">
+        <div>
+            <p>
+                (C) 2015 <a href="mailto:m.drobisch@googlemail">Marcus Drobisch</a>
+            </p>
+            <p>
+                Licence: Creative Commons <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/">CC-by-nc-sa</a>
+            </p>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="./bower_components/angularjs/angular.js"></script>
+    <script type="text/javascript" src="./bower_components/angular-route/angular-route.js"></script>
+    <script type="text/javascript" src="./bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+    <script type="text/javascript" src="./bower_components/angular-base64/angular-base64.js"></script>
+    <script type="text/javascript" src="./bower_components/lodash/dist/lodash.js"></script>
+    <script type="text/javascript" src="./bower_components/restangular/dist/restangular.js"></script>
+    <script type="text/javascript" src="./bower_components/angular-local-storage/angular-local-storage.js"></script>
+    <script type="text/javascript" src="./bower_components/angular-smart-table/dist/smart-table.js"></script>
+    <!--
+        <script src="//angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.13.2.js"></script>
+    -->
+    <script type="text/javascript" src="./js/main.js"></script>
+
+    <script type="text/javascript" src="js/directives/Match.js"></script>
+    <script type="text/javascript" src="js/directives/SmartTableRatio.js"></script>
+
+    <script type="text/javascript" src="js/filters/bitwiseAnd.js"></script>
+
+    <script type="text/javascript" src="./js/controllers/modal/RemoveUserCtrl.js"></script>
+
+
+    <script type="text/javascript" src="./js/controllers/ApplicationCtrl.js"></script>
+    <script type="text/javascript" src="./js/controllers/HomeCtrl.js"></script>
+    <script type="text/javascript" src="./js/controllers/HomeTabCtrl.js"></script>
+    <script type="text/javascript" src="./js/controllers/LoginCtrl.js"></script>
+    <script type="text/javascript" src="./js/controllers/LogoutCtrl.js"></script>
+    <script type="text/javascript" src="./js/controllers/AdminSpaceCtrl.js"></script>
+    <script type="text/javascript" src="./js/controllers/AdminTabCtrl.js"></script>
+    <script type="text/javascript" src="./js/controllers/RegisterCtrl.js"></script>
+    <script type="text/javascript" src="./js/controllers/LostPasswordCtrl.js"></script>
+    <script type="text/javascript" src="./js/controllers/UserProfileCtrl.js"></script>
+    <script type="text/javascript" src="js/controllers/admin/AdminUsersCtrl.js"></script>
+    <script type="text/javascript" src="js/controllers/admin/AdminDoorsCtrl.js"></script>
+    <script type="text/javascript" src="js/controllers/admin/AdminLogCtrl.js"></script>
+
+
+
+    <script type="text/javascript" src="./js/services/AuthService.js"></script>
+
+    <script type="text/javascript" src="./js/factories/Session.js"></script>
+    <script type="text/javascript" src="./js/factories/Door.js"></script>
+    <script type="text/javascript" src="./js/factories/User.js"></script>
+    <script type="text/javascript" src="./js/factories/OpeningRequest.js"></script>
+    <script type="text/javascript" src="./js/factories/PasswordRequest.js"></script>
+
+
+  </body>
+</html>

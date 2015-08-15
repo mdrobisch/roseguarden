@@ -1,0 +1,24 @@
+<div class="jumbotron">
+
+    <h2>Admin-page</h2>
+
+    <img src="images/RoseGuarden.png" height="180" alt="" class="center-block" >
+
+</div>
+
+<div ng-controller="AdminTabCtrl" class="nav nav-tabs center-block centered-pills" >
+    <ul class ="nav nav-pills">
+        <li ng-repeat="tab in tabs"
+            ng-class="{active:tab.active}"
+            ng-click="onClickTab(tab)">
+            <a>
+                <i class="glyphicon {{tab.glyphicon}}"></i> <br>
+                {{tab.title}}
+            </a>
+        </li>
+    </ul>
+    <div>
+        <div ng-include="currentTab.template"></div>
+    </div>
+
+</div>

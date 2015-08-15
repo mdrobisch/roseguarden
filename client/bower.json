@@ -1,0 +1,26 @@
+{
+  "name": "client",
+  "version": "0.0.0",
+  "authors": [
+    "Marcus Drobisch <m.drobisch@googlemail.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular-route": "~1.2.21",
+    "angular-bootstrap": "~0.13.0",
+    "bootstrap": "~3.2.0",
+    "restangular": "~1.4.0",
+    "angularjs": "~1.4.0",
+    "angular-local-storage": "~0.0.7",
+    "angular-smart-table": "~2.1.0",
+    "flag-icon-css": "~0.7.1"
+
+  }
+}
