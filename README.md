@@ -8,6 +8,13 @@ Quickstart
 
 start the HTTPServer with  `python -m SimpleHTTPServer 8000`
 
+Screenshots
+===========
+
+![doors](documentation/screenshots/admin_doors.png)
+
+![users](documentation/screenshots/admin_users.png)
+
 License
 =======
 
