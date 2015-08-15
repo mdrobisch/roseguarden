@@ -18,4 +18,4 @@ Screenshots
 License
 =======
 
-RoseGuarden is published under the terms of the GPL v3 license. See LICENSE.
+RoseGuarden is published under the terms of the GPL v3 license. See [LICENSE](LICENSE).
