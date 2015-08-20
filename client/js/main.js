@@ -37,7 +37,10 @@ RoseGuardenApp.run(function($location, Restangular, AuthService) {
 RoseGuardenApp.config(function($routeProvider, RestangularProvider) {
 
     //RestangularProvider.setBaseUrl('http://localhost:5000');
-    RestangularProvider.setBaseUrl('http://localhost:5000');
+
+    console.log(window.location.hostname);
+    RestangularProvider.setBaseUrl('http://' + window.location.hostname + ':5000');
+    //RestangularProvider.setBaseUrl('http://localhost:5000');
 
 
     var redirectIfAuthenticated = function(route) {

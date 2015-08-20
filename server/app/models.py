@@ -15,8 +15,14 @@ class User(db.Model):
     phone = db.Column(db.Text)
     role = db.Column(db.Integer)
     cardID = db.Column(db.Text)
+    cardPassword = db.Column(db.Text)
     license = db.Column(db.Integer)
     key = db.Column(db.Integer)
+    validKeyTimeStart = db.Column(db.DateTime)
+    validKeyTimeEnd = db.Column(db.DateTime)
+    validKeyPeriodStart = db.Column(db.DateTime)
+    validKeyPeriodEnd = db.Column(db.DateTime)
+    validKeyDays = db.Column(db.Integer)
     def __repr__(self):
         return '<User %r>' % self.email
     def __init__(self, email, password, firstName, lastName, role = 0,phone = '0',license = 0, key = 0):

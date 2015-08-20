@@ -1,1 +1,44 @@
-Log for user coming soon.
+<div ng-controller="UserLogCtrl">
+
+    <table st-table="displayedCollection" st-safe-src="rowCollection" class="table table-striped"">
+        <thead >
+            <tr>
+                <th st-sort="date">date</th>
+                <th st-sort="name">name</th>
+                <th st-sort="type">type</th>
+                <th st-sort="username">user</th>
+            </tr>
+            <tr>
+                <th colspan="4"><input st-search="" class="form-control" placeholder="global search ..." type="text"/></th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr st-select-row="row" st-select-mode="single" ng-repeat="row in displayedCollection">
+                <td>{{row.date | date:'yyyy-MM-dd HH:mm'}}</td>
+                <td>{{row.name}}</td>
+                <td>
+                    {{row.type}}
+                    <i ng-show="row.authentificationType == 0" class="glyphicon glyphicon-phone" tooltip="web authentification"></i>
+                    <i ng-show="row.authentificationType == 1" class="glyphicon glyphicon-credit-card" tooltip="card authentification."></i>
+                </td>
+                <td>
+                    <span>{{row.username}}</span>
+                    <a href="mailto:{{row.usermail}}" class="btn btn-default gliphicons" >
+                        <i class="glyphicon glyphicon-envelope"></i>
+                    </a>
+                </td>
+
+            </tr>
+        </tbody>
+
+        <tfoot>
+            <tr>
+                <td colspan="4" class="text-center">
+                    <div st-pagination="" st-items-by-page="itemsByPage" st-displayed-pages="7"></div>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+
+</div>

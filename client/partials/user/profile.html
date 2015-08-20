@@ -10,11 +10,6 @@
 
     <form name="form" ng-submit="updateProfile()" role="form" class="form-horizontal" >
 
-
-        <div class="form-group" ng-show="user.license">
-            <label class="col-xs-3 control-label">Licenses</label>
-        </div>
-
         <div class="form-group">
             <label class="col-xs-3 control-label center-block">Keys</label>
             <div class="col-xs-8">
@@ -44,6 +39,37 @@
                 </a>
             </div>
         </div>
+
+
+        <div class="form-group">
+            <label class="col-xs-3 control-label">Valid period</label>
+            <div class="col-xs-8">
+                <label class="control-label">10.08.2015 - 31.12.2018</label>
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <label class="col-xs-3 control-label">Valid days</label>
+            <div class="col-xs-8">
+                <label class="control-label">Mo, Th, We, Sa, Su</label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-xs-3 control-label">Valid time</label>
+            <div class="col-xs-8">
+                <label class="control-label">18:00 - 20:00</label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-xs-3 control-label">Licenses</label>
+            <div class="col-xs-8" ng-hide="user.license">
+                <label class="control-label">-</label>
+            </div>
+        </div>
+
 
         <div class="form-group">
             <label class="col-xs-3 control-label">Bugdet</label>

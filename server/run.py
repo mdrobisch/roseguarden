@@ -11,7 +11,7 @@ backgroundWorker.run()
 
 # running the flask app
 #app.run('0.0.0.0')
-app.run()
+app.run('0.0.0.0')
 
 # after exiting the app, cancel the backgroundowrker
 backgroundWorker.cancel()
