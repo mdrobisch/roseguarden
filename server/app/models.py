@@ -18,11 +18,12 @@ class User(db.Model):
     cardPassword = db.Column(db.Text)
     license = db.Column(db.Integer)
     key = db.Column(db.Integer)
-    validKeyTimeStart = db.Column(db.DateTime)
-    validKeyTimeEnd = db.Column(db.DateTime)
-    validKeyPeriodStart = db.Column(db.DateTime)
-    validKeyPeriodEnd = db.Column(db.DateTime)
+    validKeyDateTimeStart = db.Column(db.DateTime)
+    validKeyDateTimeEnd = db.Column(db.DateTime)
     validKeyDays = db.Column(db.Integer)
+    lastLoginDateTime = db.Column(db.DateTime)
+    registerDateTime = db.Column(db.DateTime)
+
     def __repr__(self):
         return '<User %r>' % self.email
     def __init__(self, email, password, firstName, lastName, role = 0,phone = '0',license = 0, key = 0):
@@ -35,6 +36,9 @@ class User(db.Model):
         self.phone = phone
         self.key = key
         self.licenseM = license
+        self.validKeyDateTimeStart = (datetime.datetime.today()).replace(hour=0,minute=0,second=0,microsecond=0)
+        self.validKeyDateTimeEnd = (datetime.datetime.today() + datetime.timedelta(365*15)).replace(hour=23, minute=59, second=0, microsecond=0)
+        self.lastLoginDateTime = datetime.datetime.min
 
 class Setting(db.Model):
     id = db.Column(db.Integer, primary_key=True)
