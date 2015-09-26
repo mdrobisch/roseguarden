@@ -39,11 +39,13 @@ The hardware consists of the following electronics mounted on a board.
 - a RFID-reader (e.g. RC552): reading and writing the tags
 - a relay-module: controling the door-openers
 - a dc-dc-converter: supplying the control unit
+- a micro-usb cable of 30cm length: connect dc-dc-converter to the control unit
+- some internal cable: e.g. from dc-dc converter tp the relay module
 
 Case and Mounting
 -----------------
 
-The case ist modeled with the powerful open source software FreeCAD. Have a look in the hardware folder for the current stable version of the board and its case. It is designed to be 3d-printed with dimensions of 145mm x 145mm. The design uses suckers to mount the device to windows or doors. With a few modifications you can also use screws for a more stable mounting. Be aware that the RFID-Signal could only reach throw 30mm non-metallic walls or glass. 
+The case ist modeled with the powerful open source software FreeCAD. Have a look in the hardware folder for the current stable version of the board and its case. It is designed to be 3d-printed with dimensions of 145mm x 145mm x 60mm. The design uses suckers to mount the device to windows or doors. With a few modifications you can also use screws for a more stable mounting. Be aware that the RFID-communication could only reach throw about 30mm non-metallic walls or glass (+ aboout 20mm rfid-module-to-wall distance). 
 
 ![freecad](documentation/screenshots/freecad_raspberry_plate_model_v4.png) 
 
