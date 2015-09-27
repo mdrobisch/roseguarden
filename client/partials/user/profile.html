@@ -13,53 +13,60 @@
         <div class="form-group">
             <label class="col-xs-3 control-label center-block">Keys</label>
             <div class="col-xs-8">
-                <a ng-show="user.key | bitwiseAnd : 1" class="btn btn-default gliphicons-small" tooltip="red key" >
+                <a ng-show="user.key | bitwiseAndFilter : 1" class="btn btn-default gliphicons-small" tooltip="red key" >
                     <i class="glyphicon glyphicon-thumbs-up gliphicon-red" ></i>
                 </a>
-                <a ng-show="user.key | bitwiseAnd : 2" class="btn btn-default gliphicons-small" tooltip="green key">
+                <a ng-show="user.key | bitwiseAndFilter : 2" class="btn btn-default gliphicons-small" tooltip="green key">
                     <i class="glyphicon glyphicon-thumbs-up gliphicon-green" ></i>
                 </a>
-                <a ng-show="user.key | bitwiseAnd : 4" class="btn btn-default gliphicons-small" tooltip="black key">
+                <a ng-show="user.key | bitwiseAndFilter : 4" class="btn btn-default gliphicons-small" tooltip="black key">
                     <i class="glyphicon glyphicon-thumbs-up gliphicon-black" ></i>
                 </a>
-                <a ng-show="user.key | bitwiseAnd : 8" class="btn btn-default gliphicons-small" tooltip="pink key">
+                <a ng-show="user.key | bitwiseAndFilter : 8" class="btn btn-default gliphicons-small" tooltip="pink key">
                     <i class="glyphicon glyphicon-thumbs-up gliphicon-pink" ></i>
                 </a>
-                <a ng-show="user.key | bitwiseAnd : 16" class="btn btn-default gliphicons-small" tooltip="marine key">
+                <a ng-show="user.key | bitwiseAndFilter : 16" class="btn btn-default gliphicons-small" tooltip="marine key">
                     <i class="glyphicon glyphicon-thumbs-up gliphicon-marine"></i>
                 </a>
-                <a ng-show="user.key | bitwiseAnd : 32" class="btn btn-default gliphicons-small" tooltip="orange key">
+                <a ng-show="user.key | bitwiseAndFilter : 32" class="btn btn-default gliphicons-small" tooltip="orange key">
                     <i class="glyphicon glyphicon-thumbs-up gliphicon-orange"></i>
                 </a>
-                <a ng-show="user.key | bitwiseAnd : 64" class="btn btn-default gliphicons-small" tooltip="olive key">
+                <a ng-show="user.key | bitwiseAndFilter : 64" class="btn btn-default gliphicons-small" tooltip="olive key">
                     <i class="glyphicon glyphicon-thumbs-up gliphicon-olive"></i>
                 </a>
-                <a  ng-show="user.key | bitwiseAnd : 128" class="btn btn-default gliphicons-small" tooltip="purple key">
+                <a  ng-show="user.key | bitwiseAndFilter : 128" class="btn btn-default gliphicons-small" tooltip="purple key">
                     <i class="glyphicon glyphicon-thumbs-up gliphicon-purple"></i>
                 </a>
             </div>
         </div>
 
-
         <div class="form-group">
-            <label class="col-xs-3 control-label">Valid period</label>
+            <label class="col-xs-3 control-label">Access type</label>
             <div class="col-xs-8">
-                <label class="control-label">10.08.2015 - 10.08.2030</label>
+                <label class="control-label" > {{user.accessType | accessTypeFilter}} </label>
             </div>
         </div>
 
 
         <div class="form-group">
-            <label class="col-xs-3 control-label">Valid days</label>
+            <label class="col-xs-3 control-label">Accessable period</label>
             <div class="col-xs-8">
-                <label class="control-label">Mo, Th, We, Sa, Su</label>
+                <label class="control-label"> {{user.accessDateStart }} - {{user.accessDateEnd }}</label>
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <label class="col-xs-3 control-label">Accessable days</label>
+            <div class="col-xs-8">
+                <label class="control-label">{{user.accessDays | weekdaysBitwiseFilter}}</label>
             </div>
         </div>
 
         <div class="form-group">
-            <label class="col-xs-3 control-label">Valid time</label>
+            <label class="col-xs-3 control-label">Accesable time</label>
             <div class="col-xs-8">
-                <label class="control-label">00:00 - 23:59</label>
+                <label class="control-label">{{user.accessTimeStart }} - {{user.accessTimeEnd }}</label>
             </div>
         </div>
 
@@ -74,7 +81,7 @@
         <div class="form-group">
             <label class="col-xs-3 control-label">Bugdet</label>
             <div class="col-xs-8">
-                <label class="control-label">0,00€</label>
+                <label class="control-label">{{user.budget }} €</label>
             </div>
         </div>
 

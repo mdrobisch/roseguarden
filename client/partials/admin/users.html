@@ -54,33 +54,33 @@
                         <br>
 
                         (
-                        <span ng-show="row.validationDaysMask | bitwiseAnd : 1">Mo</span>
-                        <span ng-show="row.validationDaysMask | bitwiseAnd : 2">Tu</span>
-                        <span ng-show="row.validationDaysMask | bitwiseAnd : 4">We</span>
-                        <span ng-show="row.validationDaysMask | bitwiseAnd : 8">Th</span>
-                        <span ng-show="row.validationDaysMask | bitwiseAnd : 16">Fr</span>
-                        <span ng-show="row.validationDaysMask | bitwiseAnd : 32">Sa</span>
-                        <span ng-show="row.validationDaysMask | bitwiseAnd : 64">Su</span>
+                        <span ng-show="row.validationDaysMask | bitwiseAndFilter : 1">Mo</span>
+                        <span ng-show="row.validationDaysMask | bitwiseAndFilter : 2">Tu</span>
+                        <span ng-show="row.validationDaysMask | bitwiseAndFilter : 4">We</span>
+                        <span ng-show="row.validationDaysMask | bitwiseAndFilter : 8">Th</span>
+                        <span ng-show="row.validationDaysMask | bitwiseAndFilter : 16">Fr</span>
+                        <span ng-show="row.validationDaysMask | bitwiseAndFilter : 32">Sa</span>
+                        <span ng-show="row.validationDaysMask | bitwiseAndFilter : 64">Su</span>
                         )
                 </td>
                 <td>
-                        <i ng-show="row.licenseMask | bitwiseAnd : 1"  class="glyphicon glyphicon-credit-card gliphicon-red" tooltip="red licence"></i>
-                        <i ng-show="row.licenseMask | bitwiseAnd : 2"  class="glyphicon glyphicon-credit-card gliphicon-green" tooltip="green licence"></i>
-                        <i ng-show="row.licenseMask | bitwiseAnd : 4"  class="glyphicon glyphicon-credit-card gliphicon-black" tooltip="black licence"></i>
-                        <i ng-show="row.licenseMask | bitwiseAnd : 8"  class="glyphicon glyphicon-credit-card gliphicon-pink" tooltip="pink licence"></i>
-                        <i ng-show="row.licenseMask | bitwiseAnd : 16"  class="glyphicon glyphicon-credit-card gliphicon-marine" tooltip="marine licence"></i>
-                        <i ng-show="row.licenseMask | bitwiseAnd : 32"  class="glyphicon glyphicon-credit-card gliphicon-orange" tooltip="orange licence"></i>
-                        <i ng-show="row.licenseMask | bitwiseAnd : 64"  class="glyphicon glyphicon-credit-card gliphicon-olive" tooltip="olive licence"></i>
-                        <i ng-show="row.licenseMask | bitwiseAnd : 128"  class="glyphicon glyphicon-credit-card gliphicon-purple" tooltip="purple licence"></i>
+                        <i ng-show="row.licenseMask | bitwiseAndFilter : 1"  class="glyphicon glyphicon-credit-card gliphicon-red" tooltip="red licence"></i>
+                        <i ng-show="row.licenseMask | bitwiseAndFilter : 2"  class="glyphicon glyphicon-credit-card gliphicon-green" tooltip="green licence"></i>
+                        <i ng-show="row.licenseMask | bitwiseAndFilter : 4"  class="glyphicon glyphicon-credit-card gliphicon-black" tooltip="black licence"></i>
+                        <i ng-show="row.licenseMask | bitwiseAndFilter : 8"  class="glyphicon glyphicon-credit-card gliphicon-pink" tooltip="pink licence"></i>
+                        <i ng-show="row.licenseMask | bitwiseAndFilter : 16"  class="glyphicon glyphicon-credit-card gliphicon-marine" tooltip="marine licence"></i>
+                        <i ng-show="row.licenseMask | bitwiseAndFilter : 32"  class="glyphicon glyphicon-credit-card gliphicon-orange" tooltip="orange licence"></i>
+                        <i ng-show="row.licenseMask | bitwiseAndFilter : 64"  class="glyphicon glyphicon-credit-card gliphicon-olive" tooltip="olive licence"></i>
+                        <i ng-show="row.licenseMask | bitwiseAndFilter : 128"  class="glyphicon glyphicon-credit-card gliphicon-purple" tooltip="purple licence"></i>
 
-                        <i ng-show="row.keyMask | bitwiseAnd : 1"  class="glyphicon glyphicon-thumbs-up gliphicon-red" tooltip="red key"></i>
-                        <i ng-show="row.keyMask | bitwiseAnd : 2"  class="glyphicon glyphicon-thumbs-up gliphicon-green" tooltip="green key"></i>
-                        <i ng-show="row.keyMask | bitwiseAnd : 4"  class="glyphicon glyphicon-thumbs-up gliphicon-black" tooltip="black key"></i>
-                        <i ng-show="row.keyMask | bitwiseAnd : 8"  class="glyphicon glyphicon-thumbs-up gliphicon-pink" tooltip="pink key"></i>
-                        <i ng-show="row.keyMask | bitwiseAnd : 16"  class="glyphicon glyphicon-thumbs-up gliphicon-marine" tooltip="marine key"></i>
-                        <i ng-show="row.keyMask | bitwiseAnd : 32"  class="glyphicon glyphicon-thumbs-up gliphicon-orange" tooltip="orange key"></i>
-                        <i ng-show="row.keyMask | bitwiseAnd : 64"  class="glyphicon glyphicon-thumbs-up gliphicon-olive" tooltip="olive key"></i>
-                        <i ng-show="row.keyMask | bitwiseAnd : 128"  class="glyphicon glyphicon-thumbs-up gliphicon-purple" tooltip="purple key"></i>
+                        <i ng-show="row.keyMask | bitwiseAndFilter : 1"  class="glyphicon glyphicon-thumbs-up gliphicon-red" tooltip="red key"></i>
+                        <i ng-show="row.keyMask | bitwiseAndFilter : 2"  class="glyphicon glyphicon-thumbs-up gliphicon-green" tooltip="green key"></i>
+                        <i ng-show="row.keyMask | bitwiseAndFilter : 4"  class="glyphicon glyphicon-thumbs-up gliphicon-black" tooltip="black key"></i>
+                        <i ng-show="row.keyMask | bitwiseAndFilter : 8"  class="glyphicon glyphicon-thumbs-up gliphicon-pink" tooltip="pink key"></i>
+                        <i ng-show="row.keyMask | bitwiseAndFilter : 16"  class="glyphicon glyphicon-thumbs-up gliphicon-marine" tooltip="marine key"></i>
+                        <i ng-show="row.keyMask | bitwiseAndFilter : 32"  class="glyphicon glyphicon-thumbs-up gliphicon-orange" tooltip="orange key"></i>
+                        <i ng-show="row.keyMask | bitwiseAndFilter : 64"  class="glyphicon glyphicon-thumbs-up gliphicon-olive" tooltip="olive key"></i>
+                        <i ng-show="row.keyMask | bitwiseAndFilter : 128"  class="glyphicon glyphicon-thumbs-up gliphicon-purple" tooltip="purple key"></i>
 
 
                 </td>

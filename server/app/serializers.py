@@ -3,10 +3,27 @@ __author__ = 'drobisch'
 from flask_restful import Resource
 from models import User
 from marshmallow import Serializer, fields
+import datetime
 
 class UserSerializer(Serializer):
-    class Meta:
-        fields = ("id", "email", "firstName", "lastName", "phone", "role", "license", "key")
+    id = fields.Integer()
+    email = fields.String()
+    firstName = fields.String()
+    lastName = fields.String()
+    phone = fields.String()
+    role = fields.Integer()
+    license = fields.Integer()
+    key = fields.Integer()
+    accessDateStart = fields.DateTime("%d.%m.%Y")
+    accessDateEnd = fields.DateTime("%d.%m.%Y")
+    accessTimeStart = fields.DateTime("%H:%M")
+    accessTimeEnd = fields.DateTime("%H:%M")
+    accessType = fields.Integer()
+    accessDays = fields.Integer()
+    budget = fields.Float()
+    #class Meta:
+    #    fields = ("id", "email", "firstName", "lastName", "phone", "role", "license", "key", "accessDateTimeStart", "accessType")
+    #    dateformat = "%Y "
 
 class SessionInfoSerializer(Serializer):
     class Meta:

@@ -18,11 +18,16 @@ class User(db.Model):
     cardPassword = db.Column(db.Text)
     license = db.Column(db.Integer)
     key = db.Column(db.Integer)
-    validKeyDateTimeStart = db.Column(db.DateTime)
-    validKeyDateTimeEnd = db.Column(db.DateTime)
-    validKeyDays = db.Column(db.Integer)
+    accessType = db.Column(db.Integer)
+    accessDateStart = db.Column(db.DateTime)
+    accessDateEnd = db.Column(db.DateTime)
+    accessTimeStart = db.Column(db.DateTime)
+    accessTimeEnd = db.Column(db.DateTime)
+    accessDays = db.Column(db.Integer)
+    accessDayCounter = db.Column(db.Integer)
     lastLoginDateTime = db.Column(db.DateTime)
     registerDateTime = db.Column(db.DateTime)
+    budget = db.Column(db.Float)
 
     def __repr__(self):
         return '<User %r>' % self.email
@@ -35,10 +40,17 @@ class User(db.Model):
         self.lastName = lastName
         self.phone = phone
         self.key = key
-        self.licenseM = license
-        self.validKeyDateTimeStart = (datetime.datetime.today()).replace(hour=0,minute=0,second=0,microsecond=0)
-        self.validKeyDateTimeEnd = (datetime.datetime.today() + datetime.timedelta(365*15)).replace(hour=23, minute=59, second=0, microsecond=0)
-        self.lastLoginDateTime = datetime.datetime.min
+        self.license = license
+        self.accessDays = 127
+        self.accessType = 0
+        self.accessDateStart = (datetime.datetime.today()).replace(hour=0, minute=0, second=0, microsecond=0)
+        self.accessDateEnd = (datetime.datetime.today() + datetime.timedelta(365*15)).replace(hour=0,minute=0,second=0,microsecond=0)
+        self.accessTimeStart = datetime.datetime.today().replace(hour= 6, minute= 0, second=0, microsecond=0)
+        self.accessTimeEnd = datetime.datetime.today().replace(hour= 22, minute= 30, second=0, microsecond=0)
+        self.lastLoginDateTime = datetime.datetime.today()
+        self.registerDateTime = datetime.datetime.today()
+        self.budget = 0.00;
+
 
 class Setting(db.Model):
     id = db.Column(db.Integer, primary_key=True)
