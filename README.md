@@ -62,14 +62,15 @@ We recommend the following devices, to use on the provided case:
 - RC552 rfid reader, including 2 rfid-tags (found on ebay from various distributors from about 3€ per piece)
 - SainSmart 2 ch. relay module or compatible (found on ebay from various distributors and producers from about 3€ per piece)
 - the 3d-printed case on below
-
-additional for mounting and connecting (depending on your needs):
-
 - 4 x M2 and 10 x M3 screws to mount the electronic to the case
-- some cable with at least 3 wires @ 1A (found on pollin, reichelt, digikey or your laocal electronic store)
 
+additional for connecting and supllying the device:
+
+- some cable with at least 3 wires @ 1A (found on pollin, reichelt, digikey or your laocal electronic store)
 - a ethernet-patch-cable (found on pollin, reichelt, digikey or your laocal electronic store)
 - or a wifi-dongle (found on pollin, reichelt, digikey or your laocal electronic store)
+
+additional for mounting the device on walls or doors:
 
 - suckers with 40mm diameter and M4-bolts (found on ebay from various distributors from about 7€ per 10 pieces)
 - or glue tape for mounting

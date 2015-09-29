@@ -20,6 +20,7 @@ class UserSerializer(Serializer):
     accessTimeEnd = fields.DateTime("%H:%M")
     accessType = fields.Integer()
     accessDays = fields.Integer()
+    accessDayCounter = fields.Integer()
     budget = fields.Float()
     #class Meta:
     #    fields = ("id", "email", "firstName", "lastName", "phone", "role", "license", "key", "accessDateTimeStart", "accessType")
