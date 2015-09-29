@@ -48,7 +48,7 @@
         </div>
 
 
-        <div class="form-group">
+        <div class="form-group" ng-show="user.accessType == 1">
             <label class="col-xs-3 control-label">Accessable period</label>
             <div class="col-xs-8">
                 <label class="control-label"> {{user.accessDateStart }} - {{user.accessDateEnd }}</label>
@@ -57,21 +57,21 @@
 
 
 
-        <div class="form-group">
+        <div class="form-group" ng-show="user.accessType == 2">
             <label class="col-xs-3 control-label">Access. day bugdet</label>
             <div class="col-xs-8">
                 <label class="control-label">{{user.accessDayCounter}} days</label>
             </div>
         </div>
 
-        <div class="form-group">
+        <div class="form-group" ng-show="user.accessType != 0">
             <label class="col-xs-3 control-label">Accessable days</label>
             <div class="col-xs-8">
                 <label class="control-label">{{user.accessDays | weekdaysBitwiseFilter}}</label>
             </div>
         </div>
 
-        <div class="form-group">
+        <div class="form-group" ng-show="user.accessType != 0">
             <label class="col-xs-3 control-label">Accesable time</label>
             <div class="col-xs-8">
                 <label class="control-label">{{user.accessTimeStart }} - {{user.accessTimeEnd }}</label>
