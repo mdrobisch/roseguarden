@@ -11,7 +11,7 @@ RoseGuardenApp.filter('accessTypeFilter', function () {
                 return "Access period"
             case 2:
                 return "Access days"
-            case 2:
+            case 3:
                 return "Lifetime access"
             default:
                 return "Invalid type";

@@ -11,7 +11,7 @@ from worker import backgroundWorker
 from sqlalchemy.exc import IntegrityError
 import base64
 import controller
-
+import datetime
 
 @auth.verify_password
 def verify_password(email, password):
@@ -133,8 +133,25 @@ class LostPasswordView(Resource):
 class OpeningRequestView(Resource):
     @auth.login_required
     def post(self):
-        backgroundWorker.requestOpening = True
         print 'Opening request received'
+        # check for invalid accessType == no access
+        if g.user.accessType == 0 or g.user.accessType > 3:
+            print 'invalid access because of access type'
+            return '', 201
+        # check start-date and end-date for accessType == period
+        if g.user.accessType == 1:
+            if g.user.accessDateStart > datetime.datetime.now():
+                print 'invalid access because of DateStart'
+                return '', 201
+            if g.user.accessDateEnd < datetime.datetime.now():
+                print 'invalid access because of DateEnd'
+                return '', 201
+        # check day counter for accessType == day-budget
+        if g.user.accessType == 2:
+            if g.user.accessDayCounter <= 0:
+                print 'invalid access because of day-counter'
+                return '', 201
+        backgroundWorker.requestOpening = True
         return '', 201
 
 
