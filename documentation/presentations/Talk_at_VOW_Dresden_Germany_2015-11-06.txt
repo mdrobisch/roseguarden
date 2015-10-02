@@ -1,0 +1,56 @@
+Thema: Sichern, Verwalten, Zahlen - Multifunktionale Zutrittskontrolle, Geräteverwaltung, und Bezahlfunktion.
+
+Datum: 5.11.2015,  
+Uhrzeit Teil 1: 10-12 Uhr - Überblick zum Thema (Vorträge)
+Uhrzeit Teil 2: 14-16 Uhr - Zusammenarbeit koordinieren und diskutieren (Diskussion, Workshop) 
+Teilnehmerzahl: 10-15 max.
+
+Kurzbeschreibung:
+Für viel FabLabs, offenen Werkstätten und Spaces ist eine geeignete Zutrittskontrolle
+einer der ersten Herausforderungen ihrer Infrastruktur. Einen günstigen Schlüsseldienst, Schlüsseltresore oder kreative Geheimplätze
+kennt daher fast jede Gemeinschaft. Elektronische Lösungen bieten hier deutlich mehr Flexibilität. Wer jedoch kein großen Budget  
+für ein komerzielles System finanzieren kann, verwirft diese Option oft wieder. In einigen Werkstätten haben sich daher  
+Hacker und Bastler, diesem Thema mit eigenen Entwicklungen angenommen. So bevölkern bereits viele verschiedene Lösungen den Kreativ-Raum.
+
+In der Vortrags- und Diskussionsrunde zum Verbundstreffen, soll dieses facettenreiche Thema zusammen betrachtet werden.
+Im ersten Teil werden die Möglichkeiten von Systemen aufgezeigt. Versicherungstechnische und oragnisatorische Belange als auch Randbedingungen 
+kurz beleuchtet, um anschließend ausgewählte bestehenden Lösungen vorzustellen. Sowohl für Gastredner, welche ihre Projekte selbst vorstellen 
+können, als auch für eine kurze Diskussion der Lösungen wird hier Raum geboten.
+Nach einer ausgiebigen Mittagspause sollen anschließend im zweiten Teil die Möglichkeiten einer Zusammenarbeit ausgelotet werden. 
+Hier gilt es zunächst die Notwendigkeiten, Ansprüche und Möglichkeiten zu diskutieren. Später sollen erste Vorschläge und Ideen zur 
+Zusammenarbeit bzw. zur konkreten Umsetzung gesammelt werden. 
+Abschließend wird die Gesprächsrunde mit einer Auflistung der nächsten Schritte und einem kurzen Wrap Up geschloßen.
+
+Ziele:
+ - Hilfestellung bzw. Anlaufpunkt für Mitglieder des Verbundes und anderer Vereine/Gemeinschaften zum Thema
+ - Zusammenführen von allgemeinen Information zu Zutrittskontrollen in einer Übersicht
+ - Diskussion und Zusammenführen der rechtlichen, versicherungstechnischen und organisatorischen Randbedingungen
+ - Vernetzung der Komptenzen der Arbeitsgruppen im Verbund offener Werkstätten
+ - Diskussion der Möglichkeiten zur Zusammenarbeit sowie ggf, deren Planung
+ 
+Zielgruppe:
+ - Mitglieder offener Werkstätten, FabLabs und CoWorking-Spaces
+ - Interessierte zum Thema Zutrittskontrollen z.B. Vereine oder StartUps
+ - alle anderen Hacker/Bastler/Tüftler mit Interesse zu den Themen Raspberry Pi, Web-Systemen, RFID, 3D-Druck
+
+Agenda (Vorschlag / Bitte Änderungswünsche zusenden):
+ - Einleitende Worte
+ - Problemstellung
+   - Allgemeine Ziele
+   - Rechtliche und Sicherheits- bzw. Versicherungstechnische Aspkete
+   - Komerziell, Selbstbau oder Open Source  
+ - Bestehende Lösungen
+   - Kriterien zur Gegenüberstellung
+   - Übersicht der komerziellen Lösungen
+   - Übersicht der freien Lösungen (Werkstätten/FabLabs)
+ - Gastvorstellungen
+ - Vorstellung RoseGuarden
+ - Möglichkeiten der Zusammenarbeit
+   - Diskussion der Notwendigkeit einer gemeinsamen Lösung
+   - Vernetzung der Arbeitsgruppen/Kompetenzen im Verbund offener Werkstätten
+   - Möglichkeiten zur Verschmelzung/Wiederverwendung von Projekten/Projektteilen
+   - Erarbeitung einer gemeinsamen Kommunikations- und Arbeitsplattform
+   - Erarbeiten einer gemeinsamen Zielstellung / Wunschliste
+   - Technische Lösungsvorschläge / Eingrenzung des Problemfeldes
+ - Absichten festhalten und nächste Schritte diskutieren
+ - Resüme / Wrap-Up
