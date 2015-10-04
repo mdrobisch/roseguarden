@@ -29,8 +29,33 @@ class User(db.Model):
     registerDateTime = db.Column(db.DateTime)
     budget = db.Column(db.Float)
 
+    def checkUserAccessPrivleges(self):
+        # check for invalid accessType == no access
+        if self.accessType == 0 or self.accessType > 3:
+            return 'invalid access because of access type'
+        # check start-date and end-date for accessType == period
+        if self.accessType == 1:
+            if self.accessDateStart > datetime.datetime.now():
+                return 'invalid access because of DateStart'
+            if self.accessDateEnd < datetime.datetime.now():
+                return 'invalid access because of DateEnd'
+        # check day counter for accessType == day-budget
+        if self.accessType == 2:
+            if self.accessDayCounter <= 0:
+                return 'invalid access because of day-counter'
+        if (int(1 << datetime.datetime.now().weekday()) & self.accessDays) == 0:
+            return 'invalid access because of access weekdays'
+        if self.accessTimeStart.time() > datetime.datetime.now().time():
+            return 'invalid access because of TimeStart'
+        if self.accessTimeEnd.time() < datetime.datetime.now().time():
+            return 'invalid access because of TimeEnd'
+
+
+        return "access granted"
+
     def __repr__(self):
         return '<User %r>' % self.email
+
     def __init__(self, email, password, firstName, lastName, role = 0,phone = '0',license = 0, key = 0):
         self.phone = phone
         self.role = role;
