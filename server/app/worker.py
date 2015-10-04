@@ -4,13 +4,19 @@ from models import User
 from server import app
 import threading
 import os
+from GPIO import GPIO
+from GPIO import GPIOMockup
 
 class BackgroundWorker():
     def __init__(self, app):
+        # initialize worker variables
         self.app = app
         self.requestOpening = False;
         self.openingTimer = -1;
 
+        # setup gpio and set default (Low)
+        GPIO.setup(7,GPIO.OUT)
+        GPIO.output(7, GPIO.LOW)
 
     def run(self):
         if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
