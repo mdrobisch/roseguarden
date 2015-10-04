@@ -38,10 +38,13 @@ class BackgroundWorker():
 
         if self.openingTimer >= 0:
             print "Opened door cycle" + "("  + ")"
+            GPIO.output(7, GPIO.HIGH)
             self.openingTimer += 1
             if self.openingTimer >= 5:
                 self.openingTimer = -1
                 print "Closing door"
+                GPIO.output(7, GPIO.LOW)
+
         #else:
             #print "Closing door"
 
