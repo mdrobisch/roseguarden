@@ -64,9 +64,9 @@ class GPIOWrapper:
 
     def output(self, channel, state):
         if (state == self.HIGH):
-            print "GPIO: Set " + channel + " (HIGH)"
+            print "GPIO: Set " + str(channel) + " (HIGH)"
         else:
-            print "GPIO: Reset " + channel + " (LOW)"
+            print "GPIO: Reset " + str(channel) + " (LOW)"
 
     def cleanup(self, channel):
         print "GPIO: Cleanup channel " + channel

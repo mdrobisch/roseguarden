@@ -4,6 +4,10 @@ from models import User
 from server import app
 import threading
 import os
+
+from RFID import RFID
+from RFID import RFIDMockup
+
 from GPIO import GPIO
 from GPIO import GPIOMockup
 
