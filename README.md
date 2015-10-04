@@ -6,6 +6,41 @@ A remote door api and web application for Raspberry Pi, Odroid, Orange Pi or Bea
 Quickstart
 ==========
 
+Install dependencies
+--------------------
+
+First of all update and upgrade your raspberry pi os
+
+1. sudo apt-get update
+2. sudo apt-get upgrade
+
+For the frontend we need nodejs to get a module called bower. Bower will handle alls the frontend dependencies.
+You can install the most actual package like this.
+
+3. wget http://node-arm.herokuapp.com/node_0.10.36_armhf.deb
+4. sudo dpkg -i node_0.10.36_armhf.deb
+
+Note: for the old raspberry pi the nodejs 0.10.36 is the most actual version. Newer version have problems with the c++ libaries (date 2015-10-93).
+Have a look at http://weworkweplay.com/play/raspberry-pi-nodejs/ for further informations and instructions.
+
+Now we could install bower and let bower get the packages for the frontend (css, angularjs, smarttable, etc.).
+For this step you have to switch to the `client`-directory.
+
+5. sudo npm install -g bower
+6. install the bower packages with `bower install` in the `client`-directory install
+
+Now the frontend is ready.
+
+For the backend (python) we have to install dependecies, too.
+The python package manager `pip` will handle this for us. So we need to install `pip` like this.
+
+7. sudo apt-get install python-pip
+
+At this point we will get the python packages list in the `requirement.txt` file.
+Switch to the `server`-directory and prompt.
+
+8. `pip install -r requirements.txt` in the `server`-directory
+
 Initial steps
 -------------
 
