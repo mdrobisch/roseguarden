@@ -54,3 +54,14 @@ Agenda (Vorschlag / Bitte Änderungswünsche zusenden):
    - Technische Lösungsvorschläge / Eingrenzung des Problemfeldes
  - Absichten festhalten und nächste Schritte diskutieren
  - Resüme / Wrap-Up
+
+Zur Person:
+Marcus Drobisch ist Open Source Enthusiast, 30 Jahre als und hat an der TU Dresden Elektrotechnik mit 
+Vertiefung Geräteentwicklung und Feinwerk studiert. Er arbeitet in einem Startup in Dresden als Elektronik- 
+und Softwareentwickler im Bereich Messtechnik.
+Seit knapp einem Jahr ist er Mitglied im FabLab Dresden bzw. im Konglomerat und hat geholfen die Elektronikwerkstatt 
+aufzubauen und betreut diese. Er unterstützt den Verein darüber hinaus beim Web-Auftritt und der Infrastruktur.
+Seine Interessen liegen im 3D-Druck, bei Open-Source Projekten und besonders bei der Elektronik- und Softwareentwicklung.
+Mit RoseGuarden entwickelt Marcus sein erstes größeres Projekt im prof. Webbereich und sammelt erste Erfahrungen in Python. 
+Bei Fragen zum Vortrag, zum Projekt oder zur Person könnt ihr Marcus unter m.drobisch@googlemail.com kontaktieren.
+ 

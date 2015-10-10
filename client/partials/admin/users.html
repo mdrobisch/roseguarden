@@ -5,8 +5,8 @@
                 <th st-sort="firstName">user</th>
                 <th st-sort="registrationDate">registered</th>
                 <th st-sort="lastLoginDate">last login</th>
-                <th st-sort="validationDateEnd">valid period</th>
-                <th st-sort="validationTimeStart">valid time</th>
+                <th st-sort="accessDateEnd">valid period</th>
+                <th st-sort="accessTimeStart">valid time</th>
                 <th st-sort="keyMask"> keys & licenses</th>
                 <th>actions</th>
             </tr>
@@ -29,7 +29,7 @@
                     <button ng-show="row.role == 1" popover-placement="right" popover="Admin" class="btn btn-default">
                         <i class="glyphicon glyphicon-star-empty"></i>
                     </button>
-                    <button ng-show="row.cardid" popover-placement="right" popover="{{row.cardid}}" class="btn btn-default">
+                    <button ng-show="row.cardID" popover-placement="right" popover="{{row.cardID}}" class="btn btn-default">
                         <i class="glyphicon glyphicon-credit-card"></i>
                     </button>
                     <button ng-show="row.budget != 0.00" popover-placement="right" popover="{{row.budget | number:2}}€" class="btn btn-default">
@@ -42,25 +42,25 @@
                 </td>
                 <td>{{row.lastLoginDate | date:'yyyy-MM-dd'}}</td>
                 <td>
-                        {{row.validationDateStart | date:'yyyy/MM/dd'}}
+                        {{row.accessDateStart | date:'yyyy/MM/dd'}}
                         to
-                        {{row.validationDateEnd | date:'yyyy/MM/dd'}}
+                        {{row.accessDateEnd | date:'yyyy/MM/dd'}}
                 </td>
                 <td>
-                        {{row.validationTimeStart | date:'HH:mm'}}
+                        {{row.accessTimeStart | date:'HH:mm'}}
                         to
-                        {{row.validationTimeEnd | date:'HH:mm'}}
+                        {{row.accessTimeEnd | date:'HH:mm'}}
 
                         <br>
 
                         (
-                        <span ng-show="row.validationDaysMask | bitwiseAndFilter : 1">Mo</span>
-                        <span ng-show="row.validationDaysMask | bitwiseAndFilter : 2">Tu</span>
-                        <span ng-show="row.validationDaysMask | bitwiseAndFilter : 4">We</span>
-                        <span ng-show="row.validationDaysMask | bitwiseAndFilter : 8">Th</span>
-                        <span ng-show="row.validationDaysMask | bitwiseAndFilter : 16">Fr</span>
-                        <span ng-show="row.validationDaysMask | bitwiseAndFilter : 32">Sa</span>
-                        <span ng-show="row.validationDaysMask | bitwiseAndFilter : 64">Su</span>
+                        <span ng-show="row.accessDaysMask | bitwiseAndFilter : 1">Mo</span>
+                        <span ng-show="row.accessDaysMask | bitwiseAndFilter : 2">Tu</span>
+                        <span ng-show="row.accessDaysMask | bitwiseAndFilter : 4">We</span>
+                        <span ng-show="row.accessDaysMask | bitwiseAndFilter : 8">Th</span>
+                        <span ng-show="row.accessDaysMask | bitwiseAndFilter : 16">Fr</span>
+                        <span ng-show="row.accessDaysMask | bitwiseAndFilter : 32">Sa</span>
+                        <span ng-show="row.accessDaysMask | bitwiseAndFilter : 64">Su</span>
                         )
                 </td>
                 <td>

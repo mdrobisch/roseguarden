@@ -62,7 +62,7 @@ class UserView(Resource):
         return '', 201
 
 
-class UserViewList(Resource):
+class UserListView(Resource):
     @auth.login_required
     def get(self):
         users = User.query.all()
@@ -154,6 +154,7 @@ class DoorListView(Resource):
 
 api.add_resource(SessionView, '/sessions')
 api.add_resource(UserView, '/user/<int:id>')
+api.add_resource(UserListView, '/users')
 api.add_resource(UserLogView, '/log/user/<int:id>')
 api.add_resource(DoorListView, '/doors')
 api.add_resource(OpeningRequestView, '/request/opening')

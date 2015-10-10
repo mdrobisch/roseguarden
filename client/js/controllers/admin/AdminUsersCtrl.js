@@ -8,6 +8,8 @@ RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log) {
     var cardids = ['123.3.86.93', '', '221.96.63.87', '73.23.46.13'];
     var dates = [new Date("25 Dec, 2014 23:15:00"),new Date("1 Jan, 2015 13:15:00"),new Date("11 Mar, 2015 13:15:00"),new Date("5 Feb, 2015 13:15:00")];
     var times = [new Date(new Date().setHours(11,30,0,0)), new Date(new Date().setHours(10,30,0,0)),new Date(new Date().setHours(16,30,0,0)),new Date(new Date().setHours(15,30,0,0))]
+    var daybudgets = [0, 4,5, 0];
+    var accessdaytypes = [0, 1,2, 0];
     var budgets = [0.00,10.12,5,3.21];
     var validationDayMasks = [0x6F,0x6F,0x60,0x1F]
     var keyMasks = [0x03,0x01,0x08,0x06]
@@ -29,6 +31,8 @@ RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log) {
         var keyMask = keyMasks[Math.floor(Math.random() * 3)];
         var registrationDate = dates[Math.floor(Math.random() * 3)];
         var lastLoginDate = dates[Math.floor(Math.random() * 3)];
+        var validateType = accessdaytypes[Math.floor(Math.random() * 2)];
+        var validateDayCounter = daybudgets[Math.floor(Math.random() * 3)];
         var validationDateStart = dates[Math.floor(Math.random() * 3)];
         var validationDateEnd = dates[Math.floor(Math.random() * 3)];
         var validationDaysMask = validationDayMasks[Math.floor(Math.random() * 3)];
@@ -42,17 +46,19 @@ RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log) {
             lastName: lastname,
             mail: mail,
             phone: phone,
-            cardid: card,
+            cardID: card,
             role: role,
             licenseMask: licenseMask,
             keyMask: keyMask,
             registrationDate: registrationDate,
             lastLoginDate: lastLoginDate,
-            validationDateStart: validationDateStart,
-            validationDateEnd: validationDateEnd,
-            validationDaysMask: validationDaysMask,
-            validationTimeStart: validationTimeStart,
-            validationTimeEnd: validationTimeEnd,
+            accessType: validateType,
+            accessDateStart: validationDateStart,
+            accessDateEnd: validationDateEnd,
+            accessDaysMask: validationDaysMask,
+            accessTimeStart: validationTimeStart,
+            accessTimeEnd: validationTimeEnd,
+            accessDayCounter: validateDayCounter,
             budget: budget
         };
     }

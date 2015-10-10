@@ -6,7 +6,6 @@ RoseGuardenApp.controller('RegisterCtrl', function($scope,$q,User) {
 
     $scope.register = function() {
         $scope.dataLoading = true;
-                var me = this;
         deferred = $q.defer();
         var newuser = {password:btoa($scope.newuser.password), firstName:$scope.newuser.firstName, lastName: $scope.newuser.lastName, phone: $scope.newuser.phone, email: $scope.newuser.email};
 

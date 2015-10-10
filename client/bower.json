@@ -4,7 +4,7 @@
   "authors": [
     "Marcus Drobisch <m.drobisch@googlemail.com>"
   ],
-  "license": "MIT",
+  "license": "GPLv3",
   "ignore": [
     "**/.*",
     "node_modules",

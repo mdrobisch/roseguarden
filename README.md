@@ -23,11 +23,11 @@ You can install the most actual package like this.
 Note: for the old raspberry pi the nodejs 0.10.36 is the most actual version. Newer version have problems with the c++ libaries (date 2015-10-93).
 Have a look at http://weworkweplay.com/play/raspberry-pi-nodejs/ for further informations and instructions.
 
-Now we could install bower and let bower get the packages for the frontend (css, angularjs, smarttable, etc.).
-For this step you have to switch to the `client`-directory.
+Now we could install bower and let bower get us the packages for the frontend (css, angularjs, smarttable, etc.).
+For this step you have to switch to the `client`-directory and prompt
 
 5. sudo npm install -g bower
-6. install the bower packages with `bower install` in the `client`-directory install
+6. install the bower packages with `bower install` (in the `client`-directory install)
 
 Now the frontend is ready.
 
@@ -39,7 +39,7 @@ The python package manager `pip` will handle this for us. So we need to install 
 At this point we will get the python packages list in the `requirement.txt` file.
 Switch to the `server`-directory and prompt.
 
-8. `pip install -r requirements.txt` in the `server`-directory
+8. `pip install -r requirements.txt` ()in the `server`-directory)
 
 Initial steps
 -------------
