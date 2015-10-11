@@ -136,7 +136,7 @@ To assemble the components, you only need some additional M2 and M3 screws to pu
 
 The schematic show the connection between raspberry pi and the modules.
 
-![schematic](documentation/instructions/RoseGuarden_Schematic.png = 250px)
+![schematic](documentation/instructions/RoseGuarden_Schematic.png)
 
 Further Documentation
 =====================
