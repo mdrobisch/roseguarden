@@ -6,6 +6,12 @@ A remote door api and web application for Raspberry Pi, Odroid, Orange Pi or Bea
 Quickstart
 ==========
 
+
+Install RoseGuarden
+-------------------
+
+Clone the repository to your installation path with `git clone https://github.com/blinzelaffe/roseguarden.git`
+
 Install dependencies
 --------------------
 
@@ -41,6 +47,7 @@ Switch to the `server`-directory and prompt.
 
 8. `pip install -r requirements.txt` ()in the `server`-directory)
 
+
 Initial steps
 -------------
 
@@ -75,7 +82,7 @@ The hardware consists of the following electronics  types mounted on a board.
 - a relay-module: controling the door-openers
 - a dc-dc-converter: supplying the control unit with a input  of e.g. 12V / 24V and a output of 5V
 - a micro-usb cable of 30cm length: connect dc-dc-converter to the control unit
-- some internal cable: e.g. from dc-dc converter tp the relay module
+- some internal cable: e.g. from dc-dc converter to the relay module or to the raspberry pi
 
 Screenshots (Hardware)
 ----------------------
@@ -101,7 +108,8 @@ We recommend the following devices, to use on the provided case:
 
 additional for connecting and supllying the device:
 
-- some cable with at least 3 wires @ 1A (found on pollin, reichelt, digikey or your laocal electronic store)
+- some breadboard female-female connector (found on pollin, watterot or sparkun)
+- some cable with at least 3 wires @ 1A (found on pollin, reichelt, digikey or your local electronic store)
 - a ethernet-patch-cable (found on pollin, reichelt, digikey or your laocal electronic store)
 - or a wifi-dongle (found on pollin, reichelt, digikey or your laocal electronic store)
 
@@ -125,6 +133,10 @@ Assembly
 --------
 
 To assemble the components, you only need some additional M2 and M3 screws to put the electronics on the board. While using other electronics than recommended, change the board modell to your needs. The positions are marked for easy assembly. The cable can put throw cable holes and routed along dedicated bolts.
+
+The schematic show the connection between raspberry pi and the modules.
+
+![schematic](documentation/instructions/RoseGuarden_Schematic.png = 250px)
 
 Further Documentation
 =====================
