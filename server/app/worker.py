@@ -19,8 +19,9 @@ class BackgroundWorker():
         self.openingTimer = -1;
 
         # setup gpio and set default (Low)
-        GPIO.setup(7,GPIO.OUT)
-        GPIO.output(7, GPIO.LOW)
+        GPIO.setmode(GPIO.BOARD)
+        GPIO.setup(12,GPIO.OUT, initial=GPIO.HIGH)
+        GPIO.output(12, GPIO.HIGH)
 
     def run(self):
         if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
@@ -38,12 +39,12 @@ class BackgroundWorker():
 
         if self.openingTimer >= 0:
             print "Opened door cycle" + "("  + ")"
-            GPIO.output(7, GPIO.HIGH)
+            GPIO.output(12, GPIO.LOW)
             self.openingTimer += 1
             if self.openingTimer >= 5:
                 self.openingTimer = -1
                 print "Closing door"
-                GPIO.output(7, GPIO.LOW)
+                GPIO.output(12, GPIO.HIGH)
 
         #else:
             #print "Closing door"
