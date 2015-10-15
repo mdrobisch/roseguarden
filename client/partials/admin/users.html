@@ -3,8 +3,8 @@
         <thead >
             <tr>
                 <th st-sort="firstName">user</th>
-                <th st-sort="registrationDate">registered</th>
-                <th st-sort="lastLoginDate">last login</th>
+                <th st-sort="registerDateTime">registered</th>
+                <th st-sort="lastLoginDateTime">last login</th>
                 <th st-sort="accessDateEnd">valid period</th>
                 <th st-sort="accessTimeStart">valid time</th>
                 <th st-sort="keyMask"> keys & licenses</th>
@@ -20,7 +20,7 @@
                 <td>
 
                     <span> {{row.firstName}} {{row.lastName}} </span> <br>
-                    <a href="mailto:{{row.mail}}" class="btn btn-default gliphicons" >
+                    <a href="mailto:{{row.email}}" class="btn btn-default gliphicons" >
                         <i class="glyphicon glyphicon-envelope"></i>
                     </a>
                     <button popover-placement="right" popover="{{row.phone}}" class="btn btn-default">
@@ -38,9 +38,9 @@
 
                 </td>
                 <td>
-                    {{row.registrationDate | date:'yyyy-MM-dd'}}
+                    {{row.registerDateTime | date:'yyyy-MM-dd'}}
                 </td>
-                <td>{{row.lastLoginDate | date:'yyyy-MM-dd'}}</td>
+                <td>{{row.lastLoginDateTime | date:'yyyy-MM-dd'}}</td>
                 <td>
                         {{row.accessDateStart | date:'yyyy/MM/dd'}}
                         to
@@ -91,7 +91,7 @@
                             <span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu" role="menu">
-                            <li role="menuitem"><a >Setup key validation</a></li>
+                            <li role="menuitem"><a ng-click="setupUserAccess(row)">Setup access validation</a></li>
                             <li role="menuitem"><a >Update budget</a></li>
                             <li ng-show="row.role == 0" role="menuitem"><a >Set admin rights</a></li>
                             <li ng-show="row.role == 1" role="menuitem"><a >Remove admin rights</a></li>
@@ -111,4 +111,13 @@
             </tr>
         </tfoot>
     </table>
+
+    <div class="alert alert-info" ng-show="isLoading">
+        Loading data ...
+        <img src="images/loading.gif" >
+    </div>
+
+     <div class="alert alert-danger" ng-show="showError">
+        Loading data failed.
+    </div>
 </div>

@@ -1,0 +1,87 @@
+<div class="modal-header">
+    <h3>Setup user access</h3>
+</div>
+<div class="modal-body" style="">
+
+    <p style="font-weight: bold"> Access type </p>
+    <div class="row">
+        <div class="col-md-offset-1 col-md-10">
+
+            <select class="combobox" ng-model="selectedAccessType" ng-options="AccessTypevalues.indexOf(selectedItem) as selectedItem for selectedItem in AccessTypevalues"></select>
+            <p></p>
+
+        </div>
+    </div>
+
+    <div ng-show="selectedAccessType == 1">
+        <p style="font-weight: bold"> Access period </p>
+        <div class="row">
+            <div class="col-md-offset-1 col-md-6">
+                <span> From: </span>
+                <p class="input-group">
+                  <input type="date" class="form-control" uib-datepicker-popup ng-model="dt" is-open="status.opened" min-date="minDate" max-date="maxDate" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" close-text="Close" />
+                </p>
+            </div>
+            <div class="col-md-5">
+                <span> To: </span>
+                <p class="input-group">
+                  <input type="date" class="form-control" uib-datepicker-popup ng-model="dt" is-open="status.opened" min-date="minDate" max-date="maxDate" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" close-text="Close" />
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div ng-show="selectedAccessType == 2">
+        <p style="font-weight: bold"> Access day counter </p>
+        <div class="row">
+            <div class="col-md-offset-1 col-md-10">
+                <h-number value="input.num" min="0" max="50" step="1"  singular="day" plural="days" change="onChanged()"></h-number>
+            </div>
+        </div>
+    </div>
+
+    <p style="font-weight: bold"> Access time </p>
+    <div class="row">
+        <div class="col-md-offset-1 col-md-6">
+            <span style="float:none">From: </span>
+            <uib-timepicker style="margin-left: 45px;" ng-model="mytime" ng-change="changed()" hour-step="hstep" minute-step="mstep" show-meridian="ismeridian"></uib-timepicker>
+        </div>
+        <div class="col-md-5">
+            <span style="float:none">To:</span>
+            <uib-timepicker style="margin-left: 45px;" ng-model="mytime" ng-change="changed()" hour-step="hstep" minute-step="mstep" show-meridian="ismeridian"></uib-timepicker>
+        </div>
+    </div>
+
+    <p style="font-weight: bold"> Accessable days</p>
+    <div class="row">
+        <form role="form" class="col-md-offset-2 col-md-8">
+            <label class="checkbox-inline">
+                <input type="checkbox" value="">Mo
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" value="">Tu
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" value="">We
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" value="">Th
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" value="">Fr
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" value="">Sa
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" value="">Su
+            </label>
+        </form>
+    </div>
+
+</div>
+
+<div class="modal-footer">
+    <button class="btn btn-default" ng-click="ok()">OK</button>
+    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+</div>

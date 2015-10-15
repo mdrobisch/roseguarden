@@ -13,28 +13,28 @@
         <div class="form-group">
             <label class="col-xs-3 control-label center-block">Keys</label>
             <div class="col-xs-8">
-                <a ng-show="user.key | bitwiseAndFilter : 1" class="btn btn-default gliphicons-small" tooltip="red key" >
+                <a ng-show="user.keyMask | bitwiseAndFilter : 1" class="btn btn-default gliphicons-small" tooltip="red key" >
                     <i class="glyphicon glyphicon-thumbs-up gliphicon-red" ></i>
                 </a>
-                <a ng-show="user.key | bitwiseAndFilter : 2" class="btn btn-default gliphicons-small" tooltip="green key">
+                <a ng-show="user.keyMask | bitwiseAndFilter : 2" class="btn btn-default gliphicons-small" tooltip="green key">
                     <i class="glyphicon glyphicon-thumbs-up gliphicon-green" ></i>
                 </a>
-                <a ng-show="user.key | bitwiseAndFilter : 4" class="btn btn-default gliphicons-small" tooltip="black key">
+                <a ng-show="user.keyMask | bitwiseAndFilter : 4" class="btn btn-default gliphicons-small" tooltip="black key">
                     <i class="glyphicon glyphicon-thumbs-up gliphicon-black" ></i>
                 </a>
-                <a ng-show="user.key | bitwiseAndFilter : 8" class="btn btn-default gliphicons-small" tooltip="pink key">
+                <a ng-show="user.keyMask | bitwiseAndFilter : 8" class="btn btn-default gliphicons-small" tooltip="pink key">
                     <i class="glyphicon glyphicon-thumbs-up gliphicon-pink" ></i>
                 </a>
-                <a ng-show="user.key | bitwiseAndFilter : 16" class="btn btn-default gliphicons-small" tooltip="marine key">
+                <a ng-show="user.keyMask | bitwiseAndFilter : 16" class="btn btn-default gliphicons-small" tooltip="marine key">
                     <i class="glyphicon glyphicon-thumbs-up gliphicon-marine"></i>
                 </a>
-                <a ng-show="user.key | bitwiseAndFilter : 32" class="btn btn-default gliphicons-small" tooltip="orange key">
+                <a ng-show="user.keyMask | bitwiseAndFilter : 32" class="btn btn-default gliphicons-small" tooltip="orange key">
                     <i class="glyphicon glyphicon-thumbs-up gliphicon-orange"></i>
                 </a>
-                <a ng-show="user.key | bitwiseAndFilter : 64" class="btn btn-default gliphicons-small" tooltip="olive key">
+                <a ng-show="user.keyMask | bitwiseAndFilter : 64" class="btn btn-default gliphicons-small" tooltip="olive key">
                     <i class="glyphicon glyphicon-thumbs-up gliphicon-olive"></i>
                 </a>
-                <a  ng-show="user.key | bitwiseAndFilter : 128" class="btn btn-default gliphicons-small" tooltip="purple key">
+                <a  ng-show="user.keyMask | bitwiseAndFilter : 128" class="btn btn-default gliphicons-small" tooltip="purple key">
                     <i class="glyphicon glyphicon-thumbs-up gliphicon-purple"></i>
                 </a>
             </div>
@@ -67,7 +67,7 @@
         <div class="form-group" ng-show="user.accessType != 0">
             <label class="col-xs-3 control-label">Accessable days</label>
             <div class="col-xs-8">
-                <label class="control-label">{{user.accessDays | weekdaysBitwiseFilter}}</label>
+                <label class="control-label">{{user.accessDaysMask | weekdaysBitwiseFilter}}</label>
             </div>
         </div>
 
@@ -80,7 +80,7 @@
 
         <div class="form-group">
             <label class="col-xs-3 control-label">Licenses</label>
-            <div class="col-xs-8" ng-hide="user.license">
+            <div class="col-xs-8" ng-hide="user.licenseMask">
                 <label class="control-label">-</label>
             </div>
         </div>

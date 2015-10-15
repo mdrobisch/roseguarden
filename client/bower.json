@@ -14,13 +14,13 @@
   ],
   "dependencies": {
     "angular-route": "~1.2.21",
-    "angular-bootstrap": "~0.13.0",
+    "angular-bootstrap": "~0.14.2",
     "bootstrap": "~3.2.0",
     "restangular": "~1.4.0",
     "angularjs": "~1.4.0",
     "angular-local-storage": "~0.0.7",
     "angular-smart-table": "~2.1.0",
-    "flag-icon-css": "~0.7.1"
-
+    "flag-icon-css": "~0.7.1",
+    "angular-number-picker": "~1.2.2"
   }
 }

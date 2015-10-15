@@ -1,3 +1,17 @@
+
+.combobox {
+  font-size: 14px;
+  width: 100%;
+  color: #555;
+  position: relative;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  padding-right: 34px;
+  padding-left: 10px;
+  height: 32px;
+  background-color: white;
+}
+
 .msg-error {
     display: block;
     margin-top: 5px;

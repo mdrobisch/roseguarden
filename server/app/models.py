@@ -16,14 +16,14 @@ class User(db.Model):
     role = db.Column(db.Integer)
     cardID = db.Column(db.Text)
     cardPassword = db.Column(db.Text)
-    license = db.Column(db.Integer)
-    key = db.Column(db.Integer)
+    licenseMask = db.Column(db.Integer)
+    keyMask = db.Column(db.Integer)
     accessType = db.Column(db.Integer)
     accessDateStart = db.Column(db.DateTime)
     accessDateEnd = db.Column(db.DateTime)
     accessTimeStart = db.Column(db.DateTime)
     accessTimeEnd = db.Column(db.DateTime)
-    accessDays = db.Column(db.Integer)
+    accessDaysMask = db.Column(db.Integer)
     accessDayCounter = db.Column(db.Integer)
     lastLoginDateTime = db.Column(db.DateTime)
     registerDateTime = db.Column(db.DateTime)
@@ -56,7 +56,7 @@ class User(db.Model):
     def __repr__(self):
         return '<User %r>' % self.email
 
-    def __init__(self, email, password, firstName, lastName, role = 0,phone = '0',license = 0, key = 0):
+    def __init__(self, email, password, firstName, lastName, role = 0,phone = '0',licenseMask = 0, keyMask = 0):
         self.phone = phone
         self.role = role;
         self.email = email
@@ -64,9 +64,9 @@ class User(db.Model):
         self.firstName = firstName
         self.lastName = lastName
         self.phone = phone
-        self.key = key
-        self.license = license
-        self.accessDays = 127
+        self.keyMask = keyMask
+        self.licenseMask = licenseMask
+        self.accessDaysMask = 127
         self.accessType = 0
         self.accessDateStart = (datetime.datetime.today()).replace(hour=0, minute=0, second=0, microsecond=0)
         self.accessDateEnd = (datetime.datetime.today() + datetime.timedelta(365*15)).replace(hour=0,minute=0,second=0,microsecond=0)

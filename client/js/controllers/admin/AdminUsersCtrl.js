@@ -1,4 +1,4 @@
-RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log) {
+RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log, $q, User) {
 
     $scope.message = 'This is the AdminSpaceCtrl message';
     var firstnames = ['Thomas', 'Marcus', 'Lischen', 'Stephanie'];
@@ -15,6 +15,10 @@ RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log) {
     var keyMasks = [0x03,0x01,0x08,0x06]
     var roles = [0, 1,0, 0];
     var id = 1;
+
+
+    $scope.isLoading = true;
+    $scope.showError = false;
 
     $scope.rowCollection = [];
     $scope.displayedCollection = [];
@@ -67,26 +71,29 @@ RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log) {
         for (id=0; id < 3; id++) {
             $scope.rowCollection.push(generateRandomItem(id));
         }
+        $scope.isLoading = false;
         //copy the references (you could clone ie angular.copy but then have to go through a dirty checking for the matches)
         $scope.displayedCollection = [].concat($scope.rowCollection);
     }
 
     function loadItemsFromAPI() {
-        $http.get('//127.0.0.1:5000/Users').
-            success(function(data) {
-              console.log(data.length);
-              for(i=0;i < data.length;i++) {
-                  $scope.rowCollection.push({
-                        id : data[i].id,
-                        firstName : data[i].first_name,
-                        lastName : data[i].last_name,
-                        mail : data[i].mail,
-                        phone : data[i].phone,
-                        cardid : data[i].card_id});
-              }
-            });
 
-        $scope.displayedCollection = [].concat($scope.rowCollection);
+        $scope.isLoading = true;
+        deferred = $q.defer();
+        User.getList(true).then(function(data) {
+              console.log(data.length)
+              for(i=0;i < data.length;i++) {
+                  $scope.rowCollection.push(data[i]);
+              }
+            $scope.displayedCollection = [].concat($scope.rowCollection);
+            $scope.isLoading = false;
+            return deferred.resolve();
+        }, function(response) {
+            $scope.showError = false;
+            return deferred.reject(response);
+        });
+        return deferred.promise
+
 
         /*
         $http({
@@ -104,13 +111,26 @@ RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log) {
         */
     }
 
-    //loadItemsFromAPI();
-    loadItemsDummy();
+    loadItemsFromAPI();
+    //loadItemsDummy();
 
     //add to the real data holder
     $scope.addRandomItem = function addRandomItem() {
         $scope.rowCollection.push(generateRandomItem(id));
         id++;
+    };
+
+    $scope.setupUserAccess = function setupUserAccess(row) {
+
+        var modalInstance = $modal.open({
+          templateUrl: 'partials/modals/SetupUserAccess.html',
+          controller: 'SetupUserAccessCtrl',
+          windowClass: 'center-modal',
+          resolve: {
+            name: function () {
+                return row.firstName + ' ' + row.lastName; }
+          }
+        });
     };
 
     //remove to the real data holder
@@ -122,9 +142,8 @@ RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log) {
           windowClass: 'center-modal',
           resolve: {
             name: function () {
-                return row.firstName + ' ' + row.lastName;
+                return row.firstName + ' ' + row.lastName; }
           }
-       }
         });
 
         modalInstance.result.then(function (selected) {
