@@ -20,32 +20,40 @@ First of all update and upgrade your raspberry pi os
 1. `sudo apt-get update`
 2. `sudo apt-get upgrade`
 
-For the frontend we need nodejs to get a module called bower. Bower will handle alls the frontend dependencies.
-You can install the most actual package like this.
+For the frontend we need nodejs to get a module called bower and a fast nodejs http-server.
+The http-server serve the http-request. Bower will handle all the frontend dependencies.
+You can install the most actual nodejs package like this.
 
 3. `wget http://node-arm.herokuapp.com/node_0.10.36_armhf.deb`
 4. `sudo dpkg -i node_0.10.36_armhf.deb`
 
-Note: for the old raspberry pi the nodejs 0.10.36 is the most actual version. Newer version have problems with the c++ libaries (date 2015-10-03).
+NOTE: for the old raspberry pi the nodejs 0.10.36 is used. Some newer versions have problems with the c++ libaries.
 Have a look at http://weworkweplay.com/play/raspberry-pi-nodejs/ for further informations and instructions.
+The newest nodejs-version 4.2.1 suppose to have direct raspberry pi (ARM6/ARM7) support included.
+It has to be tested with RoseGuarden.
 
-Now we could install bower and let bower get us the packages for the frontend (css, angularjs, smarttable, etc.).
+First we install the nodejs-http-server
 For this step you have to switch to the `client`-directory and prompt
 
-5. `sudo npm install -g bower`
-6. install the bower packages with `bower install` (in the `client`-directory install)
+5. `sudo npm install -g http-server`
+
+Now we could install bower and let bower get us the packages for the frontend (css, angularjs, smarttable, etc.).
+In the same `client`-directory prompt
+
+6. `sudo npm install -g bower`
+7. install the bower packages with `bower install` (in the `client`-directory install)
 
 Now the frontend is ready.
 
 For the backend (python) we have to install dependecies, too.
 The python package manager `pip` will handle this for us. So we need to install `pip` like this.
 
-7. `sudo apt-get install python-pip`
+8. `sudo apt-get install python-pip`
 
 At this point we will get the python packages list in the `requirement.txt` file.
 Switch to the `server`-directory and prompt.
 
-8. `pip install -r requirements.txt` (in the `server`-directory)
+9. `pip install -r requirements.txt` (in the `server`-directory)
 
 
 Initial steps
@@ -59,7 +67,7 @@ Initial steps
 Running RoseGuarden
 -------------------
 
-- start the HTTPServer in the `client` - directory with  `python -m SimpleHTTPServer 8000`
+- start the http-server in the `client` - directory with  `http-server -p 8000`
 - start the RoseGuarden-app in the `server` - directory with `python run.py`
 
 Screenshots (Software)

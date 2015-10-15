@@ -71,7 +71,7 @@ class GPIOWrapper:
     def cleanup(self, channel):
         print "GPIO: Cleanup channel " + channel
 
-    def setup(self, channel, type):
+    def setup(self, channel, type, initial):
         print "GPIO: Setup GPIO " + str(channel) + " to " + str(type)
 
 
