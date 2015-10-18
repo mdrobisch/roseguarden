@@ -26,10 +26,10 @@ class BackgroundWorker():
 
 
     def run(self):
-        if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
-            self.thr = threading.Timer(1, self.timer_cycle)
-            self.thr.start()
-            print 'started background-server'
+        #if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
+        self.thr = threading.Timer(1, self.timer_cycle)
+        self.thr.start()
+        print 'started background-server'
 
     def readRFIDTag(self):
         (status,TagType) = RFIDReader.MFRC522_Request(RFIDReader.PICC_REQIDL)
