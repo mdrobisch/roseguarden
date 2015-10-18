@@ -154,7 +154,7 @@ class RFIDWrapper:
 
 if platform.platform_getType() == platform.RASPBERRY_PI:
     try:
-        import MFRC522 as RFID
+        import MFRC522.MFRC522 as RFID
         print "RFID: Using MFRC522 as RFID"
         RFIDReader = RFID.MFRC522()
         RFIDMockup = None
