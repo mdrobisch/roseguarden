@@ -55,6 +55,15 @@ Switch to the `server`-directory and prompt.
 
 9. `pip install -r requirements.txt` (in the `server`-directory)
 
+To use the rfid-reader (rc522) we have to install SPI-Py. Switch to the `server/app/SPI-Py`-directory and
+install the dependencies and the module.
+
+10. `sudo apt-get install python-dev` needed to compile c++-bindings with python
+11. `sudo apt-get install gcc` needed to compile c++
+12. `sudo python setup.py install` install the module
+
+Note: depending on your raspberry pi and kernel you have to re/enable the spi-module and the device tree support
+with `sudo raspi-config` -> 'Advanded Options'
 
 Initial steps
 -------------
@@ -150,6 +159,46 @@ Further Documentation
 =====================
 
 Further documentation and information on components and installation could be found on the project-wiki http://h2371910.stratoserver.net/projects/tuer-und-geraeteverwaltung-rosenguarden/wiki/Wiki (german language only, please translate via google translate or other services).
+
+Troubleshooting
+===============
+
+*The rfid don't read any tag*
+
+With Kernel 3.18 and above Rasbian switch to device tree support on default.
+A detailed description is shown here: https://www.raspberrypi.org/forums/viewtopic.php?t=97314
+This could encounter problems with the spi.
+
+To fix the issue you have to re/enable the spi-module.
+To setup this use `sudo raspi-config` -> 'Advanded Options' or write the changes directly to `/boot/config.txt`
+on your own.
+
+For Raspbbery Pi B
+
+`dtparam=spi=on
+dtoverlay=spi-bcm2708`
+
+have to been set.
+
+For Raspberry Pi 2 (not tested, yet)
+
+`dtparam=spi=on
+dtoverlay=spi-bcm2835`
+
+should be working (not tested yet)
+
+For Raspberry Pi 2 please consider, there is be a another pin-out-connectio needed. Some instructions described here:
+https://www.raspberrypi.org/forums/viewtopic.php?f=37&t=106313 or a alternative way to enable SPI here http://bsd.ee/~hadara/blog/?p=1017
+
+
+`Mifare_RC522_RFID Raspberry Pi 2 B
+
+MOSI ——————————> pin 19 e.g. GPIO 10
+MISO ——————————> pin 21 e.g. GPIO 9
+SCLK ——————————> pin 23 e.g. GPIO 11
+SDA  ——————————> pin 24 e.g. GPIO 8
+RST  ——————————> pin 22 e.g. GPIO 25
+IRQ  ——————————> NONE `
 
 License
 =======
