@@ -6,7 +6,7 @@ from flask_restful import Resource, fields, marshal_with
 from server import api, db, flask_bcrypt, auth, mail
 from models import User, Door, Request
 from serializers import UserSerializer, SessionInfoSerializer, DoorSerializer, RequestSerializer
-from forms import UserCreateForm,UserPatchForm, SessionCreateForm, LostPasswordForm, RegisterUserForm
+from forms import UserCreateForm,UserPatchForm, SessionCreateForm, LostPasswordForm, RegisterUserForm, UserDeleteForm
 from worker import backgroundWorker
 from sqlalchemy.exc import IntegrityError
 import base64
@@ -32,12 +32,22 @@ class UserView(Resource):
         return UserSerializer(user).data
 
     @auth.login_required
+    def delete(self,id):
+        user = User.query.filter_by(id=id).first()
+        if user != None:
+            print 'delete user ' + user.firstName + ' ' + user.lastName + ' (' + user.email + ') from database'
+            User.query.filter(User.id == id).delete()
+            db.session.commit()
+        return '', 201
+
+    @auth.login_required
     def post(self, id):
         if id != g.user.id:
             if (g.user.role & 1) == 0:
                 return make_response(jsonify({'error': 'Not authorized'}), 403)
         form = UserPatchForm()
         if not form.validate_on_submit():
+            print form.errors
             return form.errors,422
         user = User.query.filter_by(id=id).first()
         if form.newpassword.data != None and form.newpassword.data != '':
@@ -58,7 +68,39 @@ class UserView(Resource):
         if form.phone.data != None and form.phone.data != '':
             print 'Change phone number'
             user.phone = form.phone.data
+        if form.role.data != None and form.role.data != '':
+            print 'Change role to ' + str(form.role.data)
+            user.role = form.role.data
+        if form.association.data != None and form.association.data != '':
+            print 'Change association to ' + str(form.association.data)
+            user.association = form.association.data
+        if form.accessDaysMask.data != None and form.accessDaysMask.data != '':
+            print 'Change accessDaysMask to ' + str(form.accessDaysMask.data)
+            user.accessDaysMask = form.accessDaysMask.data
+        if form.accessDayCounter.data != None and form.accessDayCounter.data != '':
+            print 'Change accessDayCounter to ' + str(form.accessDayCounter.data)
+            user.accessDayCounter = form.accessDayCounter.data
+        if form.accessType.data != None and form.accessType.data != '':
+            print 'Change accessType to ' + str(form.accessType.data)
+            user.accessType = form.accessType.data
+        if form.keyMask.data != None and form.keyMask.data != '':
+            print 'Change keyMask to ' + str(form.keyMask.data)
+            user.keyMask = form.keyMask.data
+        if form.accessDateStart.data != None and form.accessDateStart.data != '':
+            print 'Change accessDateStart to ' + str(form.accessDateStart.data)
+            user.accessDateStart = datetime.datetime.strptime(form.accessDateStart.data, '%Y-%m-%dT%H:%M:%S.%fZ')
+        if form.accessDateEnd.data != None and form.accessDateEnd.data != '':
+            print 'Change accessDateEnd to ' + str(form.accessDateEnd.data)
+            user.accessDateEnd = datetime.datetime.strptime(form.accessDateEnd.data, '%Y-%m-%dT%H:%M:%S.%fZ')
+        if form.accessTimeStart.data != None and form.accessTimeStart.data != '':
+            print 'Change accessTimeStart to ' + str(form.accessTimeStart.data)
+            user.accessTimeStart = datetime.datetime.strptime(form.accessTimeStart.data, '%Y-%m-%dT%H:%M:%S.%fZ')
+        if form.accessTimeEnd.data != None and form.accessTimeEnd.data != '':
+            print 'Change accessTimeEnd to ' + str(form.accessTimeEnd.data)
+            user.accessTimeEnd = datetime.datetime.strptime(form.accessTimeEnd.data, '%Y-%m-%dT%H:%M:%S.%fZ')
+
         db.session.commit()
+
         return '', 201
 
 
@@ -80,22 +122,27 @@ class UserLogView(Resource):
 class RegisterUserView(Resource):
     def post(self):
         form = RegisterUserForm()
+        print 'enter registerview'
         if not form.validate_on_submit():
             return form.errors,422
         pwd = base64.decodestring(form.password.data)
-        user = User(email = form.email.data, password = pwd,firstName = form.firstName.data, lastName = form.lastName.data, phone= form.phone.data)
+        user = User(email = form.email.data, password = pwd,firstName = form.firstName.data, lastName = form.lastName.data, phone= form.phone.data,association = form.association.data)
         try:
             db.session.add(user)
             db.session.commit()
         except IntegrityError:
             return make_response(jsonify({'error': 'eMail already registered'}), 400)
-        send_email("Welcome to %s. You successfully registered" % 'RoseGuarden',
-           MAIL_USERNAME,
-           [user.email],
-           render_template("welcome_mail.txt",
-                           user=user),
-           render_template("welcome_mail.html",
-                           user=user))
+        try:
+            send_email("Welcome to %s. You successfully registered" % 'RoseGuarden',
+                        MAIL_USERNAME,
+                        [user.email],
+                        render_template("welcome_mail.txt",
+                        user=user),
+                        render_template("welcome_mail.html",
+                        user=user))
+        except:
+            print 'unable to send mail'
+            return '',201
         return '', 201
 
 class SessionView(Resource):

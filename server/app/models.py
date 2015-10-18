@@ -13,8 +13,10 @@ class User(db.Model):
     firstName = db.Column(db.Text)
     lastName = db.Column(db.Text)
     phone = db.Column(db.Text)
+    association = db.Column(db.Text)
     role = db.Column(db.Integer)
     cardID = db.Column(db.Text)
+    cardKey = db.Column(db.Text)
     cardPassword = db.Column(db.Text)
     licenseMask = db.Column(db.Integer)
     keyMask = db.Column(db.Integer)
@@ -43,7 +45,7 @@ class User(db.Model):
         if self.accessType == 2:
             if self.accessDayCounter <= 0:
                 return 'invalid access because of day-counter'
-        if (int(1 << datetime.datetime.now().weekday()) & self.accessDays) == 0:
+        if (int(1 << datetime.datetime.now().weekday()) & self.accessDaysMask) == 0:
             return 'invalid access because of access weekdays'
         if self.accessTimeStart.time() > datetime.datetime.now().time():
             return 'invalid access because of TimeStart'
@@ -56,18 +58,20 @@ class User(db.Model):
     def __repr__(self):
         return '<User %r>' % self.email
 
-    def __init__(self, email, password, firstName, lastName, role = 0,phone = '0',licenseMask = 0, keyMask = 0):
+    def __init__(self, email, password, firstName, lastName, role = 0,phone = '0',licenseMask = 0, keyMask = 0, association = ''):
         self.phone = phone
         self.role = role;
         self.email = email
         self.password = flask_bcrypt.generate_password_hash(password)
         self.firstName = firstName
         self.lastName = lastName
+        self.association = association
         self.phone = phone
         self.keyMask = keyMask
         self.licenseMask = licenseMask
         self.accessDaysMask = 127
         self.accessType = 0
+        self.accessDayCounter = 0
         self.accessDateStart = (datetime.datetime.today()).replace(hour=0, minute=0, second=0, microsecond=0)
         self.accessDateEnd = (datetime.datetime.today() + datetime.timedelta(365*15)).replace(hour=0,minute=0,second=0,microsecond=0)
         self.accessTimeStart = datetime.datetime.today().replace(hour= 6, minute= 0, second=0, microsecond=0)

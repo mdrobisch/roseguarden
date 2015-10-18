@@ -12,7 +12,7 @@
                 <td> <input type="text" ng-model="newdoor.name" class="form-control"> </td>
                 <td> <input type="text" ng-model="newdoor.address" class="form-control"> </td>
                 <td>
-                    <button type="button" ng-click="addDoorItem()" class="btn btn-sm btn-success">
+                    <button type="button" ng-disabled="true" ng-click="addDoorItem()" class="btn btn-sm btn-success">
                         <i class="glyphicon glyphicon-plus">
                         </i> Add
                     </button>
@@ -73,16 +73,16 @@
                 </td>
 
                 <td>
-                    <button ng-show="row.local == 1" popover-placement="right" popover="local" class="btn btn-default">
+                    <button ng-show="row.local == 1" ng-disabled="true" popover-placement="right" popover="local" class="btn btn-default">
                         <i class="glyphicon glyphicon-star-empty"></i>
                     </button>
-                    <button ng-show="row.local == 0" type="button" ng-click="" class="btn btn-sm btn-success" tooltip="Synchronize user">
+                    <button ng-show="row.local == 0" ng-disabled="true" type="button" ng-click="" class="btn btn-sm btn-success" tooltip="Synchronize user">
                         <i class="glyphicon glyphicon-share-alt"></i>
                     </button>
-                    <button ng-show="row.local == 0" type="button" ng-click="" class="btn btn-sm btn-success" tooltip="Update valid keys">
+                    <button ng-show="row.local == 0" ng-disabled="true" type="button" ng-click="" class="btn btn-sm btn-success" tooltip="Update valid keys">
                         <i class="glyphicon glyphicon-refresh"></i>
                     </button>
-                    <button ng-show="row.local == 0" type="button" ng-click="removeItem(row)" class="btn btn-sm btn-danger" tooltip="Remove door">
+                    <button ng-show="row.local == 0" ng-disabled="true" type="button" ng-click="removeItem(row)" class="btn btn-sm btn-danger" tooltip="Remove door">
                         <i class="glyphicon glyphicon-remove-circle"></i>
                     </button>
                 </td>

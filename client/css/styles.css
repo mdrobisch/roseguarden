@@ -1,4 +1,9 @@
 
+.center-form-block {
+  display: inline-block;
+  text-align: center;
+}
+
 .combobox {
   font-size: 14px;
   width: 100%;
@@ -154,6 +159,14 @@ a.width170px {
 .btn-lg.round {
     border-radius: 24px;
     margin: 20px;
+}
+.btn-rfid-tag {
+    height: 80px;
+    width: 300px;
+}
+.btn-group > .btn:first-child:not(:last-child):not(.dropdown-toggle) {
+    border-bottom-right-radius: 15px;
+    border-bottom-left-radius: 15px;
 }
 
 .table > thead > tr > th {

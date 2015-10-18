@@ -1,12 +1,43 @@
 <div ng-controller="AdminUsersCtrl"   >
+    <div class="alert alert-danger" ng-show="showError">
+        Loading data failed.
+    </div>
+
+
+    <p></p>
+    <p style="font-weight: bold; margin: 0"> Card</p>
+    <hr style="margin-top: 2px">
+
+    <!-- Split button -->
+    <div class="btn-group" uib-dropdown>
+
+        <button id="split-button" type="button" class="btn btn-lg btn-rfid-tag btn-warning">No rfid-tag <br> detected.</button>
+        <button type="button" class="btn btn-danger" uib-dropdown-toggle>
+            <span class="caret"></span>
+            <span class="sr-only">Split button!</span>
+        </button>
+        <ul class="uib-dropdown-menu" role="menu" aria-labelledby="split-button">
+            <li role="menuitem"><a href="#">Action</a></li>
+            <li role="menuitem"><a href="#">Another action</a></li>
+            <li role="menuitem"><a href="#">Something else here</a></li>
+            <li class="divider"></li>
+            <li role="menuitem"><a href="#">Separated link</a></li>
+        </ul>
+    </div>
+
+    <p></p>
+
+    <p style="font-weight: bold ; margin: 30px 0 0 0"> Userlist</p>
+    <hr style="margin-top: 2px; margin-bottom: 10px">
+
     <table st-table="displayedCollection" st-safe-src="rowCollection" class="table table-striped"">
         <thead >
             <tr>
                 <th st-sort="firstName">user</th>
                 <th st-sort="registerDateTime">registered</th>
-                <th st-sort="lastLoginDateTime">last login</th>
-                <th st-sort="accessDateEnd">valid period</th>
-                <th st-sort="accessTimeStart">valid time</th>
+                <th st-sort="lastLoginDateTime">last action</th>
+                <th st-sort="accessDateEnd">valid. type</th>
+                <th st-sort="accessTimeStart">valid. time</th>
                 <th st-sort="keyMask"> keys & licenses</th>
                 <th>actions</th>
             </tr>
@@ -35,21 +66,41 @@
                     <button ng-show="row.budget != 0.00" popover-placement="right" popover="{{row.budget | number:2}}€" class="btn btn-default">
                         <i class="glyphicon glyphicon-euro"></i>
                     </button>
+                    <button popover-placement="right" popover="{{row.association}}" class="btn btn-default">
+                        <i class="glyphicon glyphicon-home"></i>
+                    </button>
 
                 </td>
                 <td>
-                    {{row.registerDateTime | date:'yyyy-MM-dd'}}
+                    {{row.registerDateTime | moment:'DD.MM.YYYY'}}
                 </td>
-                <td>{{row.lastLoginDateTime | date:'yyyy-MM-dd'}}</td>
+                <td>{{row.lastLoginDateTime | moment:'DD.MM.YYYY HH:mm'}}</td>
                 <td>
-                        {{row.accessDateStart | date:'yyyy/MM/dd'}}
-                        to
-                        {{row.accessDateEnd | date:'yyyy/MM/dd'}}
+                        <span ng-show="row.accessType == 0">
+                            no access
+                        </span>
+
+                        <span ng-show="row.accessType == 1">
+                            period <br>
+                            from
+                            {{row.accessDateStart | moment:'DD.MM.YYYY'}}
+                            to
+                            {{row.accessDateEnd | moment:'DD.MM.YYYY'}}
+                        </span>
+
+                        <span ng-show="row.accessType == 2">
+                            {{row.accessDayCounter}} day/s
+                        </span>
+
+                        <span ng-show="row.accessType == 3">
+                            infinite access
+                        </span>
+
                 </td>
                 <td>
-                        {{row.accessTimeStart | date:'HH:mm'}}
+                        {{row.accessTimeStart | moment:'HH:mm'}}
                         to
-                        {{row.accessTimeEnd | date:'HH:mm'}}
+                        {{row.accessTimeEnd | moment:'HH:mm'}}
 
                         <br>
 
@@ -92,12 +143,12 @@
                         </button>
                         <ul class="dropdown-menu" role="menu">
                             <li role="menuitem"><a ng-click="setupUserAccess(row)">Setup access validation</a></li>
-                            <li role="menuitem"><a >Update budget</a></li>
-                            <li ng-show="row.role == 0" role="menuitem"><a >Set admin rights</a></li>
-                            <li ng-show="row.role == 1" role="menuitem"><a >Remove admin rights</a></li>
+                            <li ng-show="row.role == 0" role="menuitem" ng-click="setUserAdmin(row)"><a >Set admin rights</a></li>
+                            <li ng-show="row.role == 1" role="menuitem" ng-click="resetUserAdmin(row)"><a >Remove admin rights</a></li>
                             <li class="divider"></li>
-                            <li role="menuitem"><a ng-click="removeItem(row)">Remove user</a></li>
+                            <li role="menuitem"><a ng-click="removeUser(row)">Remove user</a></li>
                         </ul>
+                        <img ng-if="row.userUpdatePending" src="images/loading.gif" >
                     </div>
                 </td>
             </tr>
@@ -115,9 +166,5 @@
     <div class="alert alert-info" ng-show="isLoading">
         Loading data ...
         <img src="images/loading.gif" >
-    </div>
-
-     <div class="alert alert-danger" ng-show="showError">
-        Loading data failed.
     </div>
 </div>

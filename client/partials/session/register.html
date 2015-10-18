@@ -44,6 +44,13 @@
         </div>
 
         <div class="form-group">
+            <label for="association">Association</label>
+            <i class="fa fa-key"></i>
+            <input type="text" name="association" id="association" class="form-control" ng-model="newuser.association" required />
+            <span ng-show="form.association.$dirty && form.association.$error.required" class="help-block">Association is required</span>
+        </div>
+
+        <div class="form-group">
             <label for="phone">Phone number</label>
             <i class="fa fa-key"></i>
             <input type="text" name="phone" id="phone" class="form-control" ng-model="newuser.phone" required />

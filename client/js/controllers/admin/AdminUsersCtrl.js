@@ -120,6 +120,60 @@ RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log, $q, Us
         id++;
     };
 
+
+    $scope.resetUserAdmin = function resetUserAdmin(row) {
+
+        $log.info('reset user admin');
+        var rolechange = {role: (row.role & 0xFE)};
+
+        User.update(row.id, rolechange).then(function() {
+            $scope.profileUpdatePending = false;
+            $scope.success = 'Successfully reset admin role.';
+            $scope.showError = false;
+            $scope.showSuccess = true;
+
+            var index = $scope.rowCollection.indexOf(row);
+            $scope.rowCollection[index].role &= ~(0x01);
+
+            return deferred.resolve();
+        }, function(response) {
+            $scope.error = 'Reset admin role failed.';
+            $scope.profileUpdatePending = false;
+            $scope.showError = true;
+            $scope.showSuccess = false;
+            return deferred.reject(response);
+        });
+        return deferred.promise
+
+    };
+
+    $scope.setUserAdmin = function setUserAdmin(row) {
+
+        $log.info('set user admin');
+
+        var rolechange = {role: (row.role | 0x01)};
+
+        User.update(row.id, rolechange).then(function() {
+            $scope.profileUpdatePending = false;
+            $scope.success = 'Successfully set user to admin.';
+            $scope.showError = false;
+            $scope.showSuccess = true;
+
+            var index = $scope.rowCollection.indexOf(row);
+            $scope.rowCollection[index].role |= 0x01;
+
+            return deferred.resolve();
+        }, function(response) {
+            $scope.error = 'Set user to admin failed.';
+            $scope.profileUpdatePending = false;
+            $scope.showError = true;
+            $scope.showSuccess = false;
+            return deferred.reject(response);
+        });
+        return deferred.promise
+
+    };
+
     $scope.setupUserAccess = function setupUserAccess(row) {
 
         var modalInstance = $modal.open({
@@ -127,14 +181,60 @@ RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log, $q, Us
           controller: 'SetupUserAccessCtrl',
           windowClass: 'center-modal',
           resolve: {
-            name: function () {
-                return row.firstName + ' ' + row.lastName; }
+            selectedUser: function () {
+                return row;
+            }
           }
+        });
+
+        modalInstance.result.then(function (setupdata) {
+
+            row.userUpdatePending = true;
+
+            var setupaccess = {keyMask: setupdata.keyMask, accessDaysMask : setupdata.accessDaysMask,
+                                accessDateStart : new Date(setupdata.accessDateStart), accessDateEnd : new Date(setupdata.accessDateEnd),
+                                accessTimeStart : new Date(setupdata.accessTimeStart), accessTimeEnd : new Date(setupdata.accessTimeEnd),
+                                accessType : setupdata.accessType, accessDayCounter : setupdata.accessDayCounter };
+
+            User.update(row.id, setupaccess).then(function() {
+                $scope.profileUpdatePending = false;
+                $scope.success = 'Successfully setup access.';
+                $scope.showError = false;
+                $scope.showSuccess = true;
+
+                var index = $scope.rowCollection.indexOf(row);
+                $scope.rowCollection[index].keyMask = setupdata.keyMask;
+                $scope.rowCollection[index].accessDaysMask = setupdata.accessDaysMask;
+                $scope.rowCollection[index].accessDateStart = setupdata.accessDateStart;
+                $scope.rowCollection[index].accessDateEnd = setupdata.accessDateEnd;
+                $scope.rowCollection[index].accessTimeStart = setupdata.accessTimeStart;
+                $scope.rowCollection[index].accessTimeEnd = setupdata.accessTimeEnd;
+                $scope.rowCollection[index].accessType = setupdata.accessType;
+                $scope.rowCollection[index].accessDayCounter = setupdata.accessDayCounter;
+
+                row.userUpdatePending = false;
+
+                return deferred.resolve();
+            }, function(response) {
+                $scope.error = 'Setup user access failed.';
+                $scope.profileUpdatePending = false;
+                $scope.showError = true;
+                $scope.showSuccess = false;
+
+                row.userUpdatePending = false;
+
+                return deferred.reject(response);
+            });
+            return deferred.promise
+
+        }, function () {
+          row.userUpdatePending = false;
+          $log.info('Modal dismissed at: ' + new Date());
         });
     };
 
     //remove to the real data holder
-    $scope.removeItem = function removeItem(row) {
+    $scope.removeUser = function removeUser(row) {
 
         var modalInstance = $modal.open({
           templateUrl: 'partials/modals/RemoveUser.html',
@@ -149,7 +249,23 @@ RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log, $q, Us
         modalInstance.result.then(function (selected) {
             var index = $scope.rowCollection.indexOf(row);
             if (index !== -1) {
-                $scope.rowCollection.splice(index, 1);
+
+                User.delete(row.id).then(function() {
+                    $scope.profileUpdatePending = false;
+                    $scope.success = 'User successfully removed.'
+                    $scope.showError = false;
+                    $scope.showSuccess = true;
+
+                    $scope.rowCollection.splice(index, 1);
+                    return deferred.resolve();
+                }, function(response) {
+                    $scope.error = 'Removing user failed.'
+                    $scope.profileUpdatePending = false;
+                    $scope.showError = true;
+                    $scope.showSuccess = false;
+                    return deferred.reject(response);
+                });
+                return deferred.promise
             }
 
         }, function () {

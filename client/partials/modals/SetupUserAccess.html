@@ -19,13 +19,13 @@
             <div class="col-md-offset-1 col-md-6">
                 <span> From: </span>
                 <p class="input-group">
-                  <input type="date" class="form-control" uib-datepicker-popup ng-model="dt" is-open="status.opened" min-date="minDate" max-date="maxDate" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" close-text="Close" />
+                  <input type="date" class="form-control" uib-datepicker-popup ng-model="accesDateStart" is-open="status.opened" min-date="minDate" max-date="maxDate" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" close-text="Close" />
                 </p>
             </div>
             <div class="col-md-5">
                 <span> To: </span>
                 <p class="input-group">
-                  <input type="date" class="form-control" uib-datepicker-popup ng-model="dt" is-open="status.opened" min-date="minDate" max-date="maxDate" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" close-text="Close" />
+                  <input type="date" class="form-control" uib-datepicker-popup ng-model="accesDateEnd" is-open="status.opened" min-date="minDate" max-date="maxDate" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" close-text="Close" />
                 </p>
             </div>
         </div>
@@ -34,48 +34,87 @@
     <div ng-show="selectedAccessType == 2">
         <p style="font-weight: bold"> Access day counter </p>
         <div class="row">
-            <div class="col-md-offset-1 col-md-10">
-                <h-number value="input.num" min="0" max="50" step="1"  singular="day" plural="days" change="onChanged()"></h-number>
+            <div class="col-md-offset-2 col-md-8">
+                <h-number value="accessDayCounter" min="0" max="50" step="1"  singular="day" plural="days" change="onChanged()"></h-number>
             </div>
         </div>
     </div>
 
     <p style="font-weight: bold"> Access time </p>
     <div class="row">
-        <div class="col-md-offset-1 col-md-6">
+        <div class="col-md-offset-2 col-md-5">
             <span style="float:none">From: </span>
-            <uib-timepicker style="margin-left: 45px;" ng-model="mytime" ng-change="changed()" hour-step="hstep" minute-step="mstep" show-meridian="ismeridian"></uib-timepicker>
+            <uib-timepicker ng-model="accesTimeStart_display" ng-change="accesTime_changed()" hour-step="hstep" minute-step="mstep" show-meridian="ismeridian"></uib-timepicker>
         </div>
         <div class="col-md-5">
             <span style="float:none">To:</span>
-            <uib-timepicker style="margin-left: 45px;" ng-model="mytime" ng-change="changed()" hour-step="hstep" minute-step="mstep" show-meridian="ismeridian"></uib-timepicker>
+            <uib-timepicker ng-model="accesTimeEnd_display" ng-change="accesTime_changed()" hour-step="hstep" minute-step="mstep" show-meridian="ismeridian"></uib-timepicker>
         </div>
     </div>
 
     <p style="font-weight: bold"> Accessable days</p>
     <div class="row">
-        <form role="form" class="col-md-offset-2 col-md-8">
+        <form role="form" class="center-form-block col-md-offset-2 col-md-8">
             <label class="checkbox-inline">
-                <input type="checkbox" value="">Mo
+                <input type="checkbox" ng-model="accesDaysMaskMon">Mo
             </label>
             <label class="checkbox-inline">
-                <input type="checkbox" value="">Tu
+                <input type="checkbox" ng-model="accesDaysMaskTue">Tu
             </label>
             <label class="checkbox-inline">
-                <input type="checkbox" value="">We
+                <input type="checkbox" ng-model="accesDaysMaskWed">We
             </label>
             <label class="checkbox-inline">
-                <input type="checkbox" value="">Th
+                <input type="checkbox" ng-model="accesDaysMaskThu">Th
             </label>
             <label class="checkbox-inline">
-                <input type="checkbox" value="">Fr
+                <input type="checkbox" ng-model="accesDaysMaskFri">Fr
             </label>
             <label class="checkbox-inline">
-                <input type="checkbox" value="">Sa
+                <input type="checkbox" ng-model="accesDaysMaskSat">Sa
             </label>
             <label class="checkbox-inline">
-                <input type="checkbox" value="">Su
+                <input type="checkbox" ng-model="accesDaysMaskSun">Su
             </label>
+        </form>
+    </div>
+
+    <p style="font-weight: bold"> Access keys</p>
+    <div class="row">
+        <form role="form" class="center-form-block col-md-offset-2 col-md-8">
+            <span>
+                <input type="checkbox" ng-model="keyMaskRed">
+                <i class="glyphicon glyphicon-thumbs-up gliphicon-red" tooltip="red key"></i>
+            </span>
+            <span>
+                <input type="checkbox" ng-model="keyMaskGreen">
+                <i class="glyphicon glyphicon-thumbs-up gliphicon-green" tooltip="green key"></i>
+            </span>
+            <span>
+                <input type="checkbox" ng-model="keyMaskBlack">
+                <i class="glyphicon glyphicon-thumbs-up gliphicon-black" tooltip="black key"></i>
+            </span>
+            <span>
+                <input type="checkbox" ng-model="keyMaskPink">
+                <i class="glyphicon glyphicon-thumbs-up gliphicon-pink" tooltip="pink key"></i>
+            </span>
+            <span>
+                <input type="checkbox" ng-model="keyMaskMarine">
+                <i class="glyphicon glyphicon-thumbs-up gliphicon-marine" tooltip="marine key"></i>
+            </span>
+            <span>
+                <input type="checkbox" ng-model="keyMaskOrange">
+                <i class="glyphicon glyphicon-thumbs-up gliphicon-orange" tooltip="orange key"></i>
+            </span>
+            <span>
+                <input type="checkbox" ng-model="keyMaskOlive">
+                <i class="glyphicon glyphicon-thumbs-up gliphicon-olive" tooltip="olive key"></i>
+
+            </span>
+            <span>
+                <input type="checkbox" ng-model="keyMaskPurple">
+                <i class="glyphicon glyphicon-thumbs-up gliphicon-purple" tooltip="purple key"></i>
+            </span>
         </form>
     </div>
 

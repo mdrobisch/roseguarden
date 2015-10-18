@@ -6,31 +6,15 @@ from marshmallow import Serializer, fields
 import datetime
 
 class UserSerializer(Serializer):
-    id = fields.Integer()
-    email = fields.String()
-    firstName = fields.String()
-    lastName = fields.String()
-    phone = fields.String()
-    role = fields.Integer()
-    licenseMask = fields.Integer()
-    keyMask = fields.Integer()
-    lastLoginDateTime = fields.DateTime("%H:%M %d.%m.%Y")
-    registerDateTime = fields.DateTime("%d.%m.%Y")
-    accessDateStart = fields.DateTime("%d.%m.%Y")
-    accessDateEnd = fields.DateTime("%d.%m.%Y")
-    accessTimeStart = fields.DateTime("%H:%M")
-    accessTimeEnd = fields.DateTime("%H:%M")
-    accessType = fields.Integer()
-    accessDaysMask = fields.Integer()
-    accessDayCounter = fields.Integer()
-    budget = fields.Float()
-    #class Meta:
-    #    fields = ("id", "email", "firstName", "lastName", "phone", "role", "license", "key", "accessDateTimeStart", "accessType")
-    #    dateformat = "%Y "
+    class Meta:
+        fields = ("id", "email", "firstName", "lastName", "phone", "role", "licenseMask", "keyMask",
+                  "association", "registerDateTime", "lastLoginDateTime", "accessDateStart", "accessDateEnd",
+                  "accessTimeStart", "accessTimeEnd", "accessType", "accessDaysMask", "accessDayCounter",
+                  "budget")
 
 class SessionInfoSerializer(Serializer):
     class Meta:
-        fields = ("id","role")
+        fields = ("id", "role")
 
 
 class RequestSerializer(Serializer):

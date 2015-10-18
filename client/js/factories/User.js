@@ -24,6 +24,12 @@ RoseGuardenApp.factory('User', function(Restangular) {
                 .one('register')
                 .withHttpConfig({bypassErrorInterceptor: true})
                 .customPOST(data);
+        },
+        delete: function(id) {
+            return Restangular
+                .one('user',id)
+                .withHttpConfig({bypassErrorInterceptor: true})
+                .remove();
         }
 
     };

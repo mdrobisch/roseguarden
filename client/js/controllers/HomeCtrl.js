@@ -1,4 +1,4 @@
-RoseGuardenApp.controller('HomeCtrl', function($q, $scope, Door, AuthService, OpeningRequest, User) {
+RoseGuardenApp.controller('HomeCtrl', function($q, $scope, Door, AuthService, $log, OpeningRequest, User) {
 
     $scope.message = '';
     $scope.isLoading = true;
@@ -10,7 +10,7 @@ RoseGuardenApp.controller('HomeCtrl', function($q, $scope, Door, AuthService, Op
     ];
 
     $scope.isAllowed = function(door) {
-        if((door.keyMask & $scope.user.key)  != 0)
+        if((door.keyMask & $scope.user.keyMask)  != 0)
             return false;
         else
             return true;

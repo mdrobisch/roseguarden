@@ -3,7 +3,7 @@ __author__ = 'drobisch'
 from flask_wtf import Form
 
 from wtforms_alchemy import model_form_factory
-from wtforms import StringField
+from wtforms import StringField, IntegerField, DateTimeField
 from wtforms.validators import DataRequired, Optional
 
 from server import db
@@ -21,13 +21,28 @@ class UserCreateForm(ModelForm):
     class Meta:
         model = User
 
+class UserDeleteForm(Form):
+    email = StringField('email', validators=[Optional()])
+
 class UserPatchForm(Form):
     email = StringField('email', validators=[Optional()])
     firstName = StringField('firstName', validators=[Optional()])
     lastName = StringField('lastName', validators=[Optional()])
     phone = StringField('phone', validators=[Optional()])
+    role = StringField('role', validators=[Optional()])
     newpassword = StringField('password', validators=[Optional()])
     oldpassword = StringField('password', validators=[Optional()])
+    association = StringField('association', validators=[Optional()])
+
+    accessType = IntegerField('accessType', validators=[Optional()])
+    keyMask = IntegerField('keyMask', validators=[Optional()])
+    accessDayCounter = IntegerField('accessDayCounter', validators=[Optional()])
+    accessDaysMask = IntegerField('accessDaysMask', validators=[Optional()])
+
+    accessDateStart = StringField('accessDateStart', validators=[Optional()])
+    accessDateEnd = StringField('accessDateEnd', validators=[Optional()])
+    accessTimeStart = StringField('accessTimeStart', validators=[Optional()])
+    accessTimeEnd = StringField('accessTimeEnd', validators=[Optional()])
 
 class SessionCreateForm(Form):
     email = StringField('email', validators=[DataRequired()])
@@ -38,7 +53,8 @@ class RegisterUserForm(Form):
     password = StringField('password', validators=[DataRequired()])
     firstName = StringField('firstName', validators=[DataRequired()])
     lastName = StringField('lastName', validators=[DataRequired()])
-    phone = StringField('lastName', validators=[DataRequired()])
+    phone = StringField('phone', validators=[DataRequired()])
+    association = StringField('association', validators=[DataRequired()])
 
 class LostPasswordForm(Form):
     email = StringField('email', validators=[DataRequired()])
