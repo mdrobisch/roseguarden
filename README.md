@@ -175,15 +175,17 @@ on your own.
 
 For Raspbbery Pi B
 
-`dtparam=spi=on
-dtoverlay=spi-bcm2708`
+`dtparam=spi=on`
+
+`dtoverlay=spi-bcm2708`
 
 have to been set.
 
 For Raspberry Pi 2 (not tested, yet)
 
-`dtparam=spi=on
-dtoverlay=spi-bcm2835`
+`dtparam=spi=on`
+
+`dtoverlay=spi-bcm2835`
 
 should be working (not tested yet)
 
@@ -191,14 +193,19 @@ For Raspberry Pi 2 please consider, there is be a another pin-out-connectio need
 https://www.raspberrypi.org/forums/viewtopic.php?f=37&t=106313 or a alternative way to enable SPI here http://bsd.ee/~hadara/blog/?p=1017
 
 
-`Mifare_RC522_RFID Raspberry Pi 2 B
+Mifare_RC522_RFID Raspberry Pi 2 B
 
 MOSI ——————————> pin 19 e.g. GPIO 10
+
 MISO ——————————> pin 21 e.g. GPIO 9
+
 SCLK ——————————> pin 23 e.g. GPIO 11
+
 SDA  ——————————> pin 24 e.g. GPIO 8
+
 RST  ——————————> pin 22 e.g. GPIO 25
-IRQ  ——————————> NONE `
+
+IRQ  ——————————> NONE
 
 License
 =======

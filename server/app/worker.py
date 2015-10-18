@@ -17,6 +17,7 @@ class BackgroundWorker():
         self.app = app
         self.requestOpening = False;
         self.openingTimer = -1;
+        self.requestTimer = 0;
 
         # setup gpio and set default (Low)
         GPIO.setmode(GPIO.BOARD)
@@ -31,12 +32,11 @@ class BackgroundWorker():
             print 'started background-server'
 
     def readRFIDTag(self):
-        print "try rfid detect"
         (status,TagType) = RFIDReader.MFRC522_Request(RFIDReader.PICC_REQIDL)
 
         # If a card is found
         if status == RFIDReader.MI_OK:
-            print "Card detected"
+            print "rfid tag detected"
 
         # Get the UID of the card
         (status,uid) = RFIDReader.MFRC522_Anticoll()
@@ -80,7 +80,11 @@ class BackgroundWorker():
                 print "Closing door"
                 GPIO.output(12, GPIO.HIGH)
 
-        self.readRFIDTag()
+        self.requestTimer += 1
+
+        if self.requestTimer > 2:
+            self.requestTimer = 0
+            self.readRFIDTag()
 
         #else:
             #print "Closing door"
