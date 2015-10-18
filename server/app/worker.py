@@ -82,7 +82,7 @@ class BackgroundWorker():
 
         self.requestTimer += 1
 
-        if self.requestTimer > 2:
+        if self.requestTimer >= 2:
             self.requestTimer = 0
             self.readRFIDTag()
 

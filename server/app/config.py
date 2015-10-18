@@ -1,6 +1,6 @@
 import os
 
-DEBUG = True
+DEBUG = False
 WTF_CSRF_ENABLED = False
 
 # email server
