@@ -17,7 +17,7 @@ RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log, $q, Us
 
 
     $scope.message = 'This is the AdminSpaceCtrl message';
-    $scope.rfidtaginfo = "Click to update."
+    $scope.rfidtaginfo = "RFID tag. <br> Click to update."
 
     $scope.isLoading = true;
     $scope.showError = false;
