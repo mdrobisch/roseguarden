@@ -45,7 +45,7 @@ class BackgroundWorker():
         if status == RFIDReader.MI_OK:
 
             # Print UID
-            print "Card read UID: "+str(uid[0])+","+str(uid[1])+","+str(uid[2])+","+str(uid[3])
+            print "Card read UID: "+str(uid[0])+"."+str(uid[1])+"."+str(uid[2])+"."+str(uid[3])
 
             # This is the default key for authentication
             key = [0xFF,0xFF,0xFF,0xFF,0xFF,0xFF]
@@ -75,7 +75,7 @@ class BackgroundWorker():
             print "Opened door cycle" + "("  + ")"
             GPIO.output(12, GPIO.LOW)
             self.openingTimer += 1
-            if self.openingTimer >= 5:
+            if self.openingTimer >= 7:
                 self.openingTimer = -1
                 print "Closing door"
                 GPIO.output(12, GPIO.HIGH)

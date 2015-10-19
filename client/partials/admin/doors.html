@@ -1,4 +1,8 @@
 <div ng-controller="AdminDoorsCtrl"   >
+    <div class="alert alert-danger" ng-show="showError">
+        Loading data failed.
+    </div>
+
     <table class="table table-striped">
         <thead >
             <tr>
@@ -97,5 +101,8 @@
             </tr>
         </tfoot>
     </table>
-
+    <div class="alert alert-info" ng-show="isLoading">
+        Loading data ...
+        <img src="images/loading.gif" >
+    </div>
 </div>

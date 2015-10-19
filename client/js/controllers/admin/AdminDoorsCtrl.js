@@ -1,4 +1,4 @@
-RoseGuardenApp.controller('AdminDoorsCtrl', function($scope) {
+RoseGuardenApp.controller('AdminDoorsCtrl', function($scope,$q, Door) {
 
     var names = ['Front door', 'Back door'];
     var keyMasks = [0x01,-1];
@@ -49,7 +49,26 @@ RoseGuardenApp.controller('AdminDoorsCtrl', function($scope) {
     }
 
 
-    loadItemsDummy();
+    function loadItemsFromAPI() {
+
+        $scope.isLoading = true;
+        deferred = $q.defer();
+        Door.getList(true).then(function(doors) {
+              for(i=0;i < doors.length;i++) {
+                  $scope.rowCollection.push(doors[i]);
+              }
+            $scope.displayedCollection = [].concat($scope.rowCollection);
+            $scope.isLoading = false;
+            return deferred.resolve();
+        }, function(response) {
+            $scope.showError = false;
+            return deferred.reject(response);
+        });
+        return deferred.promise
+    }
+
+    loadItemsFromAPI();
+    //loadItemsDummy();
 
     //add to the real data holder
     $scope.addRandomItem = function addRandomItem() {

@@ -1,6 +1,5 @@
 RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log, $q, User) {
 
-    $scope.message = 'This is the AdminSpaceCtrl message';
     var firstnames = ['Thomas', 'Marcus', 'Lischen', 'Stephanie'];
     var lastnames = ['Müller', 'Drobisch', 'Meier', 'Lehmann'];
     var mails = ['a@gmx.de', 'b@gmx.de', 'c@gmx.de', 'd@gmx.de'];
@@ -16,6 +15,9 @@ RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log, $q, Us
     var roles = [0, 1,0, 0];
     var id = 1;
 
+
+    $scope.message = 'This is the AdminSpaceCtrl message';
+    $scope.rfidtaginfo = "Click to update."
 
     $scope.isLoading = true;
     $scope.showError = false;
@@ -113,6 +115,10 @@ RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log, $q, Us
 
     loadItemsFromAPI();
     //loadItemsDummy();
+
+    $scope.updateRfidInfo = function updateRfidInfo() {
+            $scope.rfidtaginfo = "Update."
+    }
 
     //add to the real data holder
     $scope.addRandomItem = function addRandomItem() {

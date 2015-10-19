@@ -1,7 +1,7 @@
 RoseGuardenApp.factory('Door', function(Restangular) {
     var Door;
     Door = {
-        get: function() {
+        getList: function() {
             return Restangular
                 .one('doors')
                 .withHttpConfig({bypassErrorInterceptor: true})

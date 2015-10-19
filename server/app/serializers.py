@@ -23,7 +23,7 @@ class RequestSerializer(Serializer):
 
 class DoorSerializer(Serializer):
     class Meta:
-        fields = ("name", "keyMask", "address")
+        fields = ("name", "keyMask", "address", "local")
 
 #class User_Serializer (Resource):
 #    @marshal_with(parameter_marshaller)

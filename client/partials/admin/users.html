@@ -11,7 +11,7 @@
     <!-- Split button -->
     <div class="btn-group" uib-dropdown>
 
-        <button id="split-button" type="button" class="btn btn-lg btn-rfid-tag btn-warning">No rfid-tag <br> detected.</button>
+        <button id="split-button" type="button"  ng-click="updateRfidInfo()" class="btn btn-lg btn-rfid-tag btn-warning">{{rfidtaginfo}}</button>
         <button type="button" class="btn btn-danger" uib-dropdown-toggle>
             <span class="caret"></span>
             <span class="sr-only">Split button!</span>
