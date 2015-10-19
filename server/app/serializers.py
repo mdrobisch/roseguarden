@@ -16,6 +16,9 @@ class SessionInfoSerializer(Serializer):
     class Meta:
         fields = ("id", "role")
 
+class RfidTagInfoSerializer(Serializer):
+    userInfo = fields.String()
+    tagId = fields.String()
 
 class RequestSerializer(Serializer):
     class Meta:

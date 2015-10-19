@@ -4,6 +4,7 @@ from server import db, flask_bcrypt
 from wtforms.validators import Email
 import datetime
 
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.Text, unique=True, nullable=False, info={'validators': Email()})
@@ -113,3 +114,8 @@ class Request(db.Model):
         self.requestType = requestType
         self.cardID = cardID
         self.date = date
+
+class RfidTagInfo(object):
+    def __init__(self, tagId, userInfo):
+        self.userInfo = userInfo
+        self.tagId = tagId

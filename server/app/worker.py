@@ -4,7 +4,7 @@ from models import User
 from server import app
 import threading
 import os
-
+from models import RfidTagInfo
 from RFID import RFIDReader
 from RFID import RFIDMockup
 
@@ -18,6 +18,9 @@ class BackgroundWorker():
         self.requestOpening = False;
         self.openingTimer = -1;
         self.requestTimer = 0;
+        self.tagInfo = RfidTagInfo("No rfid tag detected", "")
+        self.tagResetCount = 0
+
 
         # setup gpio and set default (Low)
         GPIO.setmode(GPIO.BOARD)
@@ -30,6 +33,10 @@ class BackgroundWorker():
         self.thr = threading.Timer(1, self.timer_cycle)
         self.thr.start()
         print 'started background-server'
+
+    def resetTagInfo(self):
+        self.tagInfo.tagId = "No card detected"
+        self.tagInfo.userInfo = ""
 
     def readRFIDTag(self):
         (status,TagType) = RFIDReader.MFRC522_Request(RFIDReader.PICC_REQIDL)
@@ -47,6 +54,8 @@ class BackgroundWorker():
             # Print UID
             print "Card read UID: "+str(uid[0])+"."+str(uid[1])+"."+str(uid[2])+"."+str(uid[3])
 
+            self.tagInfo = str(uid[0])+"."+str(uid[1])+"."+str(uid[2])+"."+str(uid[3])
+
             # This is the default key for authentication
             key = [0xFF,0xFF,0xFF,0xFF,0xFF,0xFF]
 
@@ -60,8 +69,11 @@ class BackgroundWorker():
             if status == RFIDReader.MI_OK:
                 RFIDReader.MFRC522_Read(8)
                 RFIDReader.MFRC522_StopCrypto1()
+                return True
             else:
                 print "Authentication error"
+                return False
+        return False
 
     def timer_cycle(self):
         self.thr = threading.Timer(1, BackgroundWorker.timer_cycle,[self])

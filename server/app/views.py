@@ -4,8 +4,8 @@ from email import send_email
 from flask import g, render_template, make_response, jsonify
 from flask_restful import Resource, fields, marshal_with
 from server import api, db, flask_bcrypt, auth, mail
-from models import User, Door, Request
-from serializers import UserSerializer, SessionInfoSerializer, DoorSerializer, RequestSerializer
+from models import User, Door, Request, RfidTagInfo
+from serializers import UserSerializer, SessionInfoSerializer, DoorSerializer, RequestSerializer, RfidTagInfoSerializer
 from forms import UserCreateForm,UserPatchForm, SessionCreateForm, LostPasswordForm, RegisterUserForm, UserDeleteForm
 from worker import backgroundWorker
 from sqlalchemy.exc import IntegrityError
@@ -197,7 +197,10 @@ class DoorListView(Resource):
         posts = Door.query.all()
         return DoorSerializer(posts, many=True).data
 
-
+class RfidTagInfoView(Resource):
+    @auth.login_required
+    def get(self):
+        return RfidTagInfoSerializer(backgroundWorker.tagInfo).data
 
 api.add_resource(SessionView, '/sessions')
 api.add_resource(UserView, '/user/<int:id>')
@@ -207,3 +210,4 @@ api.add_resource(DoorListView, '/doors')
 api.add_resource(OpeningRequestView, '/request/opening')
 api.add_resource(LostPasswordView, '/request/password')
 api.add_resource(RegisterUserView, '/register')
+api.add_resource(RfidTagInfoView,'/taginfo')

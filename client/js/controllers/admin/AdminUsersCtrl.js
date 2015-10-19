@@ -1,4 +1,4 @@
-RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log, $q, User) {
+RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log, $q, User, RfidTagInfo) {
 
     var firstnames = ['Thomas', 'Marcus', 'Lischen', 'Stephanie'];
     var lastnames = ['Müller', 'Drobisch', 'Meier', 'Lehmann'];
@@ -117,7 +117,17 @@ RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log, $q, Us
     //loadItemsDummy();
 
     $scope.updateRfidInfo = function updateRfidInfo() {
-            $scope.rfidtaginfo = "Update."
+        $scope.rfidtaginfo = "Request tag-info ..."
+        deferred = $q.defer();
+        RfidTagInfo.get(true).then(function(tagInfo) {
+            $scope.rfidtaginfo = tagInfo.tagId + " <br>  " + tagInfo.userInfo;
+
+            return deferred.resolve();
+        }, function(response) {
+            $scope.rfidtaginfo = "Error while request tag-info";
+            return deferred.reject(response);
+        });
+        return deferred.promise
     }
 
     //add to the real data holder
