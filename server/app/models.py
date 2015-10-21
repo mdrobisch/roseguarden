@@ -7,6 +7,7 @@ import datetime
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    local = db.Column(db.Integer)
     email = db.Column(db.Text, unique=True, nullable=False, info={'validators': Email()})
     password = db.Column(db.Text, nullable=False)
     token = db.Column(db.Text)
@@ -52,14 +53,13 @@ class User(db.Model):
             return 'invalid access because of TimeStart'
         if self.accessTimeEnd.time() < datetime.datetime.now().time():
             return 'invalid access because of TimeEnd'
-
-
         return "access granted"
 
     def __repr__(self):
         return '<User %r>' % self.email
 
-    def __init__(self, email, password, firstName, lastName, role = 0,phone = '0',licenseMask = 0, keyMask = 0, association = ''):
+    def __init__(self, email, password, firstName, lastName, role = 0, phone='0', licenseMask =0, keyMask = 0, association = ''):
+        self.local = 0
         self.phone = phone
         self.role = role;
         self.email = email
@@ -83,10 +83,17 @@ class User(db.Model):
 
 
 class Setting(db.Model):
+    WRITEONLY = 0x80
+    WRITEONLY = 0x40
+    VALUETYPE_STRING = 1
+    VALUETYPE_INT = 1
+    VALUETYPE_FLOAT = 1
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text)
     value = db.Column(db.Text)
     type = db.Column(db.Integer)
+
     def __init__(self, name,value,type):
         self.name = name
         self.type = type
@@ -107,6 +114,7 @@ class Request(db.Model):
     requestName = db.Column(db.Text)
     requestType = db.Column(db.Text)
     date = db.Column(db.Date)
+
     def __init__(self, userName, userMail, cardID, requestName,requestType, date = datetime.datetime.now()):
         self.userName = userName
         self.userMail = userMail

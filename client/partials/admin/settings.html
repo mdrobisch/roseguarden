@@ -1,1 +1,96 @@
-No settings available in the moment.
+<div ng-controller="AdminSettingsCtrl">
+
+     <div class="alert alert-success" ng-show="showSuccess">
+        {{success}}
+    </div>
+
+     <div class="alert alert-danger" ng-show="showError">
+        {{error}}
+    </div>
+
+    <p></p>
+
+    <form name="form" ng-submit="updateSettings()" role="form" class="form-horizontal" >
+
+        <p style="font-weight: bold; margin: 0"> Node Settings</p>
+        <hr style="margin-top: 2px">
+
+        <div class="form-group">
+
+            <label for="nodeSetting_Name" class="col-xs-3 control-label">Name</label>
+            <div class="col-xs-8">
+                <input type="text" name="nodeSetting_Name" id="nodeSetting_Name" class="form-control" ng-model="settings.nodeSetting_Name" required />
+                <span ng-show="form.nodeSetting_Name.$dirty && form.nodeSetting_Name.$error.required" class="help-block">Name of node is required</span>
+            </div>
+        </div>
+
+
+        <div class="form-group">
+
+            <label class="col-xs-3 control-label">Valid Keys</label>
+            <div class="col-xs-8">
+                <span>
+                    <input type="checkbox" ng-model="keyMaskRed">
+                    <i class="glyphicon glyphicon-thumbs-up gliphicon-red" tooltip="red key"></i>
+                </span>
+                <span>
+                    <input type="checkbox" ng-model="keyMaskGreen">
+                    <i class="glyphicon glyphicon-thumbs-up gliphicon-green" tooltip="green key"></i>
+                </span>
+                <span>
+                    <input type="checkbox" ng-model="keyMaskBlack">
+                    <i class="glyphicon glyphicon-thumbs-up gliphicon-black" tooltip="black key"></i>
+                </span>
+                <span>
+                    <input type="checkbox" ng-model="keyMaskPink">
+                    <i class="glyphicon glyphicon-thumbs-up gliphicon-pink" tooltip="pink key"></i>
+                </span>
+                <span>
+                    <input type="checkbox" ng-model="keyMaskMarine">
+                    <i class="glyphicon glyphicon-thumbs-up gliphicon-marine" tooltip="marine key"></i>
+                </span>
+                <span>
+                    <input type="checkbox" ng-model="keyMaskOrange">
+                    <i class="glyphicon glyphicon-thumbs-up gliphicon-orange" tooltip="orange key"></i>
+                </span>
+                <span>
+                    <input type="checkbox" ng-model="keyMaskOlive">
+                    <i class="glyphicon glyphicon-thumbs-up gliphicon-olive" tooltip="olive key"></i>
+
+                </span>
+                <span>
+                    <input type="checkbox" ng-model="keyMaskPurple">
+                    <i class="glyphicon glyphicon-thumbs-up gliphicon-purple" tooltip="purple key"></i>
+                </span>
+            </div>
+        </div>
+
+        <div class="form-actions" class="col-xs-3 control-label">
+            <button type="submit" ng-disabled="form.$invalid || settingsUpdatePending" class="btn btn-success">Change settings</button>
+            <img ng-if="passwordUpdatePending" src="images/loading.gif" >
+        </div>
+
+    </form>
+
+    <p></p>
+
+     <form name="passwordform" ng-submit="changePassword()" role="form" class="form-horizontal" >
+
+        <div class="form-group">
+            <label for="nodeSetting_Password" class="col-xs-3 control-label"> New password</label>
+            <i class="fa fa-lock"></i>
+            <div class="col-xs-8">
+                <input type="password" name="nodeSetting_Password" id="nodeSetting_Password" class="form-control" ng-model="pwd.nodeSetting_Password"  required />
+                <span class="msg-error " ng-show="passwordform.nodeSetting_Password.$dirty && passwordform.nodeSetting_Password.$error.unique">Password is required.</span>
+            </div>
+        </div>
+
+        <div class="form-actions" class="col-xs-3 control-label">
+            <button type="submit" ng-disabled="passwordform.$invalid || passwordUpdatePending" class="btn btn-success">Change password</button>
+            <img ng-if="passwordUpdatePending" src="images/loading.gif" >
+        </div>
+    </form>
+
+     <p></p>
+
+</div>
