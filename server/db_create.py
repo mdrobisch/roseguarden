@@ -10,7 +10,7 @@ User.query.delete()
 
 #defaultUser1 = User('masternode@konglomerat.org','1234','Master','Konglomerat',1)
 #defaultUser1.local = 1
-defaultUser1 = User('kommando@konglomerat.org','1234','Konglomerat','Kommando',1)
+defaultUser1 = User('kommando@konglomerat.org','konglo2015','Konglomerat','Kommando',1)
 defaultUser1.accessType = 1
 defaultUser2 = User('m.drobisch@googlemail.com','1234','Marcus','Drobisch',1,'01754404298',0x00,0x03)
 defaultUser2.accessType = 1

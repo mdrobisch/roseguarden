@@ -78,6 +78,7 @@ class BackgroundWorker():
     def timer_cycle(self):
         self.thr = threading.Timer(1, BackgroundWorker.timer_cycle,[self])
         self.thr.start()
+        print "Check fo opening request"
         if self.requestOpening == True:
             self.requestOpening = False
             self.openingTimer = 0;
