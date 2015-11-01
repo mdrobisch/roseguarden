@@ -7,7 +7,7 @@ import datetime
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    local = db.Column(db.Integer)
+    syncMaster = db.Column(db.Integer)
     email = db.Column(db.Text, unique=True, nullable=False, info={'validators': Email()})
     password = db.Column(db.Text, nullable=False)
     token = db.Column(db.Text)
@@ -59,7 +59,7 @@ class User(db.Model):
         return '<User %r>' % self.email
 
     def __init__(self, email, password, firstName, lastName, role = 0, phone='0', licenseMask =0, keyMask = 0, association = ''):
-        self.local = 0
+        self.syncMaster = 0
         self.phone = phone
         self.role = role;
         self.email = email

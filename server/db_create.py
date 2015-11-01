@@ -8,9 +8,9 @@ import base64
 db.create_all()
 User.query.delete()
 
-#defaultUser1 = User('masternode@konglomerat.org','1234','Master','Konglomerat',1)
-#defaultUser1.local = 1
-defaultUser1 = User('kommando@konglomerat.org','konglo2015','Konglomerat','Kommando',1)
+syncMasterUser = User('syncmaster@roseguarden.org','pleasechangethepassword','Sync','Master',1)
+syncMasterUser.syncMaster = 1
+defaultUser1 = User('kommando@konglomerat.org','konglo2015','Konglomerat','Kommando', 0)
 defaultUser1.accessType = 1
 defaultUser2 = User('m.drobisch@googlemail.com','1234','Marcus','Drobisch',1,'01754404298',0x00,0x03)
 defaultUser2.accessType = 1
@@ -24,8 +24,11 @@ db.session.add(defaultUser2)
 
 Door.query.delete()
 #db.session.add(Door(id = 0, name = 'front door', address = 'http://192.168.2.137', keyMask = 0x01, local = 0x00 ))
+#db.session.add(Door(id = 0, name = 'front door', address = 'http://192.168.2.138', keyMask = 0x01, local = 0x00 ))
+#db.session.add(Door(id = 0, name = 'front door', address = 'http://192.168.2.139', keyMask = 0x01, local = 0x00 ))
 #db.session.add(Door(id = 1, name = 'inner door', address = 'http://localhost', keyMask = 0x02, local = 0x01 ))
-db.session.add(Door(id = 2, name = 'Inner door', address = 'http://10.42.125.7', keyMask = 0x01, local = 0x00 ))
+db.session.add(Door(id = 1, name = 'Outer door', address = 'http://192.168.0.59', keyMask = 0x03, local = 0x00 ))
+db.session.add(Door(id = 2, name = 'Inner door', address = 'http://10.43.125.7', keyMask = 0x03, local = 0x00 ))
 
 Request.query.delete()
 db.session.add(Request('Marcus Drobisch','m.drobisch@googlemail.com', '1.1.1.1','Front door opening','Door',datetime.datetime.now()))
