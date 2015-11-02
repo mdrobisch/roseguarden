@@ -1,22 +1,22 @@
 <div ng-controller="AdminDoorsCtrl"   >
-    <div class="alert alert-danger" ng-show="showError">
-        Loading data failed.
-    </div>
-
     <table class="table table-striped">
         <thead >
             <tr>
-                <th>name</th>
+                <th>displayed name</th>
                 <th>address</th>
+                <th>actions</th>
             </tr>
         </thead>
 
         <tbody>
             <tr>
                 <td> <input type="text" ng-model="newdoor.name" class="form-control"> </td>
-                <td> <input type="text" ng-model="newdoor.address" class="form-control"> </td>
                 <td>
-                    <button type="button" ng-disabled="true" ng-click="addDoorItem()" class="btn btn-sm btn-success">
+                    <label for="doorAddress" style="float: left;  margin-top: 8px; margin-right:3px">http://</label>
+                    <input id="doorAddress" type="text" ng-model="newdoor.address" class="form-control" style="width: 80%">
+                </td>
+                <td>
+                    <button type="button" ng-click="addDoor()" class="btn btn-sm btn-success">
                         <i class="glyphicon glyphicon-plus">
                         </i> Add
                     </button>
@@ -24,6 +24,12 @@
             </tr>
         </tbody>
     </table>
+
+    <div class="alert alert-danger" ng-show="showError">
+        {{error}}
+    </div>
+
+
 
     <table st-table="displayedCollection" st-safe-src="rowCollection" class="table table-striped">
         <thead >
@@ -34,7 +40,7 @@
                 <th>actions</th>
             </tr>
             <tr>
-                <th colspan="4"><input st-search="" class="form-control" placeholder="global search ..." type="text"/></th>
+                <th colspan="5"><input st-search="" class="form-control" placeholder="global search ..." type="text"/></th>
             </tr>
         </thead>
 
@@ -44,6 +50,7 @@
                     {{row.name}}
                 </td>
                 <td>{{row.address}}</td>
+
                 <td>
                     <button ng-show="row.local == 0 && row.keyMask == -1" " popover-placement="right" tooltip="update valid keys" class="btn btn-default">
                         <i class="glyphicon glyphicon-question-sign "></i>
@@ -75,20 +82,30 @@
                         </a>
                     </span>
                 </td>
-
                 <td>
-                    <button ng-show="row.local == 1" ng-disabled="true" popover-placement="right" popover="local" class="btn btn-default">
-                        <i class="glyphicon glyphicon-star-empty"></i>
-                    </button>
-                    <button ng-show="row.local == 0" ng-disabled="true" type="button" ng-click="" class="btn btn-sm btn-success" tooltip="Synchronize user">
-                        <i class="glyphicon glyphicon-share-alt"></i>
-                    </button>
-                    <button ng-show="row.local == 0" ng-disabled="true" type="button" ng-click="" class="btn btn-sm btn-success" tooltip="Update valid keys">
-                        <i class="glyphicon glyphicon-refresh"></i>
-                    </button>
-                    <button ng-show="row.local == 0" ng-disabled="true" type="button" ng-click="removeItem(row)" class="btn btn-sm btn-danger" tooltip="Remove door">
-                        <i class="glyphicon glyphicon-remove-circle"></i>
-                    </button>
+
+                    <div ng-show="row.local == 0">
+                        <button ng-show="row.local == 0" type="button" ng-click="" class="btn btn-sm btn-success" tooltip="Synchronize">
+                            <i class="glyphicon glyphicon-refresh"></i>
+                        </button>
+                        <button ng-show="row.local == 0" type="button" ng-click="removeDoor(row)" class="btn btn-sm btn-danger" tooltip="Remove door">
+                            <i class="glyphicon glyphicon-remove-circle"></i>
+                        </button>
+                    </div>
+
+                    <div ng-show="row.local == 1" class="btn-group" dropdown is-open="status.isopen">
+                        <button id="single-button" type="button"  class="btn btn-sm btn-danger" dropdown-toggle tooltip="configure user">
+                            <i class="glyphicon glyphicon-cog"></i>
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li role="menuitem"><a ng-click="setupUserAccess(row)">Setup door</a></li>
+                        </ul>
+                        <img ng-if="row.userUpdatePending" src="images/loading.gif" >
+                    </div>
+
+
+
                 </td>
             </tr>
         </tbody>
@@ -101,6 +118,7 @@
             </tr>
         </tfoot>
     </table>
+
     <div class="alert alert-info" ng-show="isLoading">
         Loading data ...
         <img src="images/loading.gif" >

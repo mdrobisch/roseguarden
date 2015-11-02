@@ -106,6 +106,12 @@ class Door(db.Model):
     address = db.Column(db.Text)
     local = db.Column(db.Integer)
 
+    def __init__(self,name,keyMask,address,local):
+        self.name = name
+        self.keyMask = keyMask
+        self.address = address
+        self.local = local
+
 class Request(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     userName = db.Column(db.Text, nullable=False)
@@ -115,7 +121,7 @@ class Request(db.Model):
     requestType = db.Column(db.Text)
     date = db.Column(db.Date)
 
-    def __init__(self, userName, userMail, cardID, requestName,requestType, date = datetime.datetime.now()):
+    def __init__(self, userName, userMail, cardID, requestName, requestType, date = datetime.datetime.now()):
         self.userName = userName
         self.userMail = userMail
         self.requestName = requestName

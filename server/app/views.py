@@ -6,9 +6,11 @@ from flask_restful import Resource, fields, marshal_with
 from server import api, db, flask_bcrypt, auth, mail
 from models import User, Door, Request, RfidTagInfo
 from serializers import UserSerializer, SessionInfoSerializer, DoorSerializer, RequestSerializer, RfidTagInfoSerializer
-from forms import UserCreateForm,UserPatchForm, SessionCreateForm, LostPasswordForm, RegisterUserForm, UserDeleteForm
+from forms import UserPatchForm, DoorRegistrationForm, SessionCreateForm, LostPasswordForm, RegisterUserForm, UserDeleteForm
 from worker import backgroundWorker
 from sqlalchemy.exc import IntegrityError
+import json
+import requests
 import base64
 import controller
 import datetime
@@ -191,10 +193,59 @@ class OpeningRequestView(Resource):
             return checkAccessResult, 201
         return '', 201
 
+class DoorView(Resource):
+    @auth.login_required
+    def delete(self, id):
+        print "requested door remove " + str(id)
+        door = Door.query.filter_by(id=id).first()
+        if door != None:
+            print 'delete door ' + door.name + ' ' + door.address + ' (id=' + str(door.id) + ') from database'
+            Door.query.filter(Door.id == id).delete()
+            db.session.commit()
+        return '', 201
+
+
+class DoorRegistrationView(Resource):
+    @auth.login_required
+    def post(self):
+        form = DoorRegistrationForm()
+        print 'Door registration request received'
+        if not form.validate_on_submit():
+            return form.errors,422
+
+        print 'Request door info from ' + 'http://' + form.address.data + ':5000' + '/request/doorinfo'
+        try:
+            response = requests.get('http://' + form.address.data + ':5000' + '/request/doorinfo', timeout=2)
+        except:
+            print "requested door unreachable"
+            return 'requested door unreachable', 400
+
+        print "create new door"
+        response_data = json.loads(response.content)
+        newDoor = Door(name = form.name.data, keyMask=response_data["keyMask"], address='http://' + form.address.data, local=0)
+        print "try to add door to database 1"
+        try:
+            print "try to add door to database 2"
+            db.session.add(newDoor)
+            db.session.commit()
+            print "Added door to database"
+        except IntegrityError:
+            print "Problems to add door to database"
+            return make_response(jsonify({'error': 'eMail already registered'}), 400)
+
+        print "return new door data for request"
+        return DoorSerializer(newDoor).data
+
+class DoorInfoView(Resource):
+    def get(self):
+        print 'Door info request'
+        localdoor = Door.query.filter_by(local=1).first()
+        return DoorSerializer(localdoor).data
+
 class DoorListView(Resource):
     @auth.login_required
     def get(self):
-        posts = Door.query.all()
+        posts = Door.query.filter_by(local=0).all()
         return DoorSerializer(posts, many=True).data
 
 class RfidTagInfoView(Resource):
@@ -206,8 +257,11 @@ api.add_resource(SessionView, '/sessions')
 api.add_resource(UserView, '/user/<int:id>')
 api.add_resource(UserListView, '/users')
 api.add_resource(UserLogView, '/log/user/<int:id>')
+api.add_resource(DoorView, '/door/<int:id>')
+api.add_resource(DoorRegistrationView, '/door')
 api.add_resource(DoorListView, '/doors')
 api.add_resource(OpeningRequestView, '/request/opening')
 api.add_resource(LostPasswordView, '/request/password')
+api.add_resource(DoorInfoView, '/request/doorinfo')
 api.add_resource(RegisterUserView, '/register')
 api.add_resource(RfidTagInfoView,'/taginfo')

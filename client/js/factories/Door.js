@@ -7,11 +7,19 @@ RoseGuardenApp.factory('Door', function(Restangular) {
                 .withHttpConfig({bypassErrorInterceptor: true})
                 .getList();
         },
-        create: function(data) {
+        add: function(data) {
             return Restangular
-                .one('doors')
+                .one('door')
+                .withHttpConfig({bypassErrorInterceptor: true})
                 .customPOST(data);
+        },
+        delete: function(id) {
+            return Restangular
+                .one('door',id)
+                .withHttpConfig({bypassErrorInterceptor: true})
+                .remove();
         }
+
     };
     return Door;
 })

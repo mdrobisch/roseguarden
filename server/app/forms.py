@@ -17,9 +17,9 @@ class ModelForm(BaseModelForm):
         return db.session
 
 
-class UserCreateForm(ModelForm):
-    class Meta:
-        model = User
+#class UserCreateForm(ModelForm):
+#    class Meta:
+#        model = User
 
 class UserDeleteForm(Form):
     email = StringField('email', validators=[Optional()])
@@ -58,3 +58,8 @@ class RegisterUserForm(Form):
 
 class LostPasswordForm(Form):
     email = StringField('email', validators=[DataRequired()])
+
+
+class DoorRegistrationForm(Form):
+    name = StringField('name', validators=[DataRequired()])
+    address = StringField('address', validators=[DataRequired()])

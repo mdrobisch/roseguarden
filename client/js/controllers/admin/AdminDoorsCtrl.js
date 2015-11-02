@@ -1,4 +1,4 @@
-RoseGuardenApp.controller('AdminDoorsCtrl', function($scope,$q, Door) {
+RoseGuardenApp.controller('AdminDoorsCtrl', function($scope,$q, Door, $modal, $log) {
 
     var names = ['Front door', 'Back door'];
     var keyMasks = [0x01,-1];
@@ -76,22 +76,74 @@ RoseGuardenApp.controller('AdminDoorsCtrl', function($scope,$q, Door) {
         id++;
     };
 
-    $scope.addDoorItem = function addDoorItem() {
-        $scope.rowCollection.push({
-            id: id,
-            name: $scope.newdoor.name,
-            doorSlot: $scope.newdoor.doorSlot,
-            address: $scope.newdoor.address,
-            local: 0 });
-        id++;
+    $scope.addDoor = function addDoor() {
+        $scope.showError = false;
+        deferred = $q.defer();
+        var newdoor = {name:$scope.newdoor.name, address: $scope.newdoor.address};
+
+
+        Door.add(newdoor).then(function(response_data) {
+            $log.info('Response  ' + response_data);
+
+            $scope.dataLoading = false;
+            $scope.showError = false;
+            $scope.showSuccess = true;
+            $scope.rowCollection.push(response_data);
+
+            return deferred.resolve();
+        }, function(response) {
+            //$log.info('Response  ' + response);
+            //console.log(response)
+            $scope.error = 'Register new door failed' + ' (' + response.data + ' )'
+            $scope.dataLoading = false;
+            $scope.showSuccess = false;
+            $scope.showError = true;
+            return deferred.reject(response);
+        });
+        return deferred.promise
     };
 
 
     //remove to the real data holder
-    $scope.removeItem = function removeItem(row) {
-        var index = $scope.rowCollection.indexOf(row);
-        if (index !== -1) {
-            $scope.rowCollection.splice(index, 1);
-        }
+    $scope.removeDoor = function removeDoor(row) {
+
+        var modalInstance = $modal.open({
+          templateUrl: 'partials/modals/RemoveDoor.html',
+          controller: 'RemoveUserCtrl',
+          windowClass: 'center-modal',
+          resolve: {
+            name: function () {
+                return row.name + ' from ' + row.address; }
+          }
+        });
+
+        modalInstance.result.then(function (selected) {
+            var index = $scope.rowCollection.indexOf(row);
+            if (index !== -1) {
+
+
+                Door.delete(row.id).then(function() {
+                    $scope.profileUpdatePending = false;
+                    $scope.success = 'Door successfully removed.'
+                    $scope.showError = false;
+                    $scope.showSuccess = true;
+
+                    $scope.rowCollection.splice(index, 1);
+                    return deferred.resolve();
+                }, function(response) {
+                    $scope.error = 'Removing door failed.'
+                    $scope.profileUpdatePending = false;
+                    $scope.showError = true;
+                    $scope.showSuccess = false;
+                    return deferred.reject(response);
+                });
+                return deferred.promise
+            }
+
+        }, function () {
+          $log.info('Modal dismissed at: ' + new Date());
+        });
+
+
     }
 })

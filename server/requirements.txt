@@ -26,3 +26,4 @@ validators==0.6.0
 wsgiref==0.1.2
 RPi.GPIO==0.5.11
 SPI-Py==1.0.0
+requests==2.8.1
