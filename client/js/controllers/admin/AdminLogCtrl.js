@@ -1,11 +1,13 @@
 RoseGuardenApp.controller('AdminLogCtrl', function($scope) {
 
     var dates = [new Date("25 Dec, 1995 23:15:00"),new Date("1 Jan, 2005 13:15:00")];
-    var names = ['Front door', 'ProtosV2'];
-    var types = ['Opening door','Unlock device'];
+    var nodeNames = ['Front door', 'ProtosV2'];
+    var logtexts = ['Opening door','Unlock device'];
     var usernames = ['Marcus Drobisch', 'Max Mustermann'];
     var usermails = ['m.drobisch@googlemail.com', 'Max.Mustermann@googlemail.com'];
     var authentificationTypes = [0, 1,0, 0];
+    var logTypes = [0, 1,0, 0];
+    var logLevels = ['L1', 'L2', 'L3', 'L4'];
 
     var id = 1;
 
@@ -15,19 +17,23 @@ RoseGuardenApp.controller('AdminLogCtrl', function($scope) {
     function generateRandomItem(id) {
 
         var date = dates[Math.floor(Math.random() * 2)];
-        var name = names[Math.floor(Math.random() * 2)];
-        var type = types[Math.floor(Math.random() * 2)];
+        var nodeName = nodeNames[Math.floor(Math.random() * 2)];
+        var logText = logtexts[Math.floor(Math.random() * 2)];
         var username = usernames[Math.floor(Math.random() * 2)];
         var usermail = usermails[Math.floor(Math.random() * 2)];
         var authentificationType = authentificationTypes[Math.floor(Math.random() * 2)];
+        var logLevel = logLevels[Math.floor(Math.random() * 3)];
+        var logType = logTypes[Math.floor(Math.random() * 3)];
         return {
             id: id,
             date: date,
-            name: name,
-            type: type,
-            authentificationType: authentificationType,
-            username: username,
-            usermail: usermail
+            nodeName: nodeName,
+            userName: username,
+            userMail: usermail,
+            authType: authentificationType,
+            logText: logText,
+            logType: logType,
+            logLevel: logLevel
         };
     }
 
