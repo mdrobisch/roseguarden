@@ -30,7 +30,7 @@
                 <li ng-show="isLoggedIn">
                     <a href="#logout"> Logout </a>
                 </li>
-                <li ng-hide="isLoggedIn">
+                <li ng-show="(isLoggedIn == 0) || isAdmin">
                     <a href="#register"> Register </a>
                 </li>
             </ul>
@@ -80,11 +80,10 @@
     <script type="text/javascript" src="js/filters/moment.js"></script>
     <script type="text/javascript" src="js/filters/unsafeHTML.js"></script>
 
-
-
     <script type="text/javascript" src="./js/controllers/modal/RemoveUserCtrl.js"></script>
     <script type="text/javascript" src="./js/controllers/modal/RemoveDoorCtrl.js"></script>
     <script type="text/javascript" src="./js/controllers/modal/SetupUserAccessCtrl.js"></script>
+    <script type="text/javascript" src="./js/controllers/modal/SendWelcomeMailCtrl.js"></script>
 
     <script type="text/javascript" src="./js/controllers/ApplicationCtrl.js"></script>
     <script type="text/javascript" src="./js/controllers/HomeCtrl.js"></script>

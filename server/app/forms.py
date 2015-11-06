@@ -55,6 +55,7 @@ class RegisterUserForm(Form):
     lastName = StringField('lastName', validators=[DataRequired()])
     phone = StringField('phone', validators=[DataRequired()])
     association = StringField('association', validators=[DataRequired()])
+    sendWelcomeMail = IntegerField('sendWelcomeMail', validators=[Optional()])
 
 class LostPasswordForm(Form):
     email = StringField('email', validators=[DataRequired()])

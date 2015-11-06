@@ -16,9 +16,6 @@ RoseGuardenApp.controller('HomeCtrl', function($q, $scope, Door, AuthService, $l
             return true;
     }
 
-
-
-
     $scope.requestOpening = function (door) {
         $scope.message = 'Request send to the door (' + door.address +  ')';
         var me = this;

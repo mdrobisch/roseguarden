@@ -129,22 +129,29 @@ class RegisterUserView(Resource):
             return form.errors,422
         pwd = base64.decodestring(form.password.data)
         user = User(email = form.email.data, password = pwd,firstName = form.firstName.data, lastName = form.lastName.data, phone= form.phone.data,association = form.association.data)
+
         try:
             db.session.add(user)
             db.session.commit()
         except IntegrityError:
             return make_response(jsonify({'error': 'eMail already registered'}), 400)
-        try:
-            send_email("Welcome to %s. You successfully registered" % 'RoseGuarden',
-                        MAIL_USERNAME,
-                        [user.email],
-                        render_template("welcome_mail.txt",
-                        user=user),
-                        render_template("welcome_mail.html",
-                        user=user))
-        except:
-            print 'unable to send mail'
-            return '',201
+
+        # if activted send email
+        if form.sendWelcomeMail.data != None:
+            print 'sendWelcomeMail is ' + str(form.sendWelcomeMail.data)
+            if form.sendWelcomeMail.data == 1:
+                print 'try to send welcome mail'
+                try:
+                    send_email("Welcome to %s. You successfully registered" % 'RoseGuarden',
+                                MAIL_USERNAME,
+                                [user.email],
+                                render_template("welcome_mail.txt",
+                                user=user),
+                                render_template("welcome_mail.html",
+                                user=user))
+                except:
+                    print 'unable to send mail'
+                    return '',201
         return '', 201
 
 class SessionView(Resource):
