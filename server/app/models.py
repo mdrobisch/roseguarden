@@ -99,6 +99,27 @@ class Setting(db.Model):
         self.type = type
         self.value = value
 
+class Log(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.DateTime)
+    nodeName = db.Column(db.Text)
+    userName = db.Column(db.Text)
+    userMail = db.Column(db.Text)
+    authType = db.Column(db.Integer)
+    logText = db.Column(db.Text)
+    logType = db.Column(db.Integer)
+    logLevel = db.Column(db.Text)
+
+    def __init__(self, date, nodeName, userName, userMail, logText, logType, logLevel, authType):
+        self.date = date
+        self.nodeName = nodeName
+        self.userName = userName
+        self.userMail = userMail
+        self.logType = logType
+        self.logLevel = logLevel
+        self.logText = logText
+        self.authType = authType
+
 class Door(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text)
@@ -106,7 +127,7 @@ class Door(db.Model):
     address = db.Column(db.Text)
     local = db.Column(db.Integer)
 
-    def __init__(self,name,keyMask,address,local):
+    def __init__(self, name,keyMask,address,local):
         self.name = name
         self.keyMask = keyMask
         self.address = address
