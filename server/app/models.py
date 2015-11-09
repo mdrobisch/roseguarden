@@ -106,11 +106,12 @@ class Log(db.Model):
     userName = db.Column(db.Text)
     userMail = db.Column(db.Text)
     authType = db.Column(db.Integer)
+    authInfo = db.Column(db.Text)
     logText = db.Column(db.Text)
-    logType = db.Column(db.Integer)
+    logType = db.Column(db.Text)
     logLevel = db.Column(db.Text)
 
-    def __init__(self, date, nodeName, userName, userMail, logText, logType, logLevel, authType):
+    def __init__(self, date, nodeName, userName, userMail, logText, logType, logLevel, authType, authInfo):
         self.date = date
         self.nodeName = nodeName
         self.userName = userName
@@ -119,6 +120,7 @@ class Log(db.Model):
         self.logLevel = logLevel
         self.logText = logText
         self.authType = authType
+        self.authInfo = authInfo
 
 class Door(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -132,23 +134,6 @@ class Door(db.Model):
         self.keyMask = keyMask
         self.address = address
         self.local = local
-
-class Request(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    userName = db.Column(db.Text, nullable=False)
-    userMail = db.Column(db.Text, nullable=False, info={'validators': Email()})
-    cardID = db.Column(db.Text)
-    requestName = db.Column(db.Text)
-    requestType = db.Column(db.Text)
-    date = db.Column(db.Date)
-
-    def __init__(self, userName, userMail, cardID, requestName, requestType, date = datetime.datetime.now()):
-        self.userName = userName
-        self.userMail = userMail
-        self.requestName = requestName
-        self.requestType = requestType
-        self.cardID = cardID
-        self.date = date
 
 class RfidTagInfo(object):
     def __init__(self, tagId, userInfo):

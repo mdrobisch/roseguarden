@@ -1,4 +1,4 @@
-RoseGuardenApp.controller('AdminLogCtrl', function($scope) {
+RoseGuardenApp.controller('AdminLogCtrl', function($scope, $q, Log) {
 
     var dates = [new Date("25 Dec, 1995 23:15:00"),new Date("1 Jan, 2005 13:15:00")];
     var nodeNames = ['Front door', 'ProtosV2'];
@@ -45,8 +45,27 @@ RoseGuardenApp.controller('AdminLogCtrl', function($scope) {
         $scope.displayedCollection = [].concat($scope.rowCollection);
     }
 
+    function loadItemsFromAPI() {
 
-    loadItemsDummy();
+        $scope.isLoading = true;
+        deferred = $q.defer();
+        Log.getAdminLog(true).then(function(data) {
+              console.log(data.length)
+              for(i=0;i < data.length;i++) {
+                  $scope.rowCollection.push(data[i]);
+              }
+            $scope.displayedCollection = [].concat($scope.rowCollection);
+            $scope.isLoading = false;
+            return deferred.resolve();
+        }, function(response) {
+            $scope.showError = false;
+            return deferred.reject(response);
+        });
+        return deferred.promise
+    }
+
+    //loadItemsDummy();
+    loadItemsFromAPI();
 
     //add to the real data holder
     $scope.addRandomItem = function addRandomItem() {

@@ -1,11 +1,16 @@
 <div ng-controller="AdminLogCtrl"   >
+
+    <div class="alert alert-danger" ng-show="showError">
+        {{error}}
+    </div>
+
     <table st-table="displayedCollection" st-safe-src="rowCollection" class="table table-striped"">
         <thead >
             <tr>
                 <th st-sort="logLevel">level</th>
                 <th st-sort="date">date</th>
                 <th st-sort="nodeName">node</th>
-                <th st-sort="logText">log</th>
+                <th st-sort="logType">type</th>
                 <th st-sort="userName">user</th>
             </tr>
             <tr>
@@ -20,12 +25,18 @@
                         {{row.logLevel}}
                     </a>
                 </td>
-                <td>{{row.date | date:'yyyy-MM-dd HH:mm'}}</td>
+                <td>{{row.date | moment:'DD.MM.YYYY HH:mm'}}</td>
                 <td>{{row.nodeName}}</td>
                 <td>
-                    {{row.logText}}
-                    <i ng-show="row.authType == 0" class="glyphicon glyphicon-phone" tooltip="web authentification"></i>
-                    <i ng-show="row.authType == 1" class="glyphicon glyphicon-credit-card" tooltip="card authentification."></i>
+                    <a ng-show="true" class="btn btn-default gliphicons-small" >
+                        <i ng-show="row.authType == 0" class="glyphicon glyphicon-phone" tooltip="web authentification"></i>
+                        <i ng-show="row.authType == 1" class="glyphicon glyphicon-credit-card" tooltip="card authentification."></i>
+                    </a>
+                    {{row.logType}}
+
+                    <a ng-show="true" class="btn btn-default gliphicons-small" tooltip="{{row.logText}}" >
+                        <i class="glyphicon glyphicon-info-sign"></i>
+                    </a>
                 </td>
                 <td>
                     <span>{{row.userName}}</span>
@@ -45,4 +56,10 @@
             </tr>
         </tfoot>
     </table>
+
+    <div class="alert alert-info" ng-show="isLoading">
+        Loading data ...
+        <img src="images/loading.gif" >
+    </div>
+
 </div>

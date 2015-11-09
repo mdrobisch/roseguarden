@@ -4,8 +4,8 @@ from email import send_email
 from flask import g, render_template, make_response, jsonify
 from flask_restful import Resource, fields, marshal_with
 from server import api, db, flask_bcrypt, auth, mail
-from models import User, Door, Request, RfidTagInfo
-from serializers import UserSerializer, SessionInfoSerializer, DoorSerializer, RequestSerializer, RfidTagInfoSerializer
+from models import User, Log, Door, RfidTagInfo
+from serializers import LogSerializer, UserSerializer, SessionInfoSerializer, DoorSerializer, RfidTagInfoSerializer
 from forms import UserPatchForm, DoorRegistrationForm, SessionCreateForm, LostPasswordForm, RegisterUserForm, UserDeleteForm
 from worker import backgroundWorker
 from sqlalchemy.exc import IntegrityError
@@ -38,6 +38,11 @@ class UserView(Resource):
         user = User.query.filter_by(id=id).first()
         if user != None:
             print 'delete user ' + user.firstName + ' ' + user.lastName + ' (' + user.email + ') from database'
+
+            logentry = Log(datetime.datetime.utcnow(), 'Test door', g.user.firstName + ' ' + g.user.lastName, g.user.email, 'User ' + user.firstName + ' on ' + user.lastName + ' removed', 'User removed', 'L1', 1, 'Web based')
+            db.session.add(logentry)
+            db.session.commit()
+
             User.query.filter(User.id == id).delete()
             db.session.commit()
         return '', 201
@@ -112,15 +117,6 @@ class UserListView(Resource):
         users = User.query.all()
         return UserSerializer(users, many=True).data
 
-class UserLogView(Resource):
-    @auth.login_required
-    def get(self,id):
-        requests = Request.query.filter_by(id=id).all()
-        if id != g.user.id:
-            if (g.user.role & 1) == 0:
-                return '',401
-        return RequestSerializer(requests, many=True).data
-
 class RegisterUserView(Resource):
     def post(self):
         form = RegisterUserForm()
@@ -129,8 +125,11 @@ class RegisterUserView(Resource):
             return form.errors,422
         pwd = base64.decodestring(form.password.data)
         user = User(email = form.email.data, password = pwd,firstName = form.firstName.data, lastName = form.lastName.data, phone= form.phone.data,association = form.association.data)
+        logentry = Log(datetime.datetime.utcnow(), 'Test door', user.firstName + ' ' + user.lastName, user.email, 'User registered ' + user.firstName + ' ' + user.lastName + ' ' + user.email , 'User registered', 'L1', 1, 'Web based')
 
         try:
+            db.session.add(logentry)
+            db.session.commit()
             db.session.add(user)
             db.session.commit()
         except IntegrityError:
@@ -162,6 +161,12 @@ class SessionView(Resource):
 
         user = User.query.filter_by(email=form.email.data).first()
         if user and flask_bcrypt.check_password_hash(user.password, form.password.data):
+            logentry = Log(datetime.datetime.utcnow(), 'Test door', user.firstName + ' ' + user.lastName, user.email, 'User login', 'User login', 'L2', 1, 'Web based')
+            try:
+                db.session.add(logentry)
+                db.session.commit()
+            except:
+                return '', 201
             return SessionInfoSerializer(user).data, 201
         return '', 401
 
@@ -192,6 +197,14 @@ class OpeningRequestView(Resource):
         print 'Opening request received'
         checkAccessResult = g.user.checkUserAccessPrivleges()
         if(checkAccessResult == "access granted"):
+
+            logentry = Log(datetime.datetime.utcnow(), 'Test door', g.user.firstName + ' ' + g.user.lastName, g.user.email, 'Opening request', 'Opening request', 'L2', 1, 'Web based')
+            try:
+                db.session.add(logentry)
+                db.session.commit()
+            except:
+                return '', 401
+
             backgroundWorker.requestOpening = True
             print "Check user privileges for opening request: " + checkAccessResult
             return '', 201
@@ -207,8 +220,14 @@ class DoorView(Resource):
         door = Door.query.filter_by(id=id).first()
         if door != None:
             print 'delete door ' + door.name + ' ' + door.address + ' (id=' + str(door.id) + ') from database'
-            Door.query.filter(Door.id == id).delete()
-            db.session.commit()
+            logentry = Log(datetime.datetime.utcnow(), 'Test door', g.user.firstName + ' ' + g.user.lastName, g.user.email, 'Door (' + door.name + ' on ' + door.address + ') removed', 'Door removed', 'L1', 1, 'Web based')
+            try:
+                db.session.add(logentry)
+                db.session.commit()
+                Door.query.filter(Door.id == id).delete()
+                db.session.commit()
+            except:
+                return '', 401
         return '', 201
 
 
@@ -230,9 +249,10 @@ class DoorRegistrationView(Resource):
         print "create new door"
         response_data = json.loads(response.content)
         newDoor = Door(name = form.name.data, keyMask=response_data["keyMask"], address='http://' + form.address.data, local=0)
-        print "try to add door to database 1"
+        logentry = Log(datetime.datetime.utcnow(), 'Test door', g.user.firstName + ' ' + g.user.lastName, g.user.email, 'Door ' + newDoor.name + ' on ' + newDoor.address + ' checked and registered', 'Door registered', 'L1', 1, 'Web based')
         try:
-            print "try to add door to database 2"
+            db.session.add(logentry)
+            db.session.commit()
             db.session.add(newDoor)
             db.session.commit()
             print "Added door to database"
@@ -255,6 +275,20 @@ class DoorListView(Resource):
         posts = Door.query.filter_by(local=0).all()
         return DoorSerializer(posts, many=True).data
 
+class LogAdminView(Resource):
+    @auth.login_required
+    def get(self):
+        if (g.user.role & 1) == 0:
+            return make_response(jsonify({'error': 'Not authorized'}), 403)
+        logs = Log.query.all()
+        return LogSerializer(logs, many=True).data
+
+class LogUserView(Resource):
+    @auth.login_required
+    def get(self):
+        logs = Log.query.filter_by(userMail=g.user.email).all()
+        return LogSerializer(logs, many=True).data
+
 class RfidTagInfoView(Resource):
     @auth.login_required
     def get(self):
@@ -263,7 +297,8 @@ class RfidTagInfoView(Resource):
 api.add_resource(SessionView, '/sessions')
 api.add_resource(UserView, '/user/<int:id>')
 api.add_resource(UserListView, '/users')
-api.add_resource(UserLogView, '/log/user/<int:id>')
+api.add_resource(LogUserView, '/log/user')
+api.add_resource(LogAdminView, '/log/admin')
 api.add_resource(DoorView, '/door/<int:id>')
 api.add_resource(DoorRegistrationView, '/door')
 api.add_resource(DoorListView, '/doors')

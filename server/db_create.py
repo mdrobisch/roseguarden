@@ -1,7 +1,7 @@
 __author__ = 'drobisch'
 
 from app.server import db, flask_bcrypt
-from app.models import User, Door, Request, Setting
+from app.models import User, Log, Door, Setting
 import datetime
 import base64
 
@@ -30,12 +30,12 @@ db.session.add(Door(name = 'Local door', address = 'http://localhost', keyMask =
 db.session.add(Door(name = 'Outer door', address = 'http://192.168.0.59', keyMask = 0x03, local = 0x00 ))
 db.session.add(Door(name = 'Inner door', address = 'http://10.43.125.7', keyMask = 0x03, local = 0x00 ))
 
-Request.query.delete()
-db.session.add(Request('Marcus Drobisch','m.drobisch@googlemail.com', '1.1.1.1','Front door opening','Door',datetime.datetime.now()))
-db.session.add(Request('Max Mustermann','m.mustermann@googlemail.com', '1.1.1.1','Front door opening','Door',datetime.datetime.now()))
-
 Setting.query.delete()
 db.session.add(Setting('NodeName','Test door',Setting.VALUETYPE_STRING))
 db.session.add(Setting('NodeValidKey','0x03',Setting.VALUETYPE_INT))
+
+Log.query.delete()
+db.session.add(Log(datetime.datetime.utcnow(), 'Test door', syncMasterUser.firstName + ' ' + syncMasterUser.lastName, syncMasterUser.email, 'Remove all data & regenerate database', 'Init systen', 'L1', 1, 'Internal'))
+
 
 db.session.commit()

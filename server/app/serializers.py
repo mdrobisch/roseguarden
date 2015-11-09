@@ -20,13 +20,14 @@ class RfidTagInfoSerializer(Serializer):
     userInfo = fields.String()
     tagId = fields.String()
 
-class RequestSerializer(Serializer):
-    class Meta:
-        fields = ("userMail", "userName", "cardID", "requestName", "requestType", "date")
-
 class DoorSerializer(Serializer):
     class Meta:
         fields = ("id", "name", "keyMask", "address", "local")
+
+class LogSerializer(Serializer):
+    class Meta:
+        fields = ("id", "date", "nodeName", "userName", "userMail", "authType", "authInfo", "logText", "logType", "logLevel")
+
 
 #class User_Serializer (Resource):
 #    @marshal_with(parameter_marshaller)
