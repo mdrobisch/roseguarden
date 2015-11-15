@@ -70,14 +70,14 @@ Initial steps
 
 - add your `MAIL_USERNAME` to your enviroment variables (for enabling mail service, default mail-server-configuration is for googlemail)
 - add your `MAIL_PASSWORD` to your enviroment variables (for enabling mail-service, default mail-server-configuration is for googlemail)
-- initialize RoseGuarden database in the `server` - directory with `python db_create`
+- initialize RoseGuarden database in the `server` - directory with `sudo python db_create.py`
 
 
 Running RoseGuarden
 -------------------
 
 - start the http-server in the `client` - directory with  `http-server -p 8000`
-- start the RoseGuarden-app in the `server` - directory with `python run.py`
+- start the RoseGuarden-app in the `server` - directory with `sudo python run.py`
 
 Screenshots (Software)
 ======================
