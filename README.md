@@ -53,7 +53,7 @@ The python package manager `pip` will handle this for us. So we need to install 
 At this point we will get the python packages list in the `requirement.txt` file.
 Switch to the `server`-directory and prompt.
 
-9. `pip install -r requirements.txt` (in the `server`-directory)
+9. `sudo pip install -r requirements.txt` (in the `server`-directory)
 
 To use the rfid-reader (rc522) we have to install SPI-Py. Switch to the `server/app/SPI-Py`-directory and
 install the dependencies and the module.
