@@ -121,7 +121,7 @@ RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log, $q, Us
         $scope.rfidtaginfo = "Request tag-info ..."
         deferred = $q.defer();
         RfidTagInfo.get(true).then(function(tagInfo) {
-            console.log(taginfo);
+            console.log(tagInfo);
             $scope.rfidtaginfo = tagInfo.tagId + " <br>  " + tagInfo.userInfo;
 
             return deferred.resolve();
