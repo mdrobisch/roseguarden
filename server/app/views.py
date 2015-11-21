@@ -292,6 +292,7 @@ class LogUserView(Resource):
 class RfidTagInfoView(Resource):
     @auth.login_required
     def get(self):
+        print backgroundWorker.tagInfo.userInfo + ' ' + backgroundWorker.tagInfo.tagId
         return RfidTagInfoSerializer(backgroundWorker.tagInfo).data
 
 api.add_resource(SessionView, '/sessions')
