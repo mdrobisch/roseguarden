@@ -42,8 +42,8 @@ class BackgroundWorker():
         (status,TagType) = RFIDReader.MFRC522_Request(RFIDReader.PICC_REQIDL)
 
         # If a card is found
-        if status == RFIDReader.MI_OK:
-            print "rfid tag detected"
+        #if status == RFIDReader.MI_OK:
+        #    print "rfid tag detected"
 
         # Get the UID of the card
         (status,uid) = RFIDReader.MFRC522_Anticoll()
