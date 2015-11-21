@@ -79,6 +79,14 @@ Running RoseGuarden
 - start the http-server in the `client` - directory with  `http-server -p 8000`
 - start the RoseGuarden-app in the `server` - directory with `sudo python run.py`
 
+Update RoseGuarden
+------------------
+
+To update the software to the latest version on github, use git.
+
+- `git fetch --all`
+- `git reset --hard origin/master`
+
 Screenshots (Software)
 ======================
 
