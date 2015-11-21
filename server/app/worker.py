@@ -18,7 +18,7 @@ class BackgroundWorker():
         self.requestOpening = False;
         self.openingTimer = -1;
         self.requestTimer = 0;
-        self.tagInfo = RfidTagInfo("No rfid tag detected", "")
+        self.tagInfo = RfidTagInfo("No rfid-tag detected", "")
         self.tagResetCount = 0
 
 
@@ -35,7 +35,7 @@ class BackgroundWorker():
         print 'started background-server'
 
     def resetTagInfo(self):
-        self.tagInfo.tagId = "No card detected"
+        self.tagInfo.tagId = "No rfid-tag detected"
         self.tagInfo.userInfo = ""
 
     def readRFIDTag(self):
@@ -54,8 +54,8 @@ class BackgroundWorker():
             # Print UID
             print "Card read UID: "+str(uid[0])+"."+str(uid[1])+"."+str(uid[2])+"."+str(uid[3])
 
-            self.tagInfo.tagID = str(uid[0])+"."+str(uid[1])+"."+str(uid[2])+"."+str(uid[3])
-            self.tagInfo.userInfo = str(uid[0])+"."+str(uid[1])+"."+str(uid[2])+"."+str(uid[3])
+            self.tagInfo.tagId = str(uid[0])+"."+str(uid[1])+"."+str(uid[2])+"."+str(uid[3])
+            self.tagInfo.userInfo = "USER"
 
             # This is the default key for authentication
             key = [0xFF,0xFF,0xFF,0xFF,0xFF,0xFF]
@@ -98,6 +98,7 @@ class BackgroundWorker():
 
         if self.requestTimer >= 2:
             self.requestTimer = 0
+            self.resetTagInfo()
             self.readRFIDTag()
 
         #else:

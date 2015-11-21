@@ -2,12 +2,14 @@ __author__ = 'drobisch'
 
 from server import db, flask_bcrypt
 from wtforms.validators import Email
+import random
 import datetime
 
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     syncMaster = db.Column(db.Integer)
+    active = db.Column(db.Integer)
     email = db.Column(db.Text, unique=True, nullable=False, info={'validators': Email()})
     password = db.Column(db.Text, nullable=False)
     token = db.Column(db.Text)
@@ -18,8 +20,11 @@ class User(db.Model):
     association = db.Column(db.Text)
     role = db.Column(db.Integer)
     cardID = db.Column(db.Text)
-    cardKey = db.Column(db.Text)
-    cardPassword = db.Column(db.Text)
+    cardAuthSector = db.Column(db.Integer)
+    cardAuthBlock = db.Column(db.Integer)
+    cardAuthKeyA = db.Column(db.Text)
+    cardAuthKeyB = db.Column(db.Text)
+    cardSecret = db.Column(db.Text)
     licenseMask = db.Column(db.Integer)
     keyMask = db.Column(db.Integer)
     accessType = db.Column(db.Integer)
@@ -60,7 +65,13 @@ class User(db.Model):
 
     def __init__(self, email, password, firstName, lastName, role = 0, phone='0', licenseMask =0, keyMask = 0, association = ''):
         self.syncMaster = 0
+        self.active = 1
         self.phone = phone
+        self.cardAuthBlock = random.randrange(1, 4)
+        self.cardAuthSector = random.randrange(4, 16)
+        self.cardID = ''
+        self.cardKey = ''
+        self.cardPassword = ''
         self.role = role;
         self.email = email
         self.password = flask_bcrypt.generate_password_hash(password)
