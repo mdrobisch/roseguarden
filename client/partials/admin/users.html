@@ -19,11 +19,7 @@
             <span class="sr-only">Split button!</span>
         </button>
         <ul class="uib-dropdown-menu" role="menu" aria-labelledby="split-button">
-            <li role="menuitem"><a href="#">Action</a></li>
-            <li role="menuitem"><a href="#">Another action</a></li>
-            <li role="menuitem"><a href="#">Something else here</a></li>
-            <li class="divider"></li>
-            <li role="menuitem"><a href="#">Separated link</a></li>
+            <li role="menuitem"><a href="#">Remove from database</a></li>
         </ul>
     </div>
 
@@ -147,6 +143,7 @@
                             <li role="menuitem"><a ng-click="setupUserAccess(row)">Setup access validation</a></li>
                             <li ng-show="row.role == 0" role="menuitem" ng-click="setUserAdmin(row)"><a >Set admin rights</a></li>
                             <li ng-show="row.role == 1" role="menuitem" ng-click="resetUserAdmin(row)"><a >Remove admin rights</a></li>
+                            <li ng-show="rfidtagId != ''" role="menuitem" ng-click="assignUserRfidTag(row)"><a >Assign RFID ({{rfidtagId}})</a></li>
                             <li class="divider"></li>
                             <li role="menuitem"><a ng-click="removeUser(row)">Remove user</a></li>
                         </ul>

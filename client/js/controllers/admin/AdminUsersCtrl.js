@@ -18,6 +18,7 @@ RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log, $q, Us
 
     $scope.message = 'This is the AdminSpaceCtrl message';
     $scope.rfidtaginfo = "RFID tag. <br> Click to update."
+    $scope.rfidtagId = "39.112.209.181"
 
     $scope.isLoading = true;
     $scope.showError = false;
@@ -120,14 +121,14 @@ RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log, $q, Us
         $scope.rfidtaginfo = "Request tag-info ..."
         deferred = $q.defer();
         RfidTagInfo.get(true).then(function(tagInfo) {
-            $scope.rfidtaginfo = tagInfo.tagId + tagInfo.tagInfo + " <br>  " + tagInfo.userInfo;
+            $scope.rfidtaginfo = tagInfo.tagId + " <br>  " + tagInfo.userInfo;
 
             return deferred.resolve();
         }, function(response) {
             $scope.rfidtaginfo = "Error while request tag-info";
             return deferred.reject(response);
         });
-        return deferred.promise
+        return deferred.promise;
     }
 
     //add to the real data holder
@@ -136,6 +137,11 @@ RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log, $q, Us
         id++;
     };
 
+
+    $scope.assignUserRfidTag = function assignUserRfidTag(row) {
+        console.log("Request rfid tag assign");
+        return deferred.promise;
+    }
 
     $scope.resetUserAdmin = function resetUserAdmin(row) {
 
