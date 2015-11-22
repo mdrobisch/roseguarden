@@ -18,7 +18,7 @@ class BackgroundWorker():
         self.requestOpening = False;
         self.openingTimer = -1;
         self.requestTimer = 0;
-        self.tagInfo = RfidTagInfo("No rfid-tag detected", "")
+        self.tagInfo = RfidTagInfo("", "")
         self.tagResetCount = 0
 
 
@@ -35,7 +35,7 @@ class BackgroundWorker():
         print 'started background-server'
 
     def resetTagInfo(self):
-        self.tagInfo.tagId = "No rfid-tag detected"
+        self.tagInfo.tagId = ""
         self.tagInfo.userInfo = ""
 
     def readRFIDTag(self):
@@ -69,6 +69,14 @@ class BackgroundWorker():
             # Check if authenticated
             if status == RFIDReader.MI_OK:
                 RFIDReader.MFRC522_Read(8)
+                user = User.query.filter_by(cardID=self.tagInfo.tagId).first()
+                if user is None:
+                    print "No user asigned to card"
+                else:
+                    if user.checkUserAccessPrivleges() == "access granted":
+                        self.requestOpening = True
+                    print user.email
+
                 RFIDReader.MFRC522_StopCrypto1()
                 return True
             else:
@@ -79,6 +87,14 @@ class BackgroundWorker():
     def timer_cycle(self):
         self.thr = threading.Timer(1, BackgroundWorker.timer_cycle,[self])
         self.thr.start()
+
+        self.requestTimer += 1
+
+        if self.requestTimer >= 2:
+            self.requestTimer = 0
+            self.resetTagInfo()
+            self.readRFIDTag()
+
         #print "Check for opening request"
         if self.requestOpening == True:
             self.requestOpening = False
@@ -94,12 +110,6 @@ class BackgroundWorker():
                 print "Closing door"
                 GPIO.output(12, GPIO.HIGH)
 
-        self.requestTimer += 1
-
-        if self.requestTimer >= 2:
-            self.requestTimer = 0
-            self.resetTagInfo()
-            self.readRFIDTag()
 
         #else:
             #print "Closing door"
