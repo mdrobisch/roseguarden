@@ -44,6 +44,11 @@ class BackgroundWorker():
     def assignRFIDTag(self, user, rfidID):
 
         self.lock = True
+
+        print "background-worker assign"
+
+        (status,TagType) = RFIDReader.MFRC522_Request(RFIDReader.PICC_REQIDL)
+
         (status,uid) = RFIDReader.MFRC522_Anticoll()
 
         # If we have the UID, continue
