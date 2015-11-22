@@ -15,11 +15,12 @@ class BackgroundWorker():
     def __init__(self, app):
         # initialize worker variables
         self.app = app
-        self.requestOpening = False;
-        self.openingTimer = -1;
-        self.requestTimer = 0;
+        self.requestOpening = False
+        self.openingTimer = -1
+        self.requestTimer = 0
         self.tagInfo = RfidTagInfo("", "")
         self.tagResetCount = 0
+        self.lock = False
 
 
         # setup gpio and set default (Low)
@@ -38,14 +39,11 @@ class BackgroundWorker():
         self.tagInfo.tagId = ""
         self.tagInfo.userInfo = ""
 
-    def readRFIDTag(self):
-        (status,TagType) = RFIDReader.MFRC522_Request(RFIDReader.PICC_REQIDL)
 
-        # If a card is found
-        #if status == RFIDReader.MI_OK:
-        #    print "rfid tag detected"
 
-        # Get the UID of the card
+    def assignRFIDTag(self, user, rfidID):
+
+        self.lock = True
         (status,uid) = RFIDReader.MFRC522_Anticoll()
 
         # If we have the UID, continue
@@ -69,20 +67,68 @@ class BackgroundWorker():
             # Check if authenticated
             if status == RFIDReader.MI_OK:
                 RFIDReader.MFRC522_Read(8)
+                RFIDReader.MFRC522_StopCrypto1()
+                self.lock = False
+                return True
+            else:
+                print "Authentication error"
+                self.lock = False
+                return False
+
+        self.lock = False
+        return False
+
+    def readRFIDTag(self):
+
+        self.lock = True
+
+        (status,TagType) = RFIDReader.MFRC522_Request(RFIDReader.PICC_REQIDL)
+
+        # If a card is found
+        #if status == RFIDReader.MI_OK:
+        #    print "rfid tag detected"
+
+        # Get the UID of the card
+        (status,uid) = RFIDReader.MFRC522_Anticoll()
+
+        # If we have the UID, continue
+        if status == RFIDReader.MI_OK:
+
+            # Print UID
+            #print "Card read UID: "+str(uid[0])+"."+str(uid[1])+"."+str(uid[2])+"."+str(uid[3])
+
+            self.tagInfo.tagId = str(uid[0])+"."+str(uid[1])+"."+str(uid[2])+"."+str(uid[3])
+            self.tagInfo.userInfo = ""
+
+            # This is the default key for authentication
+            key = [0xFF,0xFF,0xFF,0xFF,0xFF,0xFF]
+
+            # Select the scanned tag
+            RFIDReader.MFRC522_SelectTag(uid)
+
+            # Authenticate
+            status = RFIDReader.MFRC522_Auth(RFIDReader.PICC_AUTHENT1A, 8, key, uid)
+
+            # Check if authenticated
+            if status == RFIDReader.MI_OK:
                 user = User.query.filter_by(cardID=self.tagInfo.tagId).first()
                 if user is None:
                     print "No user asigned to card"
                 else:
-                    self.tagInfo.userInfo = user.firstName + ' ' + user.lastName + ' (' + user.email + ')'
+                    self.tagInfo.userInfo = user.email
                     if user.checkUserAccessPrivleges() == "access granted":
                         self.requestOpening = True
                     print user.email
 
                 RFIDReader.MFRC522_StopCrypto1()
+                self.lock = False
                 return True
             else:
                 print "Authentication error"
+                self.lock = False
                 return False
+
+        self.lock = False
         return False
 
     def timer_cycle(self):

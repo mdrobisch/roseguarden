@@ -315,8 +315,10 @@ class RfidTagAssignView(Resource):
         if(user == None):
             return make_response(jsonify({'error': 'user not found'}), 400)
 
+
         if form.rfidTagId.data != None and form.rfidTagId.data != '':
             print 'Assign cardID ' + form.rfidTagId.data + ' to ' + user.firstName + ' ' + user.lastName
+            backgroundWorker.assignRFIDTag(user, form.rfidTagId.data )
             user.cardID = form.rfidTagId.data
             db.session.commit()
 
