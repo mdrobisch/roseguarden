@@ -55,7 +55,7 @@ class BackgroundWorker():
             print "Card read UID: "+str(uid[0])+"."+str(uid[1])+"."+str(uid[2])+"."+str(uid[3])
 
             self.tagInfo.tagId = str(uid[0])+"."+str(uid[1])+"."+str(uid[2])+"."+str(uid[3])
-            self.tagInfo.userInfo = "USER"
+            self.tagInfo.userInfo = ""
 
             # This is the default key for authentication
             key = [0xFF,0xFF,0xFF,0xFF,0xFF,0xFF]
@@ -73,6 +73,7 @@ class BackgroundWorker():
                 if user is None:
                     print "No user asigned to card"
                 else:
+                    self.tagInfo.userInfo = user.firstName + ' ' + user.lastName + ' (' + user.email + ')'
                     if user.checkUserAccessPrivleges() == "access granted":
                         self.requestOpening = True
                     print user.email
