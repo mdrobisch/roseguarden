@@ -6,19 +6,21 @@ RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log, $q, Us
     var phones = ['0176 5345621', '0154 7537476', '0172 86586587', '0161 65758897'];
     var cardids = ['123.3.86.93', '', '221.96.63.87', '73.23.46.13'];
     var dates = [new Date("25 Dec, 2014 23:15:00"),new Date("1 Jan, 2015 13:15:00"),new Date("11 Mar, 2015 13:15:00"),new Date("5 Feb, 2015 13:15:00")];
-    var times = [new Date(new Date().setHours(11,30,0,0)), new Date(new Date().setHours(10,30,0,0)),new Date(new Date().setHours(16,30,0,0)),new Date(new Date().setHours(15,30,0,0))]
+    var times = [new Date(new Date().setHours(11,30,0,0)), new Date(new Date().setHours(10,30,0,0)),new Date(new Date().setHours(16,30,0,0)),new Date(new Date().setHours(15,30,0,0))];
     var daybudgets = [0, 4,5, 0];
     var accessdaytypes = [0, 1,2, 0];
     var budgets = [0.00,10.12,5,3.21];
-    var validationDayMasks = [0x6F,0x6F,0x60,0x1F]
-    var keyMasks = [0x03,0x01,0x08,0x06]
+    var validationDayMasks = [0x6F,0x6F,0x60,0x1F];
+    var keyMasks = [0x03,0x01,0x08,0x06];
     var roles = [0, 1,0, 0];
     var id = 1;
 
 
     $scope.message = 'This is the AdminSpaceCtrl message';
-    $scope.rfidtaginfo = "RFID tag. <br> Click to update."
-    $scope.rfidtagId = "39.112.209.181"
+
+    $scope.rfidtaginfo = "RFID tag. <br> Click to update.";
+    $scope.rfidTagId = "";
+    $scope.rfidTagUser = "";
 
     $scope.isLoading = true;
     $scope.showError = false;
@@ -122,7 +124,22 @@ RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log, $q, Us
         deferred = $q.defer();
         RfidTag.getInfo(true).then(function(tagInfo) {
             console.log(tagInfo);
-            $scope.rfidtaginfo = tagInfo.tagId + " <br>  " + tagInfo.userInfo;
+
+
+            $scope.rfidTagUser = tagInfo.userInfo;
+            $scope.rfidTagId = tagInfo.tagId;
+
+            // debug setting
+            //$scope.rfidTagId = "192.12.2.34";
+
+            if($scope.rfidTagId == "")
+            {
+                $scope.rfidtaginfo = "No rfid-tag detected";
+            }
+            else
+            {
+                $scope.rfidtaginfo = $scope.rfidTagId + " <br>  " + $scope.rfidTagUser;
+            }
 
             return deferred.resolve();
         }, function(response) {
@@ -141,8 +158,56 @@ RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log, $q, Us
 
     $scope.assignUserRfidTag = function assignUserRfidTag(row) {
         console.log("Request rfid tag assign");
+        $scope.showError = false;
+        deferred = $q.defer();
+        var assigndata = {email : row.email, rfidTagId : $scope.rfidTagId};
+
+        RfidTag.postAssign(assigndata).then(function(response_data) {
+            $log.info('Response  ' + response_data);
+            $scope.dataLoading = false;
+            $scope.showError = false;
+            $scope.showSuccess = true;
+
+            var index = $scope.rowCollection.indexOf(row);
+            $scope.rowCollection[index].cardID = $scope.rfidTagId;
+
+
+            return deferred.resolve();
+        }, function(response) {
+            $scope.error = 'Assign rfid tag falied' + ' (' + response.data + ' )'
+            $scope.dataLoading = false;
+            $scope.showSuccess = false;
+            $scope.showError = true;
+            return deferred.reject(response);
+        });
         return deferred.promise;
     }
+
+    $scope.withdrawUserRfidTag = function withdrawUserRfidTag(row) {
+        console.log("Request rfid tag withdraw");
+        $scope.showError = false;
+        deferred = $q.defer();
+        var withdrawdata = {email : row.email, rfidTagId : $scope.rfidTagId};
+
+        RfidTag.postWithdraw(withdrawdata).then(function(response_data) {
+            $log.info('Response  ' + response_data);
+            $scope.dataLoading = false;
+            $scope.showError = false;
+            $scope.showSuccess = true;
+
+            var index = $scope.rowCollection.indexOf(row);
+            $scope.rowCollection[index].cardID = "";
+            return deferred.resolve();
+        }, function(response) {
+            $scope.error = 'Assign rfid tag falied' + ' (' + response.data + ' )'
+            $scope.dataLoading = false;
+            $scope.showSuccess = false;
+            $scope.showError = true;
+            return deferred.reject(response);
+        });
+        return deferred.promise;
+    }
+
 
     $scope.resetUserAdmin = function resetUserAdmin(row) {
 

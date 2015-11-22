@@ -10,7 +10,7 @@ class UserSerializer(Serializer):
         fields = ("id", "email", "firstName", "lastName", "phone", "role", "licenseMask", "keyMask",
                   "association", "registerDateTime", "lastLoginDateTime", "accessDateStart", "accessDateEnd",
                   "accessTimeStart", "accessTimeEnd", "accessType", "accessDaysMask", "accessDayCounter",
-                  "budget")
+                  "budget", "cardID")
 
 class SessionInfoSerializer(Serializer):
     class Meta:

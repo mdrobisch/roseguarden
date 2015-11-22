@@ -10,6 +10,20 @@ RoseGuardenApp.factory('RfidTag', function(Restangular) {
                 .one('info')
                 .withHttpConfig({bypassErrorInterceptor: true})
                 .get();
+        },
+        postAssign: function(data) {
+            return Restangular
+                .one('tag')
+                .one('assign')
+                .withHttpConfig({bypassErrorInterceptor: true})
+                .customPOST(data);
+        },
+        postWithdraw: function(data) {
+            return Restangular
+                .one('tag')
+                .one('withdraw')
+                .withHttpConfig({bypassErrorInterceptor: true})
+                .customPOST(data);
         }
     };
     return RfidTagInfo;

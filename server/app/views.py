@@ -6,7 +6,7 @@ from flask_restful import Resource, fields, marshal_with
 from server import api, db, flask_bcrypt, auth, mail
 from models import User, Log, Door, RfidTagInfo
 from serializers import LogSerializer, UserSerializer, SessionInfoSerializer, DoorSerializer, RfidTagInfoSerializer
-from forms import UserPatchForm, DoorRegistrationForm, SessionCreateForm, LostPasswordForm, RegisterUserForm, UserDeleteForm
+from forms import UserPatchForm, DoorRegistrationForm, SessionCreateForm, LostPasswordForm, RegisterUserForm, UserDeleteForm, RFIDTagAssignForm, RFIDTagWithdrawForm
 from worker import backgroundWorker
 from sqlalchemy.exc import IntegrityError
 import json
@@ -239,6 +239,9 @@ class DoorRegistrationView(Resource):
         if not form.validate_on_submit():
             return form.errors,422
 
+        if (g.user.role & 1) == 0:
+            return make_response(jsonify({'error': 'Not authorized'}), 403)
+
         print 'Request door info from ' + 'http://' + form.address.data + ':5000' + '/request/doorinfo'
         try:
             response = requests.get('http://' + form.address.data + ':5000' + '/request/doorinfo', timeout=2)
@@ -295,6 +298,53 @@ class RfidTagInfoView(Resource):
         print backgroundWorker.tagInfo.userInfo + ' ' + backgroundWorker.tagInfo.tagId
         return RfidTagInfoSerializer(backgroundWorker.tagInfo).data
 
+class RfidTagAssignView(Resource):
+    @auth.login_required
+    def post(self):
+        print 'RFID assign request received'
+        # check request paremeters (form)
+        form = RFIDTagAssignForm()
+        if not form.validate_on_submit():
+            return form.errors, 422
+        #check admin rights
+        if (g.user.role & 1) == 0:
+            return make_response(jsonify({'error': 'Not authorized'}), 403)
+
+        user = User.query.filter_by(email=form.email.data).first()
+
+        if(user == None):
+            return make_response(jsonify({'error': 'user not found'}), 400)
+
+        if form.rfidTagId.data != None and form.rfidTagId.data != '':
+            print 'Assign cardID ' + form.rfidTagId.data + ' to ' + user.firstName + ' ' + user.lastName
+            user.cardID = form.rfidTagId.data
+            db.session.commit()
+
+        return '', 201
+
+class RfidTagWitdrawView(Resource):
+    @auth.login_required
+    def post(self):
+        print 'RFID withdraw request received'
+        # check request paremeters (form)
+        form = RFIDTagAssignForm()
+        if not form.validate_on_submit():
+            return form.errors, 422
+        #check admin rights
+        if (g.user.role & 1) == 0:
+            return make_response(jsonify({'error': 'Not authorized'}), 403)
+
+        user = User.query.filter_by(email=form.email.data).first()
+
+        if(user == None):
+            return make_response(jsonify({'error': 'user not found'}), 400)
+
+        if form.rfidTagId.data != None and form.rfidTagId.data != '':
+            print 'Withdraw cardID ' + form.rfidTagId.data + ' from ' + user.firstName + ' ' + user.lastName
+            user.cardID = ""
+            db.session.commit()
+        return '', 201
+
 api.add_resource(SessionView, '/sessions')
 api.add_resource(UserView, '/user/<int:id>')
 api.add_resource(UserListView, '/users')
@@ -306,5 +356,7 @@ api.add_resource(DoorListView, '/doors')
 api.add_resource(OpeningRequestView, '/request/opening')
 api.add_resource(LostPasswordView, '/request/password')
 api.add_resource(DoorInfoView, '/request/doorinfo')
-api.add_resource(RegisterUserView, '/register')
 api.add_resource(RfidTagInfoView,'/tag/info')
+api.add_resource(RfidTagAssignView,'/tag/assign')
+api.add_resource(RfidTagWitdrawView,'/tag/withdraw')
+api.add_resource(RegisterUserView, '/register')
