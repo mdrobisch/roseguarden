@@ -67,11 +67,15 @@ class User(db.Model):
         self.syncMaster = 0
         self.active = 1
         self.phone = phone
-        self.cardAuthBlock = random.randrange(1, 4)
-        self.cardAuthSector = random.randrange(4, 16)
+        self.cardAuthBlock = 1
+        self.cardAuthSector = 4
         self.cardID = ''
         self.cardKey = ''
-        self.cardPassword = ''
+        self.cardSecret = ''
+        self.cardAuthKeyA = 'FF FF FF FF FF FF'
+        self.cardAuthKeyB = ''
+        self.cardSecret = ''
+
         self.role = role;
         self.email = email
         self.password = flask_bcrypt.generate_password_hash(password)

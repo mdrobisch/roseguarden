@@ -3,6 +3,7 @@ __author__ = 'drobisch'
 from models import User
 from server import app
 import threading
+import time
 import os
 from models import RfidTagInfo
 from RFID import RFIDReader
@@ -39,9 +40,10 @@ class BackgroundWorker():
         self.tagInfo.tagId = ""
         self.tagInfo.userInfo = ""
 
-
-
-    def assignRFIDTag(self, user, rfidID):
+    def assignRFIDTag(self, user):
+        while(self.lock == True):
+            print "still locked (assignRFIDTag)"
+            time.sleep(0.15)
 
         self.lock = True
 
@@ -55,24 +57,47 @@ class BackgroundWorker():
         if status == RFIDReader.MI_OK:
 
             # Print UID
-            print "Card read UID: "+str(uid[0])+"."+str(uid[1])+"."+str(uid[2])+"."+str(uid[3])
+            uid_str = str(uid[0])+"." +str(uid[1])+"."+str(uid[2])+"."+str(uid[3])
+            print "Card read UID: " + uid_str
 
-            self.tagInfo.tagId = str(uid[0])+"."+str(uid[1])+"."+str(uid[2])+"."+str(uid[3])
-            self.tagInfo.userInfo = ""
+            if(uid_str != user.cardID)
+                print "Wrong cardID detected while assigning RFID-tag to user"
+                return False
 
             # This is the default key for authentication
-            key = [0xFF,0xFF,0xFF,0xFF,0xFF,0xFF]
+            key = []
+            secret = []
+
+            # extract keyA from database and print it
+            formated_key_list = user.cardAuthKeyA.split()
+            for x in formated_key_list:
+                key.append(int(x, 16))
+            print key
+
+            # extract secret from database and print it
+            formated_secret_list = user.cardSecret.split()
+            for x in formated_secret_list:
+                secret.append(int(x, 16))
+            print secret
 
             # Select the scanned tag
             RFIDReader.MFRC522_SelectTag(uid)
 
-            # Authenticate
-            status = RFIDReader.MFRC522_Auth(RFIDReader.PICC_AUTHENT1A, 8, key, uid)
+            # Authenticate for auth-sector
+            status = RFIDReader.MFRC522_Auth(RFIDReader.PICC_AUTHENT1A, user.cardAuthSector * 4 + user, key, uid)
 
             # Check if authenticated
             if status == RFIDReader.MI_OK:
-                RFIDReader.MFRC522_Read(8)
+                # read trailer from auth-sector
+                RFIDReader.MFRC522_Read(user.cardAuthSector * 4 + 3)
+                # read auth block in auth-sector
+                RFIDReader.MFRC522_Read(user.cardAuthSector * 4 + user.cardAuthBlock)
+                # write secret to auth block in auth-sector
+                RFIDReader.MFRC522_Write(user.cardAuthSector * 4 + user.cardAuthBlock, secret)
+                # read back secret from  auth block in auth-sector
+                RFIDReader.MFRC522_Read(user.cardAuthSector * 4 + user.cardAuthBlock)
                 RFIDReader.MFRC522_StopCrypto1()
+                # unlock and return succesfully
                 self.lock = False
                 return True
             else:
@@ -84,6 +109,9 @@ class BackgroundWorker():
         return False
 
     def readRFIDTag(self):
+        while(self.lock == True):
+            print "still locked (readRFIDTag)"
+            time.sleep(0.15)
 
         self.lock = True
 

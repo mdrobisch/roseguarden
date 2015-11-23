@@ -10,6 +10,7 @@ from forms import UserPatchForm, DoorRegistrationForm, SessionCreateForm, LostPa
 from worker import backgroundWorker
 from sqlalchemy.exc import IntegrityError
 import json
+import random
 import requests
 import base64
 import controller
@@ -317,11 +318,38 @@ class RfidTagAssignView(Resource):
 
 
         if form.rfidTagId.data != None and form.rfidTagId.data != '':
-            print 'Assign cardID ' + form.rfidTagId.data + ' to ' + user.firstName + ' ' + user.lastName
-            backgroundWorker.assignRFIDTag(user, form.rfidTagId.data )
-            user.cardID = form.rfidTagId.data
-            db.session.commit()
+            authKeyA = ""
+            authKeyB = ""
+            secret = ""
 
+            user.cardID = form.rfidTagId.data
+            user.cardAuthBlock = 1
+            user.cardAuthSector = 4
+
+
+            for i in range(0, 6):
+                authKeyA = authKeyA + format(255, '02X') + ' '
+                authKeyB = authKeyB + format(random.randrange(0, 256), '02X') + ' '
+
+            for i in range(0, 16):
+                secret = secret + format(random.randrange(0, 256), '02X') + ' '
+
+            print 'authKeyA:' + authKeyA
+            print 'authKeyB:' + authKeyB
+            print 'secret:' + secret
+
+            user.cardAuthKeyA = authKeyA
+            user.cardAuthKeyB = authKeyB
+            user.cardSecret = secret
+
+            if(backgroundWorker.assignRFIDTag(user) == False):
+                print 'Error while assigning cardID ' + form.rfidTagId.data + ' to ' + user.firstName + ' ' + user.lastName
+                db.session.rollback()
+                return make_response(jsonify({'error': 'user not found'}), 400)
+            else:
+                db.session.commit()
+
+        print 'Assigned cardID ' + form.rfidTagId.data + ' to ' + user.firstName + ' ' + user.lastName
         return '', 201
 
 class RfidTagWitdrawView(Resource):
