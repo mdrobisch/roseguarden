@@ -2,3 +2,4 @@
 .idea
 bower_components
 server/database/roseGuarden.db
+server/config.ini

@@ -18,7 +18,6 @@ db = SQLAlchemy(app)
 
 migrate = Migrate(app, db)
 
-
 api = Api(app)
 auth = HTTPBasicAuth()
 
