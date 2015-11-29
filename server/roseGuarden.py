@@ -1,7 +1,6 @@
 __author__ = 'drobisch'
 from app.server import app, db
 from app.worker import backgroundWorker
-from app.test import test_envirment
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
 from app.models import User, Log, Door, Setting

@@ -68,24 +68,32 @@ with `sudo raspi-config` -> 'Advanded Options'
 Initial steps
 -------------
 
-- add your `MAIL_USERNAME` to your enviroment variables (for enabling mail service, default mail-server-configuration is for googlemail)
-- add your `MAIL_PASSWORD` to your enviroment variables (for enabling mail-service, default mail-server-configuration is for googlemail)
-- initialize RoseGuarden database in the `server` - directory with `sudo python db_create.py`
+- copy the template `config.template.ini` in the `server` - directory to `config.ini` with `cp config.template.ini config.ini`
+- change settings to your requirements
+- initialize RoseGuarden database in the `server` - directory with `sudo python roseGuarden.py create_db`
 
 
 Running RoseGuarden
 -------------------
 
 - start the http-server in the `client` - directory with  `http-server -p 8000`
-- start the RoseGuarden-app in the `server` - directory with `sudo python run.py`
+- start the RoseGuarden-app in the `server` - directory with `sudo python roseGuarden.py start`
 
 Update RoseGuarden
 ------------------
+
+For updating RoseGuarden stop its running process.
 
 To update the software to the latest version on github, use git.
 
 - `git fetch --all`
 - `git reset --hard origin/master`
+
+In addition a migration of the database is required, use roseGuarden.py.
+
+- `sudo python roseGuarden.py db migrate`
+- `sudo python roseGuarden.py db upgrade`
+
 
 Screenshots (Software)
 ======================
