@@ -14,8 +14,6 @@ manager.add_command('db', MigrateCommand)
 @manager.command
 def start():
     "Start RoseGuarden"
-    test_envirment()
-
     # start backgroundworker
     backgroundWorker.run()
 
@@ -28,7 +26,6 @@ def start():
 @manager.command
 def create_db():
     "Create RoseGuarden database"
-
     db.create_all()
     User.query.delete()
 
