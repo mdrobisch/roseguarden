@@ -96,7 +96,6 @@ class User(db.Model):
         self.registerDateTime = datetime.datetime.today()
         self.budget = 0.00;
 
-
 class Setting(db.Model):
     WRITEONLY = 0x80
     WRITEONLY = 0x40

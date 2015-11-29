@@ -60,7 +60,7 @@ class BackgroundWorker():
             uid_str = str(uid[0])+"." +str(uid[1])+"."+str(uid[2])+"."+str(uid[3])
             print "Card read UID: " + uid_str
 
-            if(uid_str != user.cardID)
+            if (uid_str != user.cardID):
                 print "Wrong cardID detected while assigning RFID-tag to user"
                 return False
 

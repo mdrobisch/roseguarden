@@ -1,7 +1,7 @@
 __author__ = 'drobisch'
 
 import platform
-
+import logging
 
 class GPIOStateMockup:
     # pin configuration
@@ -50,43 +50,43 @@ class GPIOWrapper:
     def setmode(self, mode):
         self.mode = mode
         if mode == self.BOARD:
-            print "GPIO: Using BOARD pin numbering"
+            logging.log("GPIO_LOG", "GPIO: Using BOARD pin numbering")
         else:
             if mode == self.BCM:
-                print "GPIO: Using BCM pin numbering"
+                logging.log("GPIO_LOG", "GPIO: Using BCM pin numbering")
             else:
-                print "GPIO: Uknown mode"
+                logging.log("GPIO_LOG", "GPIO: Uknown mode")
         return None
 
     def input(self, channel):
-        print "GPIO: Get " + channel + " input"
+        logging.log("GPIO_LOG", "GPIO: Get " + channel + " input")
         return self.statemockup.getinput
 
     def output(self, channel, state):
         if (state == self.HIGH):
-            print "GPIO: Set " + str(channel) + " (HIGH)"
+            logging.log("GPIO_LOG", "GPIO: Set " + str(channel) + " (HIGH)")
         else:
-            print "GPIO: Reset " + str(channel) + " (LOW)"
+            logging.log("GPIO_LOG", "GPIO: Reset " + str(channel) + " (LOW)")
 
     def cleanup(self, channel):
-        print "GPIO: Cleanup channel " + channel
+        logging.log("GPIO_LOG", "GPIO: Cleanup channel " + channel)
 
     def setup(self, channel, type, initial):
-        print "GPIO: Setup GPIO " + str(channel) + " to " + str(type)
+        logging.log("GPIO_LOG", "GPIO: Setup GPIO " + str(channel) + " to " + str(type))
 
 
 if platform.platform_getType() == platform.RASPBERRY_PI:
     try:
         import RPi.GPIO as GPIO
 
-        print "GPIO: Using RPi.GPIO as GPIO"
+        logging.log("GPIO_LOG", "GPIO: Using RPi.GPIO as GPIO")
         GPIOMockup = None
         GPIO.setmode(GPIO.BOARD)
     except RuntimeError:
         print(
             "Error importing RPi.GPIO!  This is probably because you need superuser privileges.  You can achieve this by using 'sudo' to run your script")
 else:
-    print "GPIO: Using GPIOWrapper as GPIO"
+    logging.log("GPIO_LOG", "GPIO: Using GPIOWrapper as GPIO")
     GPIOMockup = GPIOStateMockup()
     GPIO = GPIOWrapper(GPIOMockup)
     GPIO.setmode(GPIO.BOARD)
