@@ -94,6 +94,7 @@ In addition a migration of the database is required, use roseGuarden.py.
 - `sudo python roseGuarden.py db migrate`
 - `sudo python roseGuarden.py db upgrade`
 
+After upgrading you can restart your roseGuarden-application again.
 
 Screenshots (Software)
 ======================
