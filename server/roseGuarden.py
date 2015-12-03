@@ -4,11 +4,11 @@ from app.worker import backgroundWorker
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
 from app.models import User, Log, Door, Setting
+from app.config import SYNC_MASTER_DEFAULT_PASSWORD
 import datetime
 
 manager = Manager(app, False)
 manager.add_command('db', MigrateCommand)
-
 
 @manager.command
 def start():
@@ -28,9 +28,14 @@ def create_db():
     db.create_all()
     User.query.delete()
 
-    syncMasterUser = User('syncmaster@roseguarden.org','pleasechangethepassword','Sync','Master',1)
+    # add syncmaster-user for synchronisation
+    syncMasterUser = User('syncmaster@roseguarden.org', SYNC_MASTER_DEFAULT_PASSWORD, 'Sync','Master',1)
     syncMasterUser.syncMaster = 1
-    defaultUser1 = User('kommando@konglomerat.org','konglo2015','Konglomerat','Kommando', 0)
+
+    db.session.add(syncMasterUser)
+
+    # you can add some default user here
+    defaultUser1 = User('kommando@konglomerat.org','pleasechangethepassword','Konglomerat','Kommando', 0)
     defaultUser1.accessType = 1
     defaultUser2 = User('m.drobisch@googlemail.com','1234','Marcus','Drobisch',1,'01754404298',0x00,0x03)
     defaultUser2.accessType = 1
