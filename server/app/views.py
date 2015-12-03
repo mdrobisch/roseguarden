@@ -1,5 +1,4 @@
 __author__ = 'drobisch'
-from config import MAIL_USERNAME
 from email import send_email
 from flask import g, render_template, make_response, jsonify
 from flask_restful import Resource, fields, marshal_with
@@ -9,6 +8,7 @@ from serializers import LogSerializer, UserSerializer, SessionInfoSerializer, Do
 from forms import UserPatchForm, DoorRegistrationForm, SessionCreateForm, LostPasswordForm, RegisterUserForm, UserDeleteForm, RFIDTagAssignForm, RFIDTagWithdrawForm
 from worker import backgroundWorker
 from sqlalchemy.exc import IntegrityError
+import config
 import json
 import random
 import requests
@@ -40,7 +40,7 @@ class UserView(Resource):
         if user != None:
             print 'delete user ' + user.firstName + ' ' + user.lastName + ' (' + user.email + ') from database'
 
-            logentry = Log(datetime.datetime.utcnow(), 'Test door', g.user.firstName + ' ' + g.user.lastName, g.user.email, 'User ' + user.firstName + ' on ' + user.lastName + ' removed', 'User removed', 'L1', 1, 'Web based')
+            logentry = Log(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName, g.user.email, 'User ' + user.firstName + ' on ' + user.lastName + ' removed', 'User removed', 'L1', 1, 'Web based')
             db.session.add(logentry)
             db.session.commit()
 
@@ -115,7 +115,8 @@ class UserView(Resource):
 class UserListView(Resource):
     @auth.login_required
     def get(self):
-        users = User.query.all()
+        users = User.query.filter_by(syncMaster=0).all()
+
         return UserSerializer(users, many=True).data
 
 class RegisterUserView(Resource):
@@ -126,7 +127,7 @@ class RegisterUserView(Resource):
             return form.errors,422
         pwd = base64.decodestring(form.password.data)
         user = User(email = form.email.data, password = pwd,firstName = form.firstName.data, lastName = form.lastName.data, phone= form.phone.data,association = form.association.data)
-        logentry = Log(datetime.datetime.utcnow(), 'Test door', user.firstName + ' ' + user.lastName, user.email, 'User registered ' + user.firstName + ' ' + user.lastName + ' ' + user.email , 'User registered', 'L1', 1, 'Web based')
+        logentry = Log(datetime.datetime.utcnow(), config.NODE_NAME, user.firstName + ' ' + user.lastName, user.email, 'User registered ' + user.firstName + ' ' + user.lastName + ' ' + user.email , 'User registered', 'L1', 1, 'Web based')
 
         try:
             db.session.add(logentry)
@@ -143,7 +144,7 @@ class RegisterUserView(Resource):
                 print 'try to send welcome mail'
                 try:
                     send_email("Welcome to %s. You successfully registered" % 'RoseGuarden',
-                                MAIL_USERNAME,
+                                config.MAIL_USERNAME,
                                 [user.email],
                                 render_template("welcome_mail.txt",
                                 user=user),
@@ -162,7 +163,7 @@ class SessionView(Resource):
 
         user = User.query.filter_by(email=form.email.data).first()
         if user and flask_bcrypt.check_password_hash(user.password, form.password.data):
-            logentry = Log(datetime.datetime.utcnow(), 'Test door', user.firstName + ' ' + user.lastName, user.email, 'User login', 'User login', 'L2', 1, 'Web based')
+            logentry = Log(datetime.datetime.utcnow(), config.NODE_NAME, user.firstName + ' ' + user.lastName, user.email, 'User login', 'User login', 'L2', 1, 'Web based')
             try:
                 db.session.add(logentry)
                 db.session.commit()
@@ -183,7 +184,7 @@ class LostPasswordView(Resource):
         user.password = flask_bcrypt.generate_password_hash(new_password)
         db.session.commit()
         send_email("%s: A new password has been generated" % 'RoseGuarden',
-           MAIL_USERNAME,
+           config.MAIL_USERNAME,
            [user.email],
            render_template("lostpassword_mail.txt",
                            user=user,password=new_password),
@@ -199,7 +200,7 @@ class OpeningRequestView(Resource):
         checkAccessResult = g.user.checkUserAccessPrivleges()
         if(checkAccessResult == "access granted"):
 
-            logentry = Log(datetime.datetime.utcnow(), 'Test door', g.user.firstName + ' ' + g.user.lastName, g.user.email, 'Opening request', 'Opening request', 'L2', 1, 'Web based')
+            logentry = Log(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName, g.user.email, 'Opening request', 'Opening request', 'L2', 1, 'Web based')
             try:
                 db.session.add(logentry)
                 db.session.commit()
@@ -221,7 +222,7 @@ class DoorView(Resource):
         door = Door.query.filter_by(id=id).first()
         if door != None:
             print 'delete door ' + door.name + ' ' + door.address + ' (id=' + str(door.id) + ') from database'
-            logentry = Log(datetime.datetime.utcnow(), 'Test door', g.user.firstName + ' ' + g.user.lastName, g.user.email, 'Door (' + door.name + ' on ' + door.address + ') removed', 'Door removed', 'L1', 1, 'Web based')
+            logentry = Log(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName, g.user.email, 'Door (' + door.name + ' on ' + door.address + ') removed', 'Door removed', 'L1', 1, 'Web based')
             try:
                 db.session.add(logentry)
                 db.session.commit()
@@ -253,7 +254,7 @@ class DoorRegistrationView(Resource):
         print "create new door"
         response_data = json.loads(response.content)
         newDoor = Door(name = form.name.data, keyMask=response_data["keyMask"], address='http://' + form.address.data, local=0)
-        logentry = Log(datetime.datetime.utcnow(), 'Test door', g.user.firstName + ' ' + g.user.lastName, g.user.email, 'Door ' + newDoor.name + ' on ' + newDoor.address + ' checked and registered', 'Door registered', 'L1', 1, 'Web based')
+        logentry = Log(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName, g.user.email, 'Door ' + newDoor.name + ' on ' + newDoor.address + ' checked and registered', 'Door registered', 'L1', 1, 'Web based')
         try:
             db.session.add(logentry)
             db.session.commit()

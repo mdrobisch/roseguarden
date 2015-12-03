@@ -4,15 +4,17 @@ print os.path.dirname(os.path.abspath(__file__))
 
 
 def conf_entry_to_bool(v):
-  return v.lower() in ("yes", "true", "t", "1")
+    return v.lower() in ("yes", "true", "t", "1")
 
 def conf_entry_to_int(v):
-  return int(v)
+    return int(v)
 
 
 
 config = ConfigObj("config.ini")
-print str(config)
+
+node_section = config['NODE']
+NODE_NAME = node_section['NODE_NAME']
 
 flask_section = config['FLASK']
 DEBUG = conf_entry_to_bool(flask_section['DEBUG'])
@@ -26,5 +28,6 @@ MAIL_USE_SSL = conf_entry_to_bool(mail_section['MAIL_USE_SSL'])
 MAIL_USERNAME = mail_section['MAIL_USERNAME']
 MAIL_PASSWORD = mail_section['MAIL_PASSWORD']
 
-rfid_section = config['RFID']
-RFID_GLOBAL_PASSWORD = rfid_section['RFID_GLOBAL_PASSWORD']
+security_section = config['SECURITY']
+RFID_GLOBAL_PASSWORD = security_section['RFID_GLOBAL_PASSWORD']
+SYNC_MASTER_DEFAULT_PASSWORD = security_section['SYNC_MASTER_DEFAULT_PASSWORD']
