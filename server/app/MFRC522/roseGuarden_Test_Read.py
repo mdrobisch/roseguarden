@@ -46,10 +46,42 @@ while continue_reading:
         # Select the scanned tag
         MIFAREReader.MFRC522_SelectTag(uid)
 
-        # Authenticate
-        status = MIFAREReader.MFRC522_Auth(MIFAREReader.PICC_AUTHENT1A, 8, key, uid)
-        print "\n"
 
+        newkey = []
+        newkeystring = '45-39-68-A7-F1-B5'
+        for x in newkeystring.split('-'):
+            newkey.append(int(x, 16))
+
+        secret = []
+        secretstring = '35-B9-68-19-F1-B5-C7-03-35-B9-68-19-F1-B5-C7-03'
+        for x in secretstring.split('-'):
+            secret.append(int(x, 16))
+
+        print "Old key is: " + str(key)
+        print "New key is: " + str(newkey)
+        print "Secret is: " + str(secret)
+
+        cardAuthSector = 4
+        cardAuthBlock = 1
+
+        SecretBlockAddr = cardAuthSector * 4 + cardAuthBlock
+        TrailerBlockAddr = cardAuthSector * 4 + 3
+
+
+        # Authenticate
+        status = MIFAREReader.MFRC522_Auth(MIFAREReader.PICC_AUTHENT1A, TrailerBlockAddr, key, uid)
+        # Check if authenticated
+        if status == MIFAREReader.MI_OK:
+            print "Read TrailerBlock :"
+            # Read block 8
+            result = MIFAREReader.MFRC522_Read(TrailerBlockAddr)
+            print result
+            print "\n"
+        else:
+            print "Authentication error"
+            continue
+
+        status = MIFAREReader.MFRC522_Auth(MIFAREReader.PICC_AUTHENT1A, SecretBlockAddr, key, uid)
         # Check if authenticated
         if status == MIFAREReader.MI_OK:
 
@@ -60,20 +92,20 @@ while continue_reading:
             for x in range(0,16):
                 data.append(0xFF)
 
-            print "Sector 8 looked like this:"
+            print "Read Secret:"
             # Read block 8
-            result = MIFAREReader.MFRC522_Read(8)
+            result = MIFAREReader.MFRC522_Read(SecretBlockAddr)
             print result
             print "\n"
 
-            print "Sector 8 will now be filled with 0xFF:"
+            print "Write new Secret:"
             # Write the data
-            MIFAREReader.MFRC522_Write(8, data)
+            MIFAREReader.MFRC522_Write(SecretBlockAddr, secret)
             print "\n"
 
-            print "It now looks like this:"
+            print "Read back secret:"
             # Check to see if it was written
-            result = MIFAREReader.MFRC522_Read(8)
+            result = MIFAREReader.MFRC522_Read(SecretBlockAddr)
             print result
             print "\n"
 
@@ -82,13 +114,13 @@ while continue_reading:
             for x in range(0,16):
                 data.append(0x00)
 
-            print "Now we fill it with 0x00:"
-            MIFAREReader.MFRC522_Write(8, data)
+            print "Clear secret:"
+            MIFAREReader.MFRC522_Write(SecretBlockAddr, data)
             print "\n"
 
-            print "It is now empty:"
+            print "Read back cleared secret:"
             # Check to see if it was written
-            result = MIFAREReader.MFRC522_Read(8)
+            result = MIFAREReader.MFRC522_Read(SecretBlockAddr)
             print result
             print "\n"
 
