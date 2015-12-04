@@ -12,7 +12,8 @@ RoseGuardenApp.controller('AdminDoorsCtrl', function($scope,$q, Door, $modal, $l
             name: 'New door',
             doorSlot: 'Slot 1',
             address: '192.168.1.199',
-            local: 0 };
+            local: 0 ,
+            password: ''};
 
     $scope.rowCollection = [];
     $scope.displayedCollection = [];
@@ -79,7 +80,7 @@ RoseGuardenApp.controller('AdminDoorsCtrl', function($scope,$q, Door, $modal, $l
     $scope.addDoor = function addDoor() {
         $scope.showError = false;
         deferred = $q.defer();
-        var newdoor = {name:$scope.newdoor.name, address: $scope.newdoor.address};
+        var newdoor = {name:$scope.newdoor.name, address: $scope.newdoor.address, password: btoa($scope.newdoor.password)};
 
 
         Door.add(newdoor).then(function(response_data) {

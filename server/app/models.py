@@ -142,8 +142,9 @@ class Door(db.Model):
     keyMask = db.Column(db.Integer)
     address = db.Column(db.Text)
     local = db.Column(db.Integer)
+    password = db.Column(db.Text)
 
-    def __init__(self, name,keyMask,address,local):
+    def __init__(self, name, keyMask, address, local):
         self.name = name
         self.keyMask = keyMask
         self.address = address

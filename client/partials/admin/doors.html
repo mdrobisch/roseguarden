@@ -4,16 +4,22 @@
             <tr>
                 <th>displayed name</th>
                 <th>address</th>
+                <th>password</th>
                 <th>actions</th>
             </tr>
         </thead>
 
         <tbody>
             <tr>
-                <td> <input type="text" ng-model="newdoor.name" class="form-control"> </td>
+                <td>
+                    <input type="text" ng-model="newdoor.name" class="form-control">
+                </td>
                 <td>
                     <label for="doorAddress" style="float: left;  margin-top: 8px; margin-right:3px">http://</label>
                     <input id="doorAddress" type="text" ng-model="newdoor.address" class="form-control" style="width: 80%">
+                </td>
+                <td>
+                    <input id="doorPassword" type="password" ng-model="newdoor.password" class="form-control">
                 </td>
                 <td>
                     <button type="button" ng-click="addDoor()" class="btn btn-sm btn-success">
