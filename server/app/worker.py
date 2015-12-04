@@ -42,7 +42,7 @@ class BackgroundWorker():
     def withdrawRFIDTag(self, user):
         while(self.lock == True):
             print "still locked (withdrawRFIDTag)"
-            time.sleep(0.2)
+            time.sleep(0.3)
 
         try:
             self.lock = True
@@ -51,14 +51,14 @@ class BackgroundWorker():
 
             print "background-worker withdrawRFIDTag"
 
-            (status, TagType) = RFIDReader.MFRC522_Request(RFIDReader.PICC_REQIDL)
-            for i in range(0, 3):
+            for i in range(0, 4):
+                (status, TagType) = RFIDReader.MFRC522_Request(RFIDReader.PICC_REQIDL)
                 (status, uid) = RFIDReader.MFRC522_Anticoll()
                 if status == RFIDReader.MI_OK:
                     break
                 else:
-                    print "retry anticoll card"
-                    time.sleep(0.2)
+                    print "retry anticoll card (withdrawRFIDTag)"
+                    time.sleep(0.3)
 
             # If we have the UID, continue
             if status == RFIDReader.MI_OK:
@@ -146,7 +146,7 @@ class BackgroundWorker():
     def assignRFIDTag(self, user):
         while(self.lock == True):
             print "still locked (assignRFIDTag)"
-            time.sleep(0.2)
+            time.sleep(0.3)
 
         try:
             self.lock = True
@@ -155,15 +155,15 @@ class BackgroundWorker():
 
             print "background-worker assignRFIDTag"
 
-            (status, TagType) = RFIDReader.MFRC522_Request(RFIDReader.PICC_REQIDL)
 
-            for i in range(0, 3):
+            for i in range(0, 4):
+                (status, TagType) = RFIDReader.MFRC522_Request(RFIDReader.PICC_REQIDL)
                 (status, uid) = RFIDReader.MFRC522_Anticoll()
                 if status == RFIDReader.MI_OK:
                     break
                 else:
-                    print "retry anticoll card"
-                    time.sleep(0.2)
+                    print "retry anticoll card (assignRFIDTag)"
+                    time.sleep(0.3)
 
             # If we have the UID, continue
             if status == RFIDReader.MI_OK:
