@@ -42,23 +42,23 @@ class BackgroundWorker():
     def withdrawRFIDTag(self, user):
         while(self.lock == True):
             print "still locked (withdrawRFIDTag)"
-            time.sleep(0.3)
+            time.sleep(0.2)
 
         try:
             self.lock = True
 
-            time.sleep(0.4)
+            time.sleep(0.2)
 
             print "background-worker withdrawRFIDTag"
 
-            for i in range(0,3):
-                (status, TagType) = RFIDReader.MFRC522_Request(RFIDReader.PICC_REQIDL)
+            (status, TagType) = RFIDReader.MFRC522_Request(RFIDReader.PICC_REQIDL)
+            for i in range(0, 3):
                 (status, uid) = RFIDReader.MFRC522_Anticoll()
                 if status == RFIDReader.MI_OK:
                     break
                 else:
                     print "retry anticoll card"
-                    time.sleep(0.4)
+                    time.sleep(0.2)
 
             # If we have the UID, continue
             if status == RFIDReader.MI_OK:
@@ -155,8 +155,9 @@ class BackgroundWorker():
 
             print "background-worker assignRFIDTag"
 
-            for i in range(0,3):
-                (status, TagType) = RFIDReader.MFRC522_Request(RFIDReader.PICC_REQIDL)
+            (status, TagType) = RFIDReader.MFRC522_Request(RFIDReader.PICC_REQIDL)
+
+            for i in range(0, 3):
                 (status, uid) = RFIDReader.MFRC522_Anticoll()
                 if status == RFIDReader.MI_OK:
                     break
@@ -251,12 +252,11 @@ class BackgroundWorker():
 
             (status, TagType) = RFIDReader.MFRC522_Request(RFIDReader.PICC_REQIDL)
 
-            for i in range(0, 3):
+            for i in range(0, 2):
                 (status, uid) = RFIDReader.MFRC522_Anticoll()
                 if status == RFIDReader.MI_OK:
                     break
                 else:
-                    print "retry anticoll card"
                     time.sleep(0.2)
 
             # If we have the UID, continue
@@ -274,7 +274,7 @@ class BackgroundWorker():
                     return
 
                 self.tagInfo.userInfo = user.email
-                print user.email
+                #print user.email
 
                 # This is the default key for authentication
                 defaultkey = [0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]
@@ -285,13 +285,13 @@ class BackgroundWorker():
                 for x in userkeyString.split('-'):
                     userkey.append(int(x, 16))
 
-                print "Userkey: " + str(userkey)
+                #print "Userkey: " + str(userkey)
 
                 usersecretString = user.cardSecret
                 for x in usersecretString.split('-'):
                     usersecret.append(int(x, 16))
 
-                print "Usersecret: " + str(usersecret)
+                #print "Usersecret: " + str(usersecret)
 
                 SecretBlockAddr = user.cardAuthSector * 4 + user.cardAuthBlock
                 TrailerBlockAddr = user.cardAuthSector * 4 + 3
@@ -306,7 +306,7 @@ class BackgroundWorker():
                 if status == RFIDReader.MI_OK:
 
                     readSecret = RFIDReader.MFRC522_Read(SecretBlockAddr)
-                    print readSecret
+                    #print readSecret
                     readSecretString = ''
                     i = 0
 
@@ -316,7 +316,7 @@ class BackgroundWorker():
                         i = i + 1
                         readSecretString = readSecretString + format(x, '02X')
 
-                    print readSecretString
+                    #print readSecretString
 
                     if readSecretString == user.cardSecret:
                         print "correct secret"
@@ -362,14 +362,14 @@ class BackgroundWorker():
             print "Opening request"
 
         if self.openingTimer >= 0:
-            print "Opened door cycle" + "("  + ")"
+            if self.openingTimer == 0:
+                print "Openening door"
             GPIO.output(12, GPIO.LOW)
             self.openingTimer += 1
             if self.openingTimer >= 7:
                 self.openingTimer = -1
                 print "Closing door"
                 GPIO.output(12, GPIO.HIGH)
-
 
         #else:
             #print "Closing door"
