@@ -286,7 +286,7 @@ class BackgroundWorker():
 
                 for x in readSecret:
                     if i != 0:
-                        hexstr = hexstr + '-'
+                        readSecretString = readSecretString + '-'
                     i = i + 1
                     readSecretString = readSecretString + format(x, '02X')
 
