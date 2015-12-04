@@ -249,8 +249,9 @@ class BackgroundWorker():
         try:
             self.lock = True
 
-            for i in range(0,3):
-                (status, TagType) = RFIDReader.MFRC522_Request(RFIDReader.PICC_REQIDL)
+            (status, TagType) = RFIDReader.MFRC522_Request(RFIDReader.PICC_REQIDL)
+
+            for i in range(0, 3):
                 (status, uid) = RFIDReader.MFRC522_Anticoll()
                 if status == RFIDReader.MI_OK:
                     break
@@ -349,7 +350,7 @@ class BackgroundWorker():
 
         self.requestTimer += 1
 
-        if self.requestTimer >= 2:
+        if self.requestTimer >= 3:
             self.requestTimer = 0
             self.resetTagInfo()
             self.checkRFIDTag()
