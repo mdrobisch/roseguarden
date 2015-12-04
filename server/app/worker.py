@@ -243,6 +243,7 @@ class BackgroundWorker():
 
             if user is None:
                 print "No user asigned to card"
+                self.lock = False        
                 return
 
             self.tagInfo.userInfo = user.email
@@ -305,7 +306,6 @@ class BackgroundWorker():
                 self.lock = False
                 return False
         else:
-            print "Authentication error"
             self.lock = False
             return False
 
