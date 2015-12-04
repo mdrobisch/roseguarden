@@ -146,12 +146,12 @@ class BackgroundWorker():
     def assignRFIDTag(self, user):
         while(self.lock == True):
             print "still locked (assignRFIDTag)"
-            time.sleep(0.3)
+            time.sleep(0.2)
 
         try:
             self.lock = True
 
-            time.sleep(0.4)
+            time.sleep(0.2)
 
             print "background-worker assignRFIDTag"
 
@@ -162,7 +162,7 @@ class BackgroundWorker():
                     break
                 else:
                     print "retry anticoll card"
-                    time.sleep(0.4)
+                    time.sleep(0.2)
 
             # If we have the UID, continue
             if status == RFIDReader.MI_OK:
@@ -244,7 +244,7 @@ class BackgroundWorker():
     def checkRFIDTag(self):
         while(self.lock == True):
             print "still locked (checkRFIDTag)"
-            time.sleep(0.3)
+            time.sleep(0.2)
 
         try:
             self.lock = True
@@ -256,7 +256,7 @@ class BackgroundWorker():
                     break
                 else:
                     print "retry anticoll card"
-                    time.sleep(0.4)
+                    time.sleep(0.2)
 
             # If we have the UID, continue
             if status == RFIDReader.MI_OK:
@@ -269,7 +269,6 @@ class BackgroundWorker():
                 user = User.query.filter_by(cardID=self.tagInfo.tagId).first()
 
                 if user is None:
-                    print "No user asigned to card"
                     self.lock = False
                     return
 
