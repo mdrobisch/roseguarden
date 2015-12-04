@@ -43,7 +43,7 @@ class BackgroundWorker():
     def withdrawRFIDTag(self, user):
         while(self.lock == True):
             print "still locked (withdrawRFIDTag)"
-            time.sleep(0.15)
+            time.sleep(1.15)
 
         self.lock = True
 
@@ -133,7 +133,7 @@ class BackgroundWorker():
     def assignRFIDTag(self, user):
         while(self.lock == True):
             print "still locked (assignRFIDTag)"
-            time.sleep(0.15)
+            time.sleep(1.15)
 
         self.lock = True
 
@@ -212,14 +212,14 @@ class BackgroundWorker():
                 self.lock = False
                 return False
         else:
-                print "Authentication error while looking for cards"
+            print "Authentication error while looking for cards"
             self.lock = False
             return False
 
     def checkRFIDTag(self):
         while(self.lock == True):
             print "still locked (checkRFIDTag)"
-            time.sleep(0.15)
+            time.sleep(1.15)
 
         self.lock = True
 
