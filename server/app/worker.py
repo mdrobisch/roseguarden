@@ -42,7 +42,7 @@ class BackgroundWorker():
     def withdrawRFIDTag(self, user):
         while(self.lock == True):
             print "still locked (withdrawRFIDTag)"
-            time.sleep(1.15)
+            time.sleep(0.4)
 
         try:
             self.lock = True
@@ -138,7 +138,7 @@ class BackgroundWorker():
     def assignRFIDTag(self, user):
         while(self.lock == True):
             print "still locked (assignRFIDTag)"
-            time.sleep(1.15)
+            time.sleep(0.4)
 
         try:
             self.lock = True
@@ -229,7 +229,7 @@ class BackgroundWorker():
     def checkRFIDTag(self):
         while(self.lock == True):
             print "still locked (checkRFIDTag)"
-            time.sleep(1.15)
+            time.sleep(0.4)
 
         try:
             self.lock = True
@@ -306,14 +306,18 @@ class BackgroundWorker():
                     if readSecretString == user.cardSecret:
                         print "correct secret"
                         if user.checkUserAccessPrivleges() == "access granted":
-                            print "no user-access privilege"
                             self.requestOpening = True
+                        else:
+                            print "no user-access privilege"
+                    else:
+                        self.tagInfo.userInfo = user.email + '(inv. sec.)'
+                        print "no user-access privilege"
 
                     RFIDReader.MFRC522_StopCrypto1()
                     self.lock = False
                     return True
                 else:
-                    self.tagInfo.userInfo = user.email + '(invalid)'
+                    self.tagInfo.userInfo = user.email + '(inv. key.)'
                     print "Authentication error"
                     self.lock = False
                     return False
