@@ -70,12 +70,9 @@ class User(db.Model):
         self.cardAuthBlock = 1
         self.cardAuthSector = 4
         self.cardID = ''
-        self.cardKey = ''
         self.cardSecret = ''
-        self.cardAuthKeyA = 'FF FF FF FF FF FF'
+        self.cardAuthKeyA = ''
         self.cardAuthKeyB = ''
-        self.cardSecret = ''
-
         self.role = role;
         self.email = email
         self.password = flask_bcrypt.generate_password_hash(password)

@@ -48,7 +48,6 @@ while continue_reading:
         # Select the scanned tag
         MIFAREReader.MFRC522_SelectTag(uid)
 
-
         newkey = []
         newkeystring = '45-39-68-A7-F1-B5'
         for x in newkeystring.split('-'):

@@ -5,7 +5,8 @@ from flask_restful import Resource, fields, marshal_with
 from server import api, db, flask_bcrypt, auth, mail
 from models import User, Log, Door, RfidTagInfo
 from serializers import LogSerializer, UserSerializer, SessionInfoSerializer, DoorSerializer, RfidTagInfoSerializer
-from forms import UserPatchForm, DoorRegistrationForm, SessionCreateForm, LostPasswordForm, RegisterUserForm, UserDeleteForm, RFIDTagAssignForm, RFIDTagWithdrawForm
+from forms import UserPatchForm, DoorRegistrationForm, SessionCreateForm, LostPasswordForm, RegisterUserForm, \
+    UserDeleteForm, RFIDTagAssignForm, RFIDTagWithdrawForm
 from worker import backgroundWorker
 from sqlalchemy.exc import IntegrityError
 import config
@@ -15,6 +16,7 @@ import requests
 import base64
 import controller
 import datetime
+
 
 @auth.verify_password
 def verify_password(email, password):
@@ -35,12 +37,14 @@ class UserView(Resource):
         return UserSerializer(user).data
 
     @auth.login_required
-    def delete(self,id):
+    def delete(self, id):
         user = User.query.filter_by(id=id).first()
         if user != None:
             print 'delete user ' + user.firstName + ' ' + user.lastName + ' (' + user.email + ') from database'
 
-            logentry = Log(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName, g.user.email, 'User ' + user.firstName + ' on ' + user.lastName + ' removed', 'User removed', 'L1', 1, 'Web based')
+            logentry = Log(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
+                           g.user.email, 'User ' + user.firstName + ' on ' + user.lastName + ' removed', 'User removed',
+                           'L1', 1, 'Web based')
             db.session.add(logentry)
             db.session.commit()
 
@@ -56,7 +60,7 @@ class UserView(Resource):
         form = UserPatchForm()
         if not form.validate_on_submit():
             print form.errors
-            return form.errors,422
+            return form.errors, 422
         user = User.query.filter_by(id=id).first()
         if form.newpassword.data != None and form.newpassword.data != '':
             print 'Change password' + base64.decodestring(form.newpassword.data)
@@ -119,15 +123,19 @@ class UserListView(Resource):
 
         return UserSerializer(users, many=True).data
 
+
 class RegisterUserView(Resource):
     def post(self):
         form = RegisterUserForm()
         print 'enter registerview'
         if not form.validate_on_submit():
-            return form.errors,422
+            return form.errors, 422
         pwd = base64.decodestring(form.password.data)
-        user = User(email = form.email.data, password = pwd,firstName = form.firstName.data, lastName = form.lastName.data, phone= form.phone.data,association = form.association.data)
-        logentry = Log(datetime.datetime.utcnow(), config.NODE_NAME, user.firstName + ' ' + user.lastName, user.email, 'User registered ' + user.firstName + ' ' + user.lastName + ' ' + user.email , 'User registered', 'L1', 1, 'Web based')
+        user = User(email=form.email.data, password=pwd, firstName=form.firstName.data, lastName=form.lastName.data,
+                    phone=form.phone.data, association=form.association.data)
+        logentry = Log(datetime.datetime.utcnow(), config.NODE_NAME, user.firstName + ' ' + user.lastName, user.email,
+                       'User registered ' + user.firstName + ' ' + user.lastName + ' ' + user.email, 'User registered',
+                       'L1', 1, 'Web based')
 
         try:
             db.session.add(logentry)
@@ -144,16 +152,17 @@ class RegisterUserView(Resource):
                 print 'try to send welcome mail'
                 try:
                     send_email("Welcome to %s. You successfully registered" % 'RoseGuarden',
-                                config.MAIL_USERNAME,
-                                [user.email],
-                                render_template("welcome_mail.txt",
-                                user=user),
-                                render_template("welcome_mail.html",
-                                user=user))
+                               config.MAIL_USERNAME,
+                               [user.email],
+                               render_template("welcome_mail.txt",
+                                               user=user),
+                               render_template("welcome_mail.html",
+                                               user=user))
                 except:
                     print 'unable to send mail'
-                    return '',201
+                    return '', 201
         return '', 201
+
 
 class SessionView(Resource):
     def post(self):
@@ -163,7 +172,8 @@ class SessionView(Resource):
 
         user = User.query.filter_by(email=form.email.data).first()
         if user and flask_bcrypt.check_password_hash(user.password, form.password.data):
-            logentry = Log(datetime.datetime.utcnow(), config.NODE_NAME, user.firstName + ' ' + user.lastName, user.email, 'User login', 'User login', 'L2', 1, 'Web based')
+            logentry = Log(datetime.datetime.utcnow(), config.NODE_NAME, user.firstName + ' ' + user.lastName,
+                           user.email, 'User login', 'User login', 'L2', 1, 'Web based')
             try:
                 db.session.add(logentry)
                 db.session.commit()
@@ -171,6 +181,7 @@ class SessionView(Resource):
                 return '', 201
             return SessionInfoSerializer(user).data, 201
         return '', 401
+
 
 class LostPasswordView(Resource):
     def post(self):
@@ -184,12 +195,12 @@ class LostPasswordView(Resource):
         user.password = flask_bcrypt.generate_password_hash(new_password)
         db.session.commit()
         send_email("%s: A new password has been generated" % 'RoseGuarden',
-           config.MAIL_USERNAME,
-           [user.email],
-           render_template("lostpassword_mail.txt",
-                           user=user,password=new_password),
-           render_template("lostpassword_mail.html",
-                           user=user,password=new_password))
+                   config.MAIL_USERNAME,
+                   [user.email],
+                   render_template("lostpassword_mail.txt",
+                                   user=user, password=new_password),
+                   render_template("lostpassword_mail.html",
+                                   user=user, password=new_password))
         return '', 201
 
 
@@ -198,9 +209,10 @@ class OpeningRequestView(Resource):
     def post(self):
         print 'Opening request received'
         checkAccessResult = g.user.checkUserAccessPrivleges()
-        if(checkAccessResult == "access granted"):
+        if (checkAccessResult == "access granted"):
 
-            logentry = Log(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName, g.user.email, 'Opening request', 'Opening request', 'L2', 1, 'Web based')
+            logentry = Log(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
+                           g.user.email, 'Opening request', 'Opening request', 'L2', 1, 'Web based')
             try:
                 db.session.add(logentry)
                 db.session.commit()
@@ -215,6 +227,7 @@ class OpeningRequestView(Resource):
             return checkAccessResult, 201
         return '', 201
 
+
 class DoorView(Resource):
     @auth.login_required
     def delete(self, id):
@@ -222,7 +235,9 @@ class DoorView(Resource):
         door = Door.query.filter_by(id=id).first()
         if door != None:
             print 'delete door ' + door.name + ' ' + door.address + ' (id=' + str(door.id) + ') from database'
-            logentry = Log(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName, g.user.email, 'Door (' + door.name + ' on ' + door.address + ') removed', 'Door removed', 'L1', 1, 'Web based')
+            logentry = Log(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
+                           g.user.email, 'Door (' + door.name + ' on ' + door.address + ') removed', 'Door removed',
+                           'L1', 1, 'Web based')
             try:
                 db.session.add(logentry)
                 db.session.commit()
@@ -239,7 +254,7 @@ class DoorRegistrationView(Resource):
         form = DoorRegistrationForm()
         print 'Door registration request received'
         if not form.validate_on_submit():
-            return form.errors,422
+            return form.errors, 422
 
         if (g.user.role & 1) == 0:
             return make_response(jsonify({'error': 'Not authorized'}), 403)
@@ -253,8 +268,11 @@ class DoorRegistrationView(Resource):
 
         print "create new door"
         response_data = json.loads(response.content)
-        newDoor = Door(name = form.name.data, keyMask=response_data["keyMask"], address='http://' + form.address.data, local=0)
-        logentry = Log(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName, g.user.email, 'Door ' + newDoor.name + ' on ' + newDoor.address + ' checked and registered', 'Door registered', 'L1', 1, 'Web based')
+        newDoor = Door(name=form.name.data, keyMask=response_data["keyMask"], address='http://' + form.address.data,
+                       local=0)
+        logentry = Log(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
+                       g.user.email, 'Door ' + newDoor.name + ' on ' + newDoor.address + ' checked and registered',
+                       'Door registered', 'L1', 1, 'Web based')
         try:
             db.session.add(logentry)
             db.session.commit()
@@ -268,17 +286,20 @@ class DoorRegistrationView(Resource):
         print "return new door data for request"
         return DoorSerializer(newDoor).data
 
+
 class DoorInfoView(Resource):
     def get(self):
         print 'Door info request'
         localdoor = Door.query.filter_by(local=1).first()
         return DoorSerializer(localdoor).data
 
+
 class DoorListView(Resource):
     @auth.login_required
     def get(self):
         posts = Door.query.filter_by(local=0).all()
         return DoorSerializer(posts, many=True).data
+
 
 class LogAdminView(Resource):
     @auth.login_required
@@ -288,17 +309,20 @@ class LogAdminView(Resource):
         logs = Log.query.all()
         return LogSerializer(logs, many=True).data
 
+
 class LogUserView(Resource):
     @auth.login_required
     def get(self):
         logs = Log.query.filter_by(userMail=g.user.email).all()
         return LogSerializer(logs, many=True).data
 
+
 class RfidTagInfoView(Resource):
     @auth.login_required
     def get(self):
         print backgroundWorker.tagInfo.userInfo + ' ' + backgroundWorker.tagInfo.tagId
         return RfidTagInfoSerializer(backgroundWorker.tagInfo).data
+
 
 class RfidTagAssignView(Resource):
     @auth.login_required
@@ -308,42 +332,36 @@ class RfidTagAssignView(Resource):
         form = RFIDTagAssignForm()
         if not form.validate_on_submit():
             return form.errors, 422
-        #check admin rights
+        # check admin rights
         if (g.user.role & 1) == 0:
             return make_response(jsonify({'error': 'Not authorized'}), 403)
 
         user = User.query.filter_by(email=form.email.data).first()
 
-        if(user == None):
+        if (user == None):
             return make_response(jsonify({'error': 'user not found'}), 400)
 
-
         if form.rfidTagId.data != None and form.rfidTagId.data != '':
-            authKeyA = ""
-            authKeyB = ""
-            secret = ""
+
+            secretString = ''
+            for i in range(0,16):
+                if i != 0:
+                    secretString = secretString + '-'
+                num = random.randrange(0, 256)
+                secretString = secretString + format(num, '02X')
 
             user.cardID = form.rfidTagId.data
+            user.cardSecret = secretString
             user.cardAuthBlock = 1
             user.cardAuthSector = 4
+            user.cardAuthKeyA = config.RFID_GLOBAL_PASSWORD
+            user.cardAuthKeyB = "FF-FF-FF-FF-FF-FF"
 
+            print "User-secret: >" + user.cardSecret + "<"
+            print "User-keyA: >" + user.cardAuthKeyA + "<"
+            print "User-keyB: >" + user.cardAuthKeyB + "<"
 
-            for i in range(0, 6):
-                authKeyA = authKeyA + format(255, '02X') + ' '
-                authKeyB = authKeyB + format(random.randrange(0, 256), '02X') + ' '
-
-            for i in range(0, 16):
-                secret = secret + format(random.randrange(0, 256), '02X') + ' '
-
-            print 'authKeyA:' + authKeyA
-            print 'authKeyB:' + authKeyB
-            print 'secret:' + secret
-
-            user.cardAuthKeyA = authKeyA
-            user.cardAuthKeyB = authKeyB
-            user.cardSecret = secret
-
-            if(backgroundWorker.assignRFIDTag(user) == False):
+            if (backgroundWorker.assignRFIDTag(user) == False):
                 print 'Error while assigning cardID ' + form.rfidTagId.data + ' to ' + user.firstName + ' ' + user.lastName
                 db.session.rollback()
                 return make_response(jsonify({'error': 'user not found'}), 400)
@@ -353,6 +371,7 @@ class RfidTagAssignView(Resource):
         print 'Assigned cardID ' + form.rfidTagId.data + ' to ' + user.firstName + ' ' + user.lastName
         return '', 201
 
+
 class RfidTagWitdrawView(Resource):
     @auth.login_required
     def post(self):
@@ -361,20 +380,31 @@ class RfidTagWitdrawView(Resource):
         form = RFIDTagAssignForm()
         if not form.validate_on_submit():
             return form.errors, 422
-        #check admin rights
+        # check admin rights
         if (g.user.role & 1) == 0:
             return make_response(jsonify({'error': 'Not authorized'}), 403)
 
         user = User.query.filter_by(email=form.email.data).first()
 
-        if(user == None):
+        if (user == None):
             return make_response(jsonify({'error': 'user not found'}), 400)
 
-        if form.rfidTagId.data != None and form.rfidTagId.data != '':
-            print 'Withdraw cardID ' + form.rfidTagId.data + ' from ' + user.firstName + ' ' + user.lastName
-            user.cardID = ""
-            db.session.commit()
-        return '', 201
+        if form.rfidTagId.data is not None and form.rfidTagId.data != '':
+            if not backgroundWorker.withdrawRFIDTag(user):
+                print 'Error while withdraw cardID ' + user.cardID + ' from ' + user.firstName + ' ' + user.lastName
+                db.session.rollback()
+                return make_response(jsonify({'error': 'user not found'}), 400)
+            else:
+                user.cardID = ''
+                user.cardSecret = ''
+                user.cardAuthKeyA = ''
+                user.cardAuthKeyB = ''
+                db.session.commit()
+                print 'Withdraw cardID ' + form.rfidTagId.data + ' from ' + user.firstName + ' ' + user.lastName
+                return '', 201
+        else:
+            return make_response(jsonify({'error': 'bad request data'}), 400)
+
 
 api.add_resource(SessionView, '/sessions')
 api.add_resource(UserView, '/user/<int:id>')
@@ -387,7 +417,7 @@ api.add_resource(DoorListView, '/doors')
 api.add_resource(OpeningRequestView, '/request/opening')
 api.add_resource(LostPasswordView, '/request/password')
 api.add_resource(DoorInfoView, '/request/doorinfo')
-api.add_resource(RfidTagInfoView,'/tag/info')
-api.add_resource(RfidTagAssignView,'/tag/assign')
-api.add_resource(RfidTagWitdrawView,'/tag/withdraw')
+api.add_resource(RfidTagInfoView, '/tag/info')
+api.add_resource(RfidTagAssignView, '/tag/assign')
+api.add_resource(RfidTagWitdrawView, '/tag/withdraw')
 api.add_resource(RegisterUserView, '/register')
