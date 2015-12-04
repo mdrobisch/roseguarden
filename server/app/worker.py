@@ -29,7 +29,6 @@ class BackgroundWorker():
         GPIO.setup(12,GPIO.OUT, initial=GPIO.HIGH)
         GPIO.output(12, GPIO.HIGH)
 
-
     def run(self):
         #if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
         self.thr = threading.Timer(1, self.timer_cycle)
@@ -45,270 +44,286 @@ class BackgroundWorker():
             print "still locked (withdrawRFIDTag)"
             time.sleep(1.15)
 
-        self.lock = True
+        try:
+            self.lock = True
 
-        print "background-worker withdrawRFIDTag"
+            print "background-worker withdrawRFIDTag"
 
-        (status, TagType) = RFIDReader.MFRC522_Request(RFIDReader.PICC_REQIDL)
+            (status, TagType) = RFIDReader.MFRC522_Request(RFIDReader.PICC_REQIDL)
 
-        (status, uid) = RFIDReader.MFRC522_Anticoll()
+            (status, uid) = RFIDReader.MFRC522_Anticoll()
 
-        # If we have the UID, continue
-        if status == RFIDReader.MI_OK:
-            # Print UID
-            uid_str = str(uid[0])+"." +str(uid[1])+"."+str(uid[2])+"."+str(uid[3])
-            print "Card read UID: " + uid_str
-
-            if (uid_str != user.cardID):
-                print "Wrong cardID detected while withdrawing RFID-tag to user"
-                self.lock = False
-                return False
-
-            # This is the default key for authentication
-            defaultkey = [0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]
-            defaultsecret = [0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]
-
-            userkey = []
-            usersecret = []
-
-            userkeyString = user.cardAuthKeyA
-            for x in userkeyString.split('-'):
-                userkey.append(int(x, 16))
-
-            print "Userkey: " + str(userkey)
-
-            usersecretString = user.cardSecret
-            for x in usersecretString.split('-'):
-                usersecret.append(int(x, 16))
-
-            print "Usersecret: " + str(usersecret)
-
-            SecretBlockAddr = user.cardAuthSector * 4 + user.cardAuthBlock
-            TrailerBlockAddr = user.cardAuthSector * 4 + 3
-
-            # Select the scanned tag
-            RFIDReader.MFRC522_SelectTag(uid)
-
-            # Authenticate for secret-block
-            status = RFIDReader.MFRC522_Auth(RFIDReader.PICC_AUTHENT1A, SecretBlockAddr, userkey, uid)
-
-            # write user secret
+            # If we have the UID, continue
             if status == RFIDReader.MI_OK:
-                RFIDReader.MFRC522_Write(SecretBlockAddr, defaultsecret)
+                # Print UID
+                uid_str = str(uid[0])+"." +str(uid[1])+"."+str(uid[2])+"."+str(uid[3])
+                print "Card read UID: " + uid_str
+
+                if (uid_str != user.cardID):
+                    print "Wrong cardID detected while withdrawing RFID-tag to user"
+                    self.lock = False
+                    return False
+
+                # This is the default key for authentication
+                defaultkey = [0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]
+                defaultsecret = [0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]
+
+                userkey = []
+                usersecret = []
+
+                userkeyString = user.cardAuthKeyA
+                for x in userkeyString.split('-'):
+                    userkey.append(int(x, 16))
+
+                print "Userkey: " + str(userkey)
+
+                usersecretString = user.cardSecret
+                for x in usersecretString.split('-'):
+                    usersecret.append(int(x, 16))
+
+                print "Usersecret: " + str(usersecret)
+
+                SecretBlockAddr = user.cardAuthSector * 4 + user.cardAuthBlock
+                TrailerBlockAddr = user.cardAuthSector * 4 + 3
+
+                # Select the scanned tag
+                RFIDReader.MFRC522_SelectTag(uid)
+
+                # Authenticate for secret-block
+                status = RFIDReader.MFRC522_Auth(RFIDReader.PICC_AUTHENT1A, SecretBlockAddr, userkey, uid)
+
+                # write user secret
+                if status == RFIDReader.MI_OK:
+                    RFIDReader.MFRC522_Write(SecretBlockAddr, defaultsecret)
+                else:
+                    print "Authentication error while write rfid-tag secret sector"
+                    self.lock = False
+                    return False
+
+                status = RFIDReader.MFRC522_Auth(RFIDReader.PICC_AUTHENT1A, TrailerBlockAddr, userkey, uid)
+
+                # Check if authenticated
+                if status == RFIDReader.MI_OK :
+                    print "Read TrailerBlock :"
+                    # Read block 8
+                    result = RFIDReader.MFRC522_Read(TrailerBlockAddr)
+                    print result
+
+                    for x in range(0,6):
+                        result[x] = 0xFF
+                    print result
+
+                    print "Write new trailer:"
+                    # Write the data
+                    RFIDReader.MFRC522_Write(TrailerBlockAddr, result)
+                    print "\n"
+
+                    RFIDReader.MFRC522_StopCrypto1()
+                    # unlock and return succesfully
+                    self.lock = False
+                    return True
+                else:
+                    print "Authentication error while write rfid-tag key sector"
+                    self.lock = False
+                    return False
             else:
-                print "Authentication error while write rfid-tag secret sector"
                 self.lock = False
                 return False
-
-            status = RFIDReader.MFRC522_Auth(RFIDReader.PICC_AUTHENT1A, TrailerBlockAddr, userkey, uid)
-
-            # Check if authenticated
-            if status == RFIDReader.MI_OK :
-                print "Read TrailerBlock :"
-                # Read block 8
-                result = RFIDReader.MFRC522_Read(TrailerBlockAddr)
-                print result
-
-                for x in range(0,6):
-                    result[x] = 0xFF
-                print result
-
-                print "Write new trailer:"
-                # Write the data
-                RFIDReader.MFRC522_Write(TrailerBlockAddr, result)
-                print "\n"
-
-                RFIDReader.MFRC522_StopCrypto1()
-                # unlock and return succesfully
-                self.lock = False
-                return True
-            else:
-                print "Authentication error while write rfid-tag key sector"
-                self.lock = False
-                return False
-        else:
+        except:
             self.lock = False
-            return False
+            print "unexpected error withdrawRFIDTag"
+            raise
+
 
     def assignRFIDTag(self, user):
         while(self.lock == True):
             print "still locked (assignRFIDTag)"
             time.sleep(1.15)
 
-        self.lock = True
+        try:
+            self.lock = True
 
-        print "background-worker assignRFIDTag"
+            print "background-worker assignRFIDTag"
 
-        (status, TagType) = RFIDReader.MFRC522_Request(RFIDReader.PICC_REQIDL)
+            (status, TagType) = RFIDReader.MFRC522_Request(RFIDReader.PICC_REQIDL)
 
-        (status, uid) = RFIDReader.MFRC522_Anticoll()
+            (status, uid) = RFIDReader.MFRC522_Anticoll()
 
-        # If we have the UID, continue
-        if status == RFIDReader.MI_OK:
-            # Print UID
-            uid_str = str(uid[0])+"." +str(uid[1])+"."+str(uid[2])+"."+str(uid[3])
-            print "Card read UID: " + uid_str
-
-            if (uid_str != user.cardID):
-                print "Wrong cardID detected while assigning RFID-tag to user"
-                self.lock = False
-                return False
-
-            # This is the default key for authentication
-            defaultkey = [0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]
-            userkey = []
-            usersecret = []
-
-            userkeyString = user.cardAuthKeyA
-            for x in userkeyString.split('-'):
-                userkey.append(int(x, 16))
-
-            print "Userkey: " + str(userkey)
-
-            usersecretString = user.cardSecret
-            for x in usersecretString.split('-'):
-                usersecret.append(int(x, 16))
-
-            print "Usersecret: " + str(usersecret)
-
-            SecretBlockAddr = user.cardAuthSector * 4 + user.cardAuthBlock
-            TrailerBlockAddr = user.cardAuthSector * 4 + 3
-
-            # Select the scanned tag
-            RFIDReader.MFRC522_SelectTag(uid)
-
-            # Authenticate for secret-block
-            status = RFIDReader.MFRC522_Auth(RFIDReader.PICC_AUTHENT1A, SecretBlockAddr, defaultkey, uid)
-
-            # write user secret
+            # If we have the UID, continue
             if status == RFIDReader.MI_OK:
-                RFIDReader.MFRC522_Write(SecretBlockAddr, usersecret)
+                # Print UID
+                uid_str = str(uid[0])+"." +str(uid[1])+"."+str(uid[2])+"."+str(uid[3])
+                print "Card read UID: " + uid_str
+
+                if (uid_str != user.cardID):
+                    print "Wrong cardID detected while assigning RFID-tag to user"
+                    self.lock = False
+                    return False
+
+                # This is the default key for authentication
+                defaultkey = [0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]
+                userkey = []
+                usersecret = []
+
+                userkeyString = user.cardAuthKeyA
+                for x in userkeyString.split('-'):
+                    userkey.append(int(x, 16))
+
+                print "Userkey: " + str(userkey)
+
+                usersecretString = user.cardSecret
+                for x in usersecretString.split('-'):
+                    usersecret.append(int(x, 16))
+
+                print "Usersecret: " + str(usersecret)
+
+                SecretBlockAddr = user.cardAuthSector * 4 + user.cardAuthBlock
+                TrailerBlockAddr = user.cardAuthSector * 4 + 3
+
+                # Select the scanned tag
+                RFIDReader.MFRC522_SelectTag(uid)
+
+                # Authenticate for secret-block
+                status = RFIDReader.MFRC522_Auth(RFIDReader.PICC_AUTHENT1A, SecretBlockAddr, defaultkey, uid)
+
+                # write user secret
+                if status == RFIDReader.MI_OK:
+                    RFIDReader.MFRC522_Write(SecretBlockAddr, usersecret)
+                else:
+                    print "Authentication error while write rfid-tag secret sector"
+                    self.lock = False
+                    return False
+
+                # Authenticate
+                status = RFIDReader.MFRC522_Auth(RFIDReader.PICC_AUTHENT1A, TrailerBlockAddr, defaultkey, uid)
+                if status == RFIDReader.MI_OK:
+                    result = RFIDReader.MFRC522_Read(TrailerBlockAddr)
+                    print result
+
+                    for x in range(0,6):
+                        result[x] = userkey[x]
+                    print result
+
+                    print "Write new trailer:"
+                    # Write the data
+                    RFIDReader.MFRC522_Write(TrailerBlockAddr, result)
+                    print "\n"
+
+                    RFIDReader.MFRC522_StopCrypto1()
+                    # unlock and return succesfully
+                    self.lock = False
+                    return True
+                else:
+                    print "Authentication error while write rfid-tag key sector"
+                    self.lock = False
+                    return False
             else:
-                print "Authentication error while write rfid-tag secret sector"
+                print "Authentication error while looking for cards"
                 self.lock = False
                 return False
-
-            # Authenticate
-            status = RFIDReader.MFRC522_Auth(RFIDReader.PICC_AUTHENT1A, TrailerBlockAddr, defaultkey, uid)
-            if status == RFIDReader.MI_OK:
-                result = RFIDReader.MFRC522_Read(TrailerBlockAddr)
-                print result
-
-                for x in range(0,6):
-                    result[x] = userkey[x]
-                print result
-
-                print "Write new trailer:"
-                # Write the data
-                RFIDReader.MFRC522_Write(TrailerBlockAddr, result)
-                print "\n"
-
-                RFIDReader.MFRC522_StopCrypto1()
-                # unlock and return succesfully
-                self.lock = False
-                return True
-            else:
-                print "Authentication error while write rfid-tag key sector"
-                self.lock = False
-                return False
-        else:
-            print "Authentication error while looking for cards"
+        except:
             self.lock = False
-            return False
+            print "unexpected error assignRFIDTag"
+            raise
 
     def checkRFIDTag(self):
         while(self.lock == True):
             print "still locked (checkRFIDTag)"
             time.sleep(1.15)
 
-        self.lock = True
+        try:
+            self.lock = True
 
-        (status, TagType) = RFIDReader.MFRC522_Request(RFIDReader.PICC_REQIDL)
+            (status, TagType) = RFIDReader.MFRC522_Request(RFIDReader.PICC_REQIDL)
 
-        # If a card is found
-        #if status == RFIDReader.MI_OK:
-        #    print "rfid tag detected"
+            # If a card is found
+            #if status == RFIDReader.MI_OK:
+            #    print "rfid tag detected"
 
-        # Get the UID of the card
-        (status, uid) = RFIDReader.MFRC522_Anticoll()
+            # Get the UID of the card
+            (status, uid) = RFIDReader.MFRC522_Anticoll()
 
-        # If we have the UID, continue
-        if status == RFIDReader.MI_OK:
-
-            # Print UID
-
-            self.tagInfo.tagId = str(uid[0])+"."+str(uid[1])+"."+str(uid[2])+"."+str(uid[3])
-            self.tagInfo.userInfo = ""
-
-            user = User.query.filter_by(cardID=self.tagInfo.tagId).first()
-
-            if user is None:
-                print "No user asigned to card"
-                self.lock = False
-                return
-
-            self.tagInfo.userInfo = user.email
-            print user.email
-
-            # This is the default key for authentication
-            defaultkey = [0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]
-            userkey = []
-            usersecret = []
-
-            userkeyString = user.cardAuthKeyA
-            for x in userkeyString.split('-'):
-                userkey.append(int(x, 16))
-
-            print "Userkey: " + str(userkey)
-
-            usersecretString = user.cardSecret
-            for x in usersecretString.split('-'):
-                usersecret.append(int(x, 16))
-
-            print "Usersecret: " + str(usersecret)
-
-            SecretBlockAddr = user.cardAuthSector * 4 + user.cardAuthBlock
-            TrailerBlockAddr = user.cardAuthSector * 4 + 3
-
-            # Select the scanned tag
-            RFIDReader.MFRC522_SelectTag(uid)
-
-            # Authenticate
-            status = RFIDReader.MFRC522_Auth(RFIDReader.PICC_AUTHENT1A, SecretBlockAddr, userkey, uid)
-
-            # Check if authenticated
+            # If we have the UID, continue
             if status == RFIDReader.MI_OK:
 
-                readSecret = RFIDReader.MFRC522_Read(SecretBlockAddr)
-                print readSecret
-                readSecretString = ''
-                i = 0
+                # Print UID
 
-                for x in readSecret:
-                    if i != 0:
-                        readSecretString = readSecretString + '-'
-                    i = i + 1
-                    readSecretString = readSecretString + format(x, '02X')
+                self.tagInfo.tagId = str(uid[0])+"."+str(uid[1])+"."+str(uid[2])+"."+str(uid[3])
+                self.tagInfo.userInfo = ""
 
-                print readSecretString
+                user = User.query.filter_by(cardID=self.tagInfo.tagId).first()
 
-                if readSecretString == user.cardSecret:
-                    print "correct secret"
-                    if user.checkUserAccessPrivleges() == "access granted":
-                        print "no user-access privilege"
-                        self.requestOpening = True
+                if user is None:
+                    print "No user asigned to card"
+                    self.lock = False
+                    return
 
-                RFIDReader.MFRC522_StopCrypto1()
-                self.lock = False
-                return True
+                self.tagInfo.userInfo = user.email
+                print user.email
+
+                # This is the default key for authentication
+                defaultkey = [0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]
+                userkey = []
+                usersecret = []
+
+                userkeyString = user.cardAuthKeyA
+                for x in userkeyString.split('-'):
+                    userkey.append(int(x, 16))
+
+                print "Userkey: " + str(userkey)
+
+                usersecretString = user.cardSecret
+                for x in usersecretString.split('-'):
+                    usersecret.append(int(x, 16))
+
+                print "Usersecret: " + str(usersecret)
+
+                SecretBlockAddr = user.cardAuthSector * 4 + user.cardAuthBlock
+                TrailerBlockAddr = user.cardAuthSector * 4 + 3
+
+                # Select the scanned tag
+                RFIDReader.MFRC522_SelectTag(uid)
+
+                # Authenticate
+                status = RFIDReader.MFRC522_Auth(RFIDReader.PICC_AUTHENT1A, SecretBlockAddr, userkey, uid)
+
+                # Check if authenticated
+                if status == RFIDReader.MI_OK:
+
+                    readSecret = RFIDReader.MFRC522_Read(SecretBlockAddr)
+                    print readSecret
+                    readSecretString = ''
+                    i = 0
+
+                    for x in readSecret:
+                        if i != 0:
+                            readSecretString = readSecretString + '-'
+                        i = i + 1
+                        readSecretString = readSecretString + format(x, '02X')
+
+                    print readSecretString
+
+                    if readSecretString == user.cardSecret:
+                        print "correct secret"
+                        if user.checkUserAccessPrivleges() == "access granted":
+                            print "no user-access privilege"
+                            self.requestOpening = True
+
+                    RFIDReader.MFRC522_StopCrypto1()
+                    self.lock = False
+                    return True
+                else:
+                    self.tagInfo.userInfo = user.email + '(invalid)'
+                    print "Authentication error"
+                    self.lock = False
+                    return False
             else:
-                self.tagInfo.userInfo = user.email + '(invalid)'
-                print "Authentication error"
                 self.lock = False
                 return False
-        else:
+        except:
             self.lock = False
-            return False
+            print "unexpected error in checkRFIDTag"
+            raise
 
     def timer_cycle(self):
         self.thr = threading.Timer(1, BackgroundWorker.timer_cycle,[self])
