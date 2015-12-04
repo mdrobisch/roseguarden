@@ -7,6 +7,7 @@ Flask-Mail==0.9.1
 Flask-WTF==0.12.0
 Flask-Migrate==1.6.0
 Flask-Script==2.0.5
+ConfigObj==4.7.2
 Jinja2==2.7.3
 MarkupSafe==0.23
 SQLAlchemy==0.9.7

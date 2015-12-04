@@ -89,6 +89,12 @@ To update the software to the latest version on github, use git.
 - `git fetch --all`
 - `git reset --hard origin/master`
 
+Noe switch to the `server`-directory:
+
+If some new external pip-modules are introduces in a version you need to reload the `requirements.txt`.
+
+- `sudo pip install -r requirements.txt`
+
 In addition a migration of the database is required, use roseGuarden.py.
 
 - `sudo python roseGuarden.py db migrate`
