@@ -259,11 +259,12 @@ class BackgroundWorker():
                 else:
                     time.sleep(0.2)
 
+            self.resetTagInfo()
+
             # If we have the UID, continue
             if status == RFIDReader.MI_OK:
 
                 # Print UID
-
                 self.tagInfo.tagId = str(uid[0])+"."+str(uid[1])+"."+str(uid[2])+"."+str(uid[3])
                 self.tagInfo.userInfo = ""
 
@@ -352,7 +353,6 @@ class BackgroundWorker():
 
         if self.requestTimer >= 3:
             self.requestTimer = 0
-            self.resetTagInfo()
             self.checkRFIDTag()
 
         #print "Check for opening request"
