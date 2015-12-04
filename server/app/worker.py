@@ -189,7 +189,7 @@ class BackgroundWorker():
                 return False
 
             # Authenticate
-            status = RFIDReader.MFRC522_Auth(RFIDReader.PICC_AUTHENT1A, TrailerBlockAddr, key, uid)
+            status = RFIDReader.MFRC522_Auth(RFIDReader.PICC_AUTHENT1A, TrailerBlockAddr, defaultkey, uid)
             if status == RFIDReader.MI_OK:
                 result = RFIDReader.MFRC522_Read(TrailerBlockAddr)
                 print result
@@ -212,6 +212,7 @@ class BackgroundWorker():
                 self.lock = False
                 return False
         else:
+                print "Authentication error while looking for cards"
             self.lock = False
             return False
 
@@ -243,7 +244,7 @@ class BackgroundWorker():
 
             if user is None:
                 print "No user asigned to card"
-                self.lock = False        
+                self.lock = False
                 return
 
             self.tagInfo.userInfo = user.email
