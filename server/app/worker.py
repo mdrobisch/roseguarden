@@ -47,6 +47,8 @@ class BackgroundWorker():
         try:
             self.lock = True
 
+            time.sleep(0.4)
+
             print "background-worker withdrawRFIDTag"
 
             (status, TagType) = RFIDReader.MFRC522_Request(RFIDReader.PICC_REQIDL)
@@ -127,6 +129,7 @@ class BackgroundWorker():
                     self.lock = False
                     return False
             else:
+                print "Authentication error while looking for cards"
                 self.lock = False
                 return False
         except:
@@ -142,6 +145,8 @@ class BackgroundWorker():
 
         try:
             self.lock = True
+
+            time.sleep(0.4)
 
             print "background-worker assignRFIDTag"
 
