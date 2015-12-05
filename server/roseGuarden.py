@@ -2,13 +2,16 @@ __author__ = 'drobisch'
 from app.server import app, db
 from app.worker import backgroundWorker
 from flask_script import Manager
-from flask_migrate import Migrate, MigrateCommand
+from flask_migrate import MigrateCommand
+from flask_alchemydumps import AlchemyDumpsCommand
 from app.models import User, Log, Door, Setting
 from app.config import SYNC_MASTER_DEFAULT_PASSWORD
 import datetime
 
 manager = Manager(app, False)
 manager.add_command('db', MigrateCommand)
+manager.add_command('backup', AlchemyDumpsCommand)
+
 
 @manager.command
 def start():

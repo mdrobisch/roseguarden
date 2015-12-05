@@ -3,7 +3,8 @@ from flask_restful import Api
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from flask_restful import Resource, fields, marshal_with
+from flask_alchemydumps import AlchemyDumps
+
 from flask_httpauth import HTTPBasicAuth
 from flask_mail import Mail
 
@@ -17,6 +18,7 @@ app.config['SQLALCHEMY_MIGRATE_DATABASE_URI'] = 'sqlite:///database/roseGuarden.
 db = SQLAlchemy(app)
 
 migrate = Migrate(app, db)
+alchemydumps = AlchemyDumps(app, db)
 
 api = Api(app)
 auth = HTTPBasicAuth()
