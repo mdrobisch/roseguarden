@@ -141,11 +141,12 @@ class Door(db.Model):
     local = db.Column(db.Integer)
     password = db.Column(db.Text)
 
-    def __init__(self, name, keyMask, address, local):
+    def __init__(self, name, keyMask, address, local, password = ''):
         self.name = name
         self.keyMask = keyMask
         self.address = address
         self.local = local
+        self.password = flask_bcrypt.generate_password_hash(password)
 
 class RfidTagInfo(object):
     def __init__(self, tagId, userInfo):

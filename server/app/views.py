@@ -260,16 +260,22 @@ class DoorRegistrationView(Resource):
             return make_response(jsonify({'error': 'Not authorized'}), 403)
 
         print 'Request door info from ' + 'http://' + form.address.data + ':5000' + '/request/doorinfo'
+
+        pwd = base64.b64decode(form.password.data)
+        auth_token = 'Basic ' + base64.b64encode("syncmaster@roseguarden.org:" + pwd)
+        headers = {'Authorization' : auth_token}
+
         try:
-            response = requests.get('http://' + form.address.data + ':5000' + '/request/doorinfo', timeout=2)
+            response = requests.get('http://' + form.address.data + ':5000' + '/request/doorinfo', timeout=2, headers = headers)
         except:
             print "requested door unreachable"
             return 'requested door unreachable', 400
 
         print "create new door"
+
         response_data = json.loads(response.content)
         newDoor = Door(name=form.name.data, keyMask=response_data["keyMask"], address='http://' + form.address.data,
-                       local=0)
+                       local=0, password = pwd)
         logentry = Log(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
                        g.user.email, 'Door ' + newDoor.name + ' on ' + newDoor.address + ' checked and registered',
                        'Door registered', 'L1', 1, 'Web based')
@@ -288,6 +294,7 @@ class DoorRegistrationView(Resource):
 
 
 class DoorInfoView(Resource):
+    @auth.login_required
     def get(self):
         print 'Door info request'
         localdoor = Door.query.filter_by(local=1).first()

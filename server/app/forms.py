@@ -64,6 +64,7 @@ class LostPasswordForm(Form):
 class DoorRegistrationForm(Form):
     name = StringField('name', validators=[DataRequired()])
     address = StringField('address', validators=[DataRequired()])
+    password = StringField('password', validators=[DataRequired()])
 
 class RFIDTagAssignForm(Form):
     email = StringField('email', validators=[DataRequired()])

@@ -6,6 +6,7 @@ from flask_migrate import MigrateCommand
 from flask_alchemydumps import AlchemyDumpsCommand
 from app.models import User, Log, Door, Setting
 from app.config import SYNC_MASTER_DEFAULT_PASSWORD
+import app.config as config
 import datetime
 
 manager = Manager(app, False)
@@ -54,15 +55,13 @@ def create_db():
     #db.session.add(Door(id = 0, name = 'front door', address = 'http://192.168.2.138', keyMask = 0x01, local = 0x00 ))
     #db.session.add(Door(id = 0, name = 'front door', address = 'http://192.168.2.139', keyMask = 0x01, local = 0x00 ))
     db.session.add(Door(name = 'Local door', address = 'http://localhost', keyMask = 0x03, local = 0x01 ))
-    db.session.add(Door(name = 'Outer door', address = 'http://192.168.0.59', keyMask = 0x03, local = 0x00 ))
-    db.session.add(Door(name = 'Inner door', address = 'http://10.43.125.7', keyMask = 0x03, local = 0x00 ))
 
     Setting.query.delete()
     db.session.add(Setting('NodeName','Test door',Setting.VALUETYPE_STRING))
     db.session.add(Setting('NodeValidKey','0x03',Setting.VALUETYPE_INT))
 
     Log.query.delete()
-    db.session.add(Log(datetime.datetime.utcnow(), 'Test door', syncMasterUser.firstName + ' ' + syncMasterUser.lastName, syncMasterUser.email, 'Remove all data & regenerate database', 'Init systen', 'L1', 1, 'Internal'))
+    db.session.add(Log(datetime.datetime.utcnow(), config.NODE_NAME, syncMasterUser.firstName + ' ' + syncMasterUser.lastName, syncMasterUser.email, 'Remove all data & regenerate database', 'Init systen', 'L1', 1, 'Internal'))
 
     db.session.commit()
 
