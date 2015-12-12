@@ -102,6 +102,17 @@ In addition a migration of the database is required, use roseGuarden.py.
 
 After upgrading you can restart your roseGuarden-application again.
 
+Install autostart and montoring (supervisor)
+============================================
+
+Install supersior from distribution package
+
+- `sudo apt-get install supervisor`
+
+- `service supervisor restart`
+
+
+
 Screenshots (Software)
 ======================
 
