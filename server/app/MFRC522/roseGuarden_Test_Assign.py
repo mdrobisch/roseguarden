@@ -49,7 +49,7 @@ while continue_reading:
         MIFAREReader.MFRC522_SelectTag(uid)
 
         newkey = []
-        newkeystring = '45-39-68-A7-F1-B5'
+        newkeystring = '55-39-68-A7-F1-B5'
         for x in newkeystring.split('-'):
             newkey.append(int(x, 16))
 

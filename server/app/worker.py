@@ -1,9 +1,15 @@
+import requests
+
 __author__ = 'drobisch'
 
-from models import User
+from models import User, Door
 from server import app
+from serializers import LogSerializer, UserSyncSerializer, SessionInfoSerializer, DoorSerializer, RfidTagInfoSerializer
+from werkzeug.datastructures import MultiDict
 import threading
 import time
+import json
+import datetime
 import os
 from models import RfidTagInfo
 from RFID import RFIDReader
@@ -12,6 +18,7 @@ from RFID import RFIDMockup
 from GPIO import GPIO
 from GPIO import GPIOMockup
 
+
 class BackgroundWorker():
     def __init__(self, app):
         # initialize worker variables
@@ -19,28 +26,40 @@ class BackgroundWorker():
         self.requestOpening = False
         self.openingTimer = -1
         self.requestTimer = 0
+        self.backLogSyncTimer = 0
         self.tagInfo = RfidTagInfo("", "")
         self.tagResetCount = 0
         self.lock = False
-
-
+        self.lastBackupTime = datetime.datetime.now()
+        self.lastLogUpdate = datetime.datetime.now()
+        self.lastSynchronitationTime = datetime.datetime.now()
         # setup gpio and set default (Low)
         GPIO.setmode(GPIO.BOARD)
-        GPIO.setup(12,GPIO.OUT, initial=GPIO.HIGH)
+        GPIO.setup(12, GPIO.OUT, initial=GPIO.HIGH)
         GPIO.output(12, GPIO.HIGH)
 
     def run(self):
-        #if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
+        # if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
         self.thr = threading.Timer(1, self.timer_cycle)
         self.thr.start()
+        # [('accessTimeStart', 'Sat, 05 Dec 2015 06:00:00 -0000'), ('firstName', u'Sync'), ('lastName', u'Master'), ('accessDayCounter', 0), ('cardID', u''), ('accessType', 0), ('accessDateStart', 'Sat, 05 Dec 2015 00:00:00 -0000'), ('keyMask', 0), ('email', u'syncmaster@roseguarden.org'), ('phone', u'0'), ('accessDaysMask', 127), ('role', 1), ('licenseMask', 0), ('lastLoginDateTime', 'Sat, 05 Dec 2015 00:26:47 -0000'), ('accessDateEnd', 'Sun, 01 Dec 2030 00:00:00 -0000'), ('budget', 0.0), ('accessTimeEnd', 'Sat, 05 Dec 2015 22:30:00 -0000'), ('registerDateTime', 'Sat, 05 Dec 2015 00:26:47 -0000'), ('id', 1), ('association', u'')]), OrderedDict([('accessTimeStart', 'Sat, 05 Dec 2015 06:00:00 -0000'), ('firstName', u'Konglomerat'), ('lastName', u'Kommando'), ('accessDayCounter', 0), ('cardID', u''), ('accessType', 1), ('accessDateStart', 'Sat, 05 Dec 2015 00:00:00 -0000'), ('keyMask', 0), ('email', u'kommando@konglomerat.org'), ('phone', u'0'), ('accessDaysMask', 127), ('role', 0), ('licenseMask', 0), ('lastLoginDateTime', 'Sat, 05 Dec 2015 00:26:47 -0000'), ('accessDateEnd', 'Sun, 01 Dec 2030 00:00:00 -0000'), ('budget', 0.0), ('accessTimeEnd', 'Sat, 05 Dec 2015 22:30:00 -0000'), ('registerDateTime', 'Sat, 05 Dec 2015 00:26:47 -0000'), ('id', 2), ('association', u'')]), OrderedDict([('accessTimeStart', 'Sat, 05 Dec 2015 06:00:00 -0000'), ('firstName', u'Marcus'), ('lastName', u'Drobisch'), ('accessDayCounter', 0), ('cardID', u''), ('accessType', 1), ('accessDateStart', 'Sat, 05 Dec 2015 00:00:00 -0000'), ('keyMask', 3), ('email', u'm.drobisch@googlemail.com'), ('phone', u'01754404298'), ('accessDaysMask', 127), ('role', 1), ('licenseMask', 0), ('lastLoginDateTime', 'Sat, 05 Dec 2015 00:26:48 -0000'), ('accessDateEnd', 'Sun, 01 Dec 2030 00:00:00 -0000'), ('budget', 0.0), ('accessTimeEnd', 'Sat, 05 Dec 2015 22:30:00 -0000'), ('registerDateTime', 'Sat, 05 Dec 2015 00:26:48 -0000'), ('id', 3), ('association', u'')]
         print 'started background-server'
 
     def resetTagInfo(self):
         self.tagInfo.tagId = ""
         self.tagInfo.userInfo = ""
 
+    def checkBackupHandle(self):
+        print "check for next backup"
+
+    def checkLogUpdaterHandle(self):
+        print "check for next log update"
+
+    def checkSynchronizerHandle(self):
+        print "check for next synchronizer update"
+
     def withdrawRFIDTag(self, user):
-        while(self.lock == True):
+        while (self.lock == True):
             print "still locked (withdrawRFIDTag)"
             time.sleep(0.3)
 
@@ -63,7 +82,7 @@ class BackgroundWorker():
             # If we have the UID, continue
             if status == RFIDReader.MI_OK:
                 # Print UID
-                uid_str = str(uid[0])+"." +str(uid[1])+"."+str(uid[2])+"."+str(uid[3])
+                uid_str = str(uid[0]) + "." + str(uid[1]) + "." + str(uid[2]) + "." + str(uid[3])
                 print "Card read UID: " + uid_str
 
                 if (uid_str != user.cardID):
@@ -73,7 +92,8 @@ class BackgroundWorker():
 
                 # This is the default key for authentication
                 defaultkey = [0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]
-                defaultsecret = [0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]
+                defaultsecret = [0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+                                 0xFF, 0xFF]
 
                 userkey = []
                 usersecret = []
@@ -110,13 +130,13 @@ class BackgroundWorker():
                 status = RFIDReader.MFRC522_Auth(RFIDReader.PICC_AUTHENT1A, TrailerBlockAddr, userkey, uid)
 
                 # Check if authenticated
-                if status == RFIDReader.MI_OK :
+                if status == RFIDReader.MI_OK:
                     print "Read TrailerBlock :"
                     # Read block 8
                     result = RFIDReader.MFRC522_Read(TrailerBlockAddr)
                     print result
 
-                    for x in range(0,6):
+                    for x in range(0, 6):
                         result[x] = 0xFF
                     print result
 
@@ -142,9 +162,8 @@ class BackgroundWorker():
             print "unexpected error withdrawRFIDTag"
             raise
 
-
     def assignRFIDTag(self, user):
-        while(self.lock == True):
+        while (self.lock == True):
             print "still locked (assignRFIDTag)"
             time.sleep(0.3)
 
@@ -154,7 +173,6 @@ class BackgroundWorker():
             time.sleep(0.2)
 
             print "background-worker assignRFIDTag"
-
 
             for i in range(0, 4):
                 (status, TagType) = RFIDReader.MFRC522_Request(RFIDReader.PICC_REQIDL)
@@ -168,7 +186,7 @@ class BackgroundWorker():
             # If we have the UID, continue
             if status == RFIDReader.MI_OK:
                 # Print UID
-                uid_str = str(uid[0])+"." +str(uid[1])+"."+str(uid[2])+"."+str(uid[3])
+                uid_str = str(uid[0]) + "." + str(uid[1]) + "." + str(uid[2]) + "." + str(uid[3])
                 print "Card read UID: " + uid_str
 
                 if (uid_str != user.cardID):
@@ -216,7 +234,7 @@ class BackgroundWorker():
                     result = RFIDReader.MFRC522_Read(TrailerBlockAddr)
                     print result
 
-                    for x in range(0,6):
+                    for x in range(0, 6):
                         result[x] = userkey[x]
                     print result
 
@@ -243,7 +261,7 @@ class BackgroundWorker():
             raise
 
     def checkRFIDTag(self):
-        while(self.lock == True):
+        while (self.lock == True):
             print "still locked (checkRFIDTag)"
             time.sleep(0.2)
 
@@ -265,7 +283,7 @@ class BackgroundWorker():
             if status == RFIDReader.MI_OK:
 
                 # Print UID
-                self.tagInfo.tagId = str(uid[0])+"."+str(uid[1])+"."+str(uid[2])+"."+str(uid[3])
+                self.tagInfo.tagId = str(uid[0]) + "." + str(uid[1]) + "." + str(uid[2]) + "." + str(uid[3])
                 self.tagInfo.userInfo = ""
 
                 user = User.query.filter_by(cardID=self.tagInfo.tagId).first()
@@ -275,7 +293,7 @@ class BackgroundWorker():
                     return
 
                 self.tagInfo.userInfo = user.email
-                #print user.email
+                # print user.email
 
                 # This is the default key for authentication
                 defaultkey = [0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]
@@ -286,13 +304,13 @@ class BackgroundWorker():
                 for x in userkeyString.split('-'):
                     userkey.append(int(x, 16))
 
-                #print "Userkey: " + str(userkey)
+                # print "Userkey: " + str(userkey)
 
                 usersecretString = user.cardSecret
                 for x in usersecretString.split('-'):
                     usersecret.append(int(x, 16))
 
-                #print "Usersecret: " + str(usersecret)
+                # print "Usersecret: " + str(usersecret)
 
                 SecretBlockAddr = user.cardAuthSector * 4 + user.cardAuthBlock
                 TrailerBlockAddr = user.cardAuthSector * 4 + 3
@@ -307,7 +325,7 @@ class BackgroundWorker():
                 if status == RFIDReader.MI_OK:
 
                     readSecret = RFIDReader.MFRC522_Read(SecretBlockAddr)
-                    #print readSecret
+                    # print readSecret
                     readSecretString = ''
                     i = 0
 
@@ -317,7 +335,7 @@ class BackgroundWorker():
                         i = i + 1
                         readSecretString = readSecretString + format(x, '02X')
 
-                    #print readSecretString
+                    # print readSecretString
 
                     if readSecretString == user.cardSecret:
                         print "correct secret"
@@ -345,8 +363,21 @@ class BackgroundWorker():
             print "unexpected error in checkRFIDTag"
             raise
 
+    def backLogSync_cycle(self):
+        print "backlogsync cycle"
+        door = Door.query.filter_by(id=0).first()
+        userList = User.query.filter_by(syncMaster=0).all()
+        serial = UserSyncSerializer().dump(userList, many=True).data
+        #print serial
+        data = {'userList' : serial}
+        try:
+            response = requests.post('http://localhost:5000' + '/users', json= data, timeout=2)
+            print response
+        except:
+            print "error while request users-sync"
+
     def timer_cycle(self):
-        self.thr = threading.Timer(1, BackgroundWorker.timer_cycle,[self])
+        self.thr = threading.Timer(1, BackgroundWorker.timer_cycle, [self])
         self.thr.start()
 
         self.requestTimer += 1
@@ -355,7 +386,12 @@ class BackgroundWorker():
             self.requestTimer = 0
             self.checkRFIDTag()
 
-        #print "Check for opening request"
+        self.backLogSyncTimer += 1
+        if self.backLogSyncTimer > 3:
+            self.backLogSyncTimer = -1000
+            self.backLogSync_cycle()
+
+        # print "Check for opening request"
         if self.requestOpening == True:
             self.requestOpening = False
             self.openingTimer = 0;
@@ -371,14 +407,15 @@ class BackgroundWorker():
                 print "Closing door"
                 GPIO.output(12, GPIO.HIGH)
 
-        #else:
-            #print "Closing door"
+                # else:
+                # print "Closing door"
 
-        #user = User.query.filter_by(id=0).first()
-        #print user.firstName
+                # user = User.query.filter_by(id=0).first()
+                # print user.firstName
 
     def cancel(self):
         if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
             self.thr.cancel()
+
 
 backgroundWorker = BackgroundWorker(app)

@@ -1,10 +1,10 @@
 __author__ = 'drobisch'
 from email import send_email
-from flask import g, render_template, make_response, jsonify
+from flask import g, render_template, make_response, jsonify, request
 from flask_restful import Resource, fields, marshal_with
 from server import api, db, flask_bcrypt, auth, mail
 from models import User, Log, Door, RfidTagInfo
-from serializers import LogSerializer, UserSerializer, SessionInfoSerializer, DoorSerializer, RfidTagInfoSerializer
+from serializers import LogSerializer, UserSyncSerializer, UserSerializer, SessionInfoSerializer, DoorSerializer, RfidTagInfoSerializer
 from forms import UserPatchForm, DoorRegistrationForm, SessionCreateForm, LostPasswordForm, RegisterUserForm, \
     UserDeleteForm, RFIDTagAssignForm, RFIDTagWithdrawForm
 from worker import backgroundWorker
@@ -120,9 +120,26 @@ class UserListView(Resource):
     @auth.login_required
     def get(self):
         users = User.query.filter_by(syncMaster=0).all()
+        return UserSerializer().dumps(users, many=True).data
 
-        return UserSerializer(users, many=True).data
-
+    def post(self):
+        counter = 0
+        users = User.query.all()
+        if request.json['userList'] != None:
+            print str(request.json['userList'])
+            try:
+                for userItem in request.json['userList']:
+                    requestUserList = UserSyncSerializer().load((userItem))
+                    try:
+                        if users[userItem['id']]:
+                            print userItem['email']
+                    except:
+                        print 'out of range'
+                        raise
+                    counter += 1
+            except:
+                print 'failure detected'
+        return '', 201
 
 class RegisterUserView(Resource):
     def post(self):
@@ -201,6 +218,14 @@ class LostPasswordView(Resource):
                                    user=user, password=new_password),
                    render_template("lostpassword_mail.html",
                                    user=user, password=new_password))
+        return '', 201
+
+class DoorSyncView(Resource):
+    #@auth.login_required
+    def post(self, id):
+        print 'Sync. request '
+        for userItem in globals.request.json:
+            print userItem
         return '', 201
 
 
@@ -298,14 +323,14 @@ class DoorInfoView(Resource):
     def get(self):
         print 'Door info request'
         localdoor = Door.query.filter_by(local=1).first()
-        return DoorSerializer(localdoor).data
+        return DoorSerializer().dumps(localdoor).data
 
 
 class DoorListView(Resource):
     @auth.login_required
     def get(self):
         posts = Door.query.filter_by(local=0).all()
-        return DoorSerializer(posts, many=True).data
+        return DoorSerializer().dumps(posts, many=True).data
 
 
 class LogAdminView(Resource):
@@ -314,14 +339,14 @@ class LogAdminView(Resource):
         if (g.user.role & 1) == 0:
             return make_response(jsonify({'error': 'Not authorized'}), 403)
         logs = Log.query.all()
-        return LogSerializer(logs, many=True).data
+        return LogSerializer().dumps(logs, many=True).data
 
 
 class LogUserView(Resource):
     @auth.login_required
     def get(self):
         logs = Log.query.filter_by(userMail=g.user.email).all()
-        return LogSerializer(logs, many=True).data
+        return LogSerializer().dumps(logs, many=True).data
 
 
 class RfidTagInfoView(Resource):
@@ -418,9 +443,12 @@ api.add_resource(UserView, '/user/<int:id>')
 api.add_resource(UserListView, '/users')
 api.add_resource(LogUserView, '/log/user')
 api.add_resource(LogAdminView, '/log/admin')
+
 api.add_resource(DoorView, '/door/<int:id>')
+api.add_resource(DoorSyncView, '/door/<int:id>/sync')
 api.add_resource(DoorRegistrationView, '/door')
 api.add_resource(DoorListView, '/doors')
+
 api.add_resource(OpeningRequestView, '/request/opening')
 api.add_resource(LostPasswordView, '/request/password')
 api.add_resource(DoorInfoView, '/request/doorinfo')
