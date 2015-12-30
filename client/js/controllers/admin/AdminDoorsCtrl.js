@@ -83,7 +83,7 @@ RoseGuardenApp.controller('AdminDoorsCtrl', function($scope,$q, Door, $modal, $l
         var newdoor = {name:$scope.newdoor.name, address: $scope.newdoor.address, password: btoa($scope.newdoor.password)};
 
 
-        Door.add(newdoor).then(function(response_data) {
+        Door.register(newdoor).then(function(response_data) {
             $log.info('Response  ' + response_data);
 
             $scope.dataLoading = false;
@@ -104,6 +104,33 @@ RoseGuardenApp.controller('AdminDoorsCtrl', function($scope,$q, Door, $modal, $l
         return deferred.promise
     };
 
+
+    //remove to the real data holder
+    $scope.synchronizeDoor = function synchronizeDoor(row) {
+        console.log("synchronize door")
+        var index = $scope.rowCollection.indexOf(row);
+        if (index !== -1) {
+
+
+            Door.delete(row.id).then(function() {
+                $scope.profileUpdatePending = false;
+                $scope.success = 'Door successfully removed.'
+                $scope.showError = false;
+                $scope.showSuccess = true;
+
+                $scope.rowCollection.splice(index, 1);
+                return deferred.resolve();
+            }, function(response) {
+                $scope.error = 'Removing door failed.'
+                $scope.profileUpdatePending = false;
+                $scope.showError = true;
+                $scope.showSuccess = false;
+                return deferred.reject(response);
+            });
+            return deferred.promise
+        }
+
+    };
 
     //remove to the real data holder
     $scope.removeDoor = function removeDoor(row) {

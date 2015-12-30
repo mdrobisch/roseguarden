@@ -3,7 +3,7 @@ from email import send_email
 from flask import g, render_template, make_response, jsonify, request
 from flask_restful import Resource, fields, marshal_with
 from server import api, db, flask_bcrypt, auth, mail
-from models import User, Log, Door, RfidTagInfo
+from models import User, Action, Door, RfidTagInfo
 from serializers import LogSerializer, UserSyncSerializer, UserSerializer, SessionInfoSerializer, DoorSerializer, RfidTagInfoSerializer
 from forms import UserPatchForm, DoorRegistrationForm, SessionCreateForm, LostPasswordForm, RegisterUserForm, \
     UserDeleteForm, RFIDTagAssignForm, RFIDTagWithdrawForm
@@ -34,7 +34,7 @@ class UserView(Resource):
             if (g.user.role & 1) == 0:
                 return make_response(jsonify({'error': 'Not authorized'}), 403)
         user = User.query.filter_by(id=id).first()
-        return UserSerializer(user).data
+        return UserSerializer().dump(user).data
 
     @auth.login_required
     def delete(self, id):
@@ -42,7 +42,7 @@ class UserView(Resource):
         if user != None:
             print 'delete user ' + user.firstName + ' ' + user.lastName + ' (' + user.email + ') from database'
 
-            logentry = Log(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
+            logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
                            g.user.email, 'User ' + user.firstName + ' on ' + user.lastName + ' removed', 'User removed',
                            'L1', 1, 'Web based')
             db.session.add(logentry)
@@ -120,25 +120,53 @@ class UserListView(Resource):
     @auth.login_required
     def get(self):
         users = User.query.filter_by(syncMaster=0).all()
-        return UserSerializer().dumps(users, many=True).data
+        return UserSerializer().dump(users, many=True).data
 
     def post(self):
         counter = 0
-        users = User.query.all()
         if request.json['userList'] != None:
-            print str(request.json['userList'])
+            #print str(request.json['userList'])
+            print datetime.datetime.now()
             try:
+                dbUserDeletetionList = User.query.filter(User.syncMaster == 0).all()
                 for userItem in request.json['userList']:
-                    requestUserList = UserSyncSerializer().load((userItem))
-                    try:
-                        if users[userItem['id']]:
-                            print userItem['email']
-                    except:
-                        print 'out of range'
-                        raise
-                    counter += 1
+                    newuser_detected = True
+                    for dbUser in dbUserDeletetionList:
+                        if userItem['id'] == dbUser.id:
+                            # print the
+                            print dbUser.email + " found in list and will get updated"
+                            # remove user from deletion List
+                            dbUser.updateUserFromSyncDict(userItem)
+                            dbUser.lastSyncDateTime = datetime.datetime.now()
+                            dbUserDeletetionList.remove(dbUser)
+                            newuser_detected = False
+                            break
+                        else:
+                            if userItem['email'] == dbUser.email:
+                                newuser_detected = False
+                    if newuser_detected == True:
+                        print userItem['email'] + " as new user detected"
+                        newUser = UserSyncSerializer().load(userItem).data
+                        db.session.add(newUser)
+
+                db.session.commit()
+
+                #delete remaining users not found in the request-user-list
+                for dbUser in dbUserDeletetionList:
+                    print dbUser.email + " not found in the sync-list and will get deleted"
+                    db.session.delete(dbUser)
+
+                    #requestUser = UserSyncSerializer().load(userItem).data
+                    #db.session.add(requestUser)
+                    #databaseUser = User.query.filter_by(id=1).first()
+
+                db.session.commit()
+
             except:
                 print 'failure detected'
+                db.session.rollback()
+                raise
+            print datetime.datetime.now()
         return '', 201
 
 class RegisterUserView(Resource):
@@ -150,7 +178,7 @@ class RegisterUserView(Resource):
         pwd = base64.decodestring(form.password.data)
         user = User(email=form.email.data, password=pwd, firstName=form.firstName.data, lastName=form.lastName.data,
                     phone=form.phone.data, association=form.association.data)
-        logentry = Log(datetime.datetime.utcnow(), config.NODE_NAME, user.firstName + ' ' + user.lastName, user.email,
+        logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, user.firstName + ' ' + user.lastName, user.email,
                        'User registered ' + user.firstName + ' ' + user.lastName + ' ' + user.email, 'User registered',
                        'L1', 1, 'Web based')
 
@@ -189,14 +217,15 @@ class SessionView(Resource):
 
         user = User.query.filter_by(email=form.email.data).first()
         if user and flask_bcrypt.check_password_hash(user.password, form.password.data):
-            logentry = Log(datetime.datetime.utcnow(), config.NODE_NAME, user.firstName + ' ' + user.lastName,
+            logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, user.firstName + ' ' + user.lastName,
                            user.email, 'User login', 'User login', 'L2', 1, 'Web based')
             try:
                 db.session.add(logentry)
                 db.session.commit()
             except:
+                raise
                 return '', 201
-            return SessionInfoSerializer(user).data, 201
+            return SessionInfoSerializer().dump(user).data, 201
         return '', 401
 
 
@@ -236,7 +265,7 @@ class OpeningRequestView(Resource):
         checkAccessResult = g.user.checkUserAccessPrivleges()
         if (checkAccessResult == "access granted"):
 
-            logentry = Log(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
+            logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
                            g.user.email, 'Opening request', 'Opening request', 'L2', 1, 'Web based')
             try:
                 db.session.add(logentry)
@@ -260,7 +289,7 @@ class DoorView(Resource):
         door = Door.query.filter_by(id=id).first()
         if door != None:
             print 'delete door ' + door.name + ' ' + door.address + ' (id=' + str(door.id) + ') from database'
-            logentry = Log(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
+            logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
                            g.user.email, 'Door (' + door.name + ' on ' + door.address + ') removed', 'Door removed',
                            'L1', 1, 'Web based')
             try:
@@ -291,7 +320,7 @@ class DoorRegistrationView(Resource):
         headers = {'Authorization' : auth_token}
 
         try:
-            response = requests.get('http://' + form.address.data + ':5000' + '/request/doorinfo', timeout=2, headers = headers)
+            response = requests.get('http://' + form.address.data + ':5000' + '/request/doorinfo', timeout=4, headers = headers)
         except:
             print "requested door unreachable"
             return 'requested door unreachable', 400
@@ -301,7 +330,7 @@ class DoorRegistrationView(Resource):
         response_data = json.loads(response.content)
         newDoor = Door(name=form.name.data, keyMask=response_data["keyMask"], address='http://' + form.address.data,
                        local=0, password = pwd)
-        logentry = Log(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
+        logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
                        g.user.email, 'Door ' + newDoor.name + ' on ' + newDoor.address + ' checked and registered',
                        'Door registered', 'L1', 1, 'Web based')
         try:
@@ -315,7 +344,7 @@ class DoorRegistrationView(Resource):
             return make_response(jsonify({'error': 'eMail already registered'}), 400)
 
         print "return new door data for request"
-        return DoorSerializer(newDoor).data
+        return DoorSerializer().dump(newDoor).data
 
 
 class DoorInfoView(Resource):
@@ -323,14 +352,14 @@ class DoorInfoView(Resource):
     def get(self):
         print 'Door info request'
         localdoor = Door.query.filter_by(local=1).first()
-        return DoorSerializer().dumps(localdoor).data
+        return DoorSerializer().dump(localdoor).data
 
 
 class DoorListView(Resource):
     @auth.login_required
     def get(self):
         posts = Door.query.filter_by(local=0).all()
-        return DoorSerializer().dumps(posts, many=True).data
+        return DoorSerializer().dump(posts, many=True).data
 
 
 class LogAdminView(Resource):
@@ -338,22 +367,24 @@ class LogAdminView(Resource):
     def get(self):
         if (g.user.role & 1) == 0:
             return make_response(jsonify({'error': 'Not authorized'}), 403)
-        logs = Log.query.all()
-        return LogSerializer().dumps(logs, many=True).data
+        logs = Action.query.all()
+        return LogSerializer().dump(logs, many=True).data
+    def delete(self):
+        return '', 201
 
 
 class LogUserView(Resource):
     @auth.login_required
     def get(self):
-        logs = Log.query.filter_by(userMail=g.user.email).all()
-        return LogSerializer().dumps(logs, many=True).data
+        logs = Action.query.filter_by(userMail=g.user.email).all()
+        return LogSerializer().dump(logs, many=True).data
 
 
 class RfidTagInfoView(Resource):
     @auth.login_required
     def get(self):
         print backgroundWorker.tagInfo.userInfo + ' ' + backgroundWorker.tagInfo.tagId
-        return RfidTagInfoSerializer(backgroundWorker.tagInfo).data
+        return RfidTagInfoSerializer().dump(backgroundWorker.tagInfo).data
 
 
 class RfidTagAssignView(Resource):
@@ -439,10 +470,12 @@ class RfidTagWitdrawView(Resource):
 
 
 api.add_resource(SessionView, '/sessions')
+
 api.add_resource(UserView, '/user/<int:id>')
 api.add_resource(UserListView, '/users')
-api.add_resource(LogUserView, '/log/user')
-api.add_resource(LogAdminView, '/log/admin')
+
+api.add_resource(LogUserView, '/actions/user')
+api.add_resource(LogAdminView, '/actions/admin')
 
 api.add_resource(DoorView, '/door/<int:id>')
 api.add_resource(DoorSyncView, '/door/<int:id>/sync')
@@ -452,6 +485,7 @@ api.add_resource(DoorListView, '/doors')
 api.add_resource(OpeningRequestView, '/request/opening')
 api.add_resource(LostPasswordView, '/request/password')
 api.add_resource(DoorInfoView, '/request/doorinfo')
+
 api.add_resource(RfidTagInfoView, '/tag/info')
 api.add_resource(RfidTagAssignView, '/tag/assign')
 api.add_resource(RfidTagWitdrawView, '/tag/withdraw')

@@ -6,13 +6,13 @@ RoseGuardenApp.factory('Log', function(Restangular) {
     Log = {
         getAdminLog: function (bypassErrorInterceptor) {
             return Restangular
-                .all('log/admin')
+                .all('actions/admin')
                 .withHttpConfig({bypassErrorInterceptor: bypassErrorInterceptor})
                 .getList();
         },
         getUserLog: function (bypassErrorInterceptor) {
             return Restangular
-                .all('log/user')
+                .all('actions/user')
                 .withHttpConfig({bypassErrorInterceptor: bypassErrorInterceptor})
                 .getList();
         },

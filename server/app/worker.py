@@ -2,19 +2,20 @@ import requests
 
 __author__ = 'drobisch'
 
+import flask_alchemydumps
 from models import User, Door
-from server import app
+from server import app, db
 from serializers import LogSerializer, UserSyncSerializer, SessionInfoSerializer, DoorSerializer, RfidTagInfoSerializer
 from werkzeug.datastructures import MultiDict
 import threading
 import time
+import config
 import json
 import datetime
 import os
 from models import RfidTagInfo
 from RFID import RFIDReader
 from RFID import RFIDMockup
-
 from GPIO import GPIO
 from GPIO import GPIOMockup
 
@@ -26,12 +27,12 @@ class BackgroundWorker():
         self.requestOpening = False
         self.openingTimer = -1
         self.requestTimer = 0
-        self.backLogSyncTimer = 0
+        self.syncTimer = 0
+        self.backupTimer = 0
         self.tagInfo = RfidTagInfo("", "")
         self.tagResetCount = 0
         self.lock = False
         self.lastBackupTime = datetime.datetime.now()
-        self.lastLogUpdate = datetime.datetime.now()
         self.lastSynchronitationTime = datetime.datetime.now()
         # setup gpio and set default (Low)
         GPIO.setmode(GPIO.BOARD)
@@ -363,15 +364,62 @@ class BackgroundWorker():
             print "unexpected error in checkRFIDTag"
             raise
 
-    def backLogSync_cycle(self):
-        print "backlogsync cycle"
+    def backup_cycle(self):
+        lasttime = self.lastBackupTime
+        now = datetime.datetime.now()
+
+        compare_time = lasttime.replace(hour=4, minute=00, second=0, microsecond=0)
+        if compare_time > lasttime:
+            next_time = compare_time
+        else:
+            next_time = compare_time + datetime.timedelta(days=1)
+
+        if(now > next_time):
+            print 'Doing a backup (' + str(datetime.datetime.now()) + ')'
+            with app.app_context():
+                flask_alchemydumps.autoclean(True)
+                flask_alchemydumps.create()
+                if config.BACKUP_ENABLE_FTP == True:
+                    print 'Doing a additional FTP backup'
+                    app.config['ALCHEMYDUMPS_FTP_SERVER'] = ''
+                    app.config['ALCHEMYDUMPS_FTP_USER'] = ''
+                    app.config['ALCHEMYDUMPS_FTP_PASSWORD'] = ''
+                    app.config['ALCHEMYDUMPS_FTP_PATH'] = ''
+                    flask_alchemydumps.create()
+                    app.config['ALCHEMYDUMPS_FTP_SERVER'] = config.ALCHEMYDUMPS_FTP_SERVER
+                    app.config['ALCHEMYDUMPS_FTP_USER'] = config.ALCHEMYDUMPS_FTP_USER
+                    app.config['ALCHEMYDUMPS_FTP_PASSWORD'] = config.ALCHEMYDUMPS_FTP_PASSWORD
+                    app.config['ALCHEMYDUMPS_FTP_PATH'] = config.ALCHEMYDUMPS_FTP_PATH
+            print 'Next backup @' + str(next_time) + ' (' + str(datetime.datetime.now()) + ')'
+            self.lastBackupTime = now
+
+    def sync_cycle(self):
+        print "sync cycle"
         door = Door.query.filter_by(id=0).first()
+        doorList = Door.query.all()
+
+        for doorSync in doorList:
+            print doorSync.name
+
         userList = User.query.filter_by(syncMaster=0).all()
+        adding = 0
+
+        if adding == 1:
+            newUser = User("test" + str(datetime.datetime.now().hour) + '-' +  str(datetime.datetime.now().minute) + '-' + str(datetime.datetime.now().second) + "@gmx.de", "test", "newuser", "lastuser")
+            newUser.id = -1
+            userList.append(newUser)
+        else:
+            tempUserList = []
+            for usr in userList:
+                if userList.index(usr) < 2:
+                    tempUserList.append(usr)
+            userList = tempUserList
+
         serial = UserSyncSerializer().dump(userList, many=True).data
-        #print serial
+        print serial
         data = {'userList' : serial}
         try:
-            response = requests.post('http://localhost:5000' + '/users', json= data, timeout=2)
+            response = requests.post('http://localhost:5000' + '/users', json= data, timeout=4)
             print response
         except:
             print "error while request users-sync"
@@ -386,10 +434,15 @@ class BackgroundWorker():
             self.requestTimer = 0
             self.checkRFIDTag()
 
-        self.backLogSyncTimer += 1
-        if self.backLogSyncTimer > 3:
-            self.backLogSyncTimer = -1000
-            self.backLogSync_cycle()
+        self.backupTimer += 1
+        if self.backupTimer > 60:
+            self.backupTimer = 0;
+            self.backup_cycle()
+
+        self.syncTimer += 1
+        if self.syncTimer > 3:
+            self.syncTimer = -100000
+            self.sync_cycle()
 
         # print "Check for opening request"
         if self.requestOpening == True:

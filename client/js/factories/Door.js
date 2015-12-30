@@ -7,9 +7,16 @@ RoseGuardenApp.factory('Door', function(Restangular) {
                 .withHttpConfig({bypassErrorInterceptor: true})
                 .getList();
         },
-        add: function(data) {
+        register: function(data) {
             return Restangular
                 .one('door')
+                .withHttpConfig({bypassErrorInterceptor: true})
+                .customPOST(data);
+        },
+        synchronize: function(data) {
+            return Restangular
+                .one('door', id)
+                .one('sync')
                 .withHttpConfig({bypassErrorInterceptor: true})
                 .customPOST(data);
         },

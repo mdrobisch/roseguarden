@@ -89,9 +89,8 @@
                     </span>
                 </td>
                 <td>
-
                     <div ng-show="row.local == 0">
-                        <button ng-show="row.local == 0" type="button" ng-click="" class="btn btn-sm btn-success" tooltip="Synchronize">
+                        <button ng-show="row.local == 0" type="button" ng-click="synchronizeDoor(row)" class="btn btn-sm btn-success" tooltip="Synchronize">
                             <i class="glyphicon glyphicon-refresh"></i>
                         </button>
                         <button ng-show="row.local == 0" type="button" ng-click="removeDoor(row)" class="btn btn-sm btn-danger" tooltip="Remove door">
@@ -105,13 +104,10 @@
                             <span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu" role="menu">
-                            <li role="menuitem"><a ng-click="setupUserAccess(row)">Setup door</a></li>
+                            <!-- <li role="menuitem"><a ng-click="setupUserAccess(row)">Setup door</a></li> -->
                         </ul>
                         <img ng-if="row.userUpdatePending" src="images/loading.gif" >
                     </div>
-
-
-
                 </td>
             </tr>
         </tbody>

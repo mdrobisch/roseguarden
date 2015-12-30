@@ -4,7 +4,7 @@ from server import db, flask_bcrypt
 from wtforms.validators import Email
 import random
 import datetime
-
+import marshmallow
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -35,6 +35,7 @@ class User(db.Model):
     accessDaysMask = db.Column(db.Integer)
     accessDayCounter = db.Column(db.Integer)
     lastLoginDateTime = db.Column(db.DateTime)
+    lastSyncDateTime = db.Column(db.DateTime)
     registerDateTime = db.Column(db.DateTime)
     budget = db.Column(db.Float)
 
@@ -59,6 +60,39 @@ class User(db.Model):
         if self.accessTimeEnd.time() < datetime.datetime.now().time():
             return 'invalid access because of TimeEnd'
         return "access granted"
+
+
+    def updateUserFromSyncDict(self, data):
+        self.syncMaster = data['syncMaster']
+        self.active = data['active']
+        self.phone = data['phone']
+        self.cardAuthBlock = data['cardAuthBlock']
+        self.cardAuthSector = data['cardAuthSector']
+        self.cardID = data['cardID']
+        self.cardSecret = data['cardSecret']
+        self.cardAuthKeyA = data['cardAuthKeyA']
+        self.cardAuthKeyB = data['cardAuthKeyB']
+        self.role = data['role']
+        self.email = data['email']
+        self.password = data['password']
+        self.firstName = data['firstName']
+        self.lastName = data['lastName']
+        self.association = data['association']
+        self.phone = data['phone']
+        self.keyMask = data['keyMask']
+        self.licenseMask = data['licenseMask']
+        self.accessDaysMask = data['accessDaysMask']
+        self.accessType = data['accessType']
+        self.accessDayCounter = data['accessDayCounter']
+
+        self.accessDateStart = datetime.datetime.strptime(data['accessDateStart'][:19], '%Y-%m-%dT%H:%M:%S')
+        self.accessDateEnd = datetime.datetime.strptime(data['accessDateEnd'][:19], '%Y-%m-%dT%H:%M:%S')
+        self.accessTimeStart = datetime.datetime.strptime(data['accessTimeStart'][:19], '%Y-%m-%dT%H:%M:%S')
+        self.accessTimeEnd = datetime.datetime.strptime(data['accessTimeEnd'][:19], '%Y-%m-%dT%H:%M:%S')
+        self.lastLoginDateTime = datetime.datetime.strptime(data['lastLoginDateTime'][:19], '%Y-%m-%dT%H:%M:%S')
+        self.registerDateTime = datetime.datetime.strptime(data['registerDateTime'][:19], '%Y-%m-%dT%H:%M:%S')
+
+        self.budget = data['budget']
 
     def __repr__(self):
         return '<User %r>' % self.email
@@ -90,6 +124,7 @@ class User(db.Model):
         self.accessTimeStart = datetime.datetime.today().replace(hour= 6, minute= 0, second=0, microsecond=0)
         self.accessTimeEnd = datetime.datetime.today().replace(hour= 22, minute= 30, second=0, microsecond=0)
         self.lastLoginDateTime = datetime.datetime.today()
+        self.lastSyncDateTime = datetime.datetime.now()
         self.registerDateTime = datetime.datetime.today()
         self.budget = 0.00;
 
@@ -110,7 +145,9 @@ class Setting(db.Model):
         self.type = type
         self.value = value
 
-class Log(db.Model):
+class Action(db.Model):
+    ACTION_NONE = 0
+
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.DateTime)
     nodeName = db.Column(db.Text)
@@ -121,8 +158,12 @@ class Log(db.Model):
     logText = db.Column(db.Text)
     logType = db.Column(db.Text)
     logLevel = db.Column(db.Text)
+    action = db.Column(db.Integer)
+    actionParameter = db.Column(db.Integer)
+    rollbackPoint = db.Column(db.Integer)
+    synced = db.Column(db.Integer)
 
-    def __init__(self, date, nodeName, userName, userMail, logText, logType, logLevel, authType, authInfo):
+    def __init__(self, date, nodeName, userName, userMail, logText, logType, logLevel, authType, authInfo, rollbackpoint = -1, action = ACTION_NONE, actionParameter = 0):
         self.date = date
         self.nodeName = nodeName
         self.userName = userName
@@ -132,6 +173,10 @@ class Log(db.Model):
         self.logText = logText
         self.authType = authType
         self.authInfo = authInfo
+        self.synced = 0
+        self.action = action
+        self.actionParameter = actionParameter
+        self.rollbackPoint = rollbackpoint
 
 class Door(db.Model):
     id = db.Column(db.Integer, primary_key=True)

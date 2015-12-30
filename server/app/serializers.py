@@ -9,7 +9,7 @@ class UserSerializer(Schema):
     class Meta:
         fields = ("id", "email", "firstName", "lastName", "phone", "role", "licenseMask", "keyMask",
                   "association", "registerDateTime", "lastLoginDateTime", "accessDateStart", "accessDateEnd",
-                  "accessTimeStart", "accessTimeEnd", "accessType", "accessDaysMask", "accessDayCounter",
+                  "accessTimeStart", "accessTimeEnd", "lastSyncDateTime", "accessType", "accessDaysMask", "accessDayCounter",
                   "budget", "cardID")
 
     #@post_dump(pass_many=True)
@@ -26,17 +26,30 @@ class UserSerializer(Schema):
 class UserSyncSerializer(Schema):
     class Meta:
         fields = ("id", "email", "firstName", "lastName", "phone", "role", "licenseMask", "keyMask",
-                  "association", "registerDateTime", "lastLoginDateTime", "accessDateStart", "accessDateEnd",
+                  "association", "registerDateTime", "lastLoginDateTime", "lastSyncDateTime", "accessDateStart", "accessDateEnd",
                   "accessTimeStart", "accessTimeEnd", "accessType", "accessDaysMask", "accessDayCounter",
-                  "budget", "cardID", "password")
+                  "budget", "cardID", "password", "syncMaster", "active", "cardAuthBlock", "cardAuthSector",
+                  "cardID", "cardSecret", "cardAuthKeyA", "cardAuthKeyB")
+
     @post_load
     def make_user(self, data):
         firstName = data['firstName']
         lastName = data['lastName']
         email = data['email']
         password = data['password']
-        result = User(email, password, firstName, lastName)
-        return result
+
+        #create base user
+        user = User(email, password, firstName, lastName)
+
+        user.updateUserFromSyncDict(data)
+
+        #add all aditional member-vars
+        user.id = data['id']
+        if user.id == -1:
+            user.id = None
+
+        return user
+        #return { "id": data['id'], "firstName": data['firstName'], lastName: data['lastName'], "email": email, password : password}
 
 
 class SessionInfoSerializer(Schema):
