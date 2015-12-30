@@ -1,7 +1,7 @@
 __author__ = 'drobisch'
 
 from flask_restful import Resource
-from models import User
+from models import User, Action
 from marshmallow import Schema, fields, post_load, post_dump
 import datetime
 
@@ -66,8 +66,26 @@ class DoorSerializer(Schema):
 
 class LogSerializer(Schema):
     class Meta:
-        fields = ("id", "date", "nodeName", "userName", "userMail", "authType", "authInfo", "logText", "logType", "logLevel")
+        fields = ("id", "date", "nodeName", "userName", "userMail", "authType", "authInfo", "logText", "logType", "logLevel", "rollbackPoint", "synced", "action", "actionParameter")
 
+    @post_load
+    def make_user(self, data):
+        date            = datetime.datetime.strptime(data['date'][:19], '%Y-%m-%dT%H:%M:%S')
+        nodeName        = data['nodeName']
+        userName        = data['userName']
+        userMail        = data['userMail']
+        authType        = data['authType']
+        authInfo        = data['authInfo']
+        logText         = data['logText']
+        logType         = data['logType']
+        logLevel        = data['logLevel']
+        rollbackPoint   = data['rollbackPoint']
+        action          = data['action']
+        actionParameter = data['actionParameter']
+
+        action = Action(date,nodeName,userName,userMail,logText,logType,logLevel,authType,authInfo,action,actionParameter,rollbackPoint)
+
+        return action
 
 #class User_Serializer (Resource):
 #    @marshal_with(parameter_marshaller)

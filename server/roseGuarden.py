@@ -57,8 +57,8 @@ def create_db():
     db.session.add(Door(name = config.NODE_NAME, displayName = 'Local door', address = 'http://localhost', keyMask = 0x03, local = 0x01, password= config.SYNC_MASTER_DEFAULT_PASSWORD))
 
     Setting.query.delete()
-    db.session.add(Setting('NodeName', 'Test door',Setting.VALUETYPE_STRING))
-    db.session.add(Setting('NodeValidKey','0x03',Setting.VALUETYPE_INT))
+    db.session.add(Setting('NodeName', 'Test door', Setting.VALUETYPE_STRING))
+    db.session.add(Setting('NodeValidKey','0x03', Setting.VALUETYPE_INT))
 
     Action.query.delete()
     db.session.add(Action(datetime.datetime.utcnow(), config.NODE_NAME, syncMasterUser.firstName + ' ' + syncMasterUser.lastName, syncMasterUser.email, 'Remove all data & regenerate database', 'Init systen', 'L1', 1, 'Internal'))

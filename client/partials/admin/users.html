@@ -26,7 +26,7 @@
             <tr>
                 <th st-sort="firstName">user</th>
                 <th st-sort="registerDateTime">registered</th>
-                <th st-sort="lastLoginDateTime">last action</th>
+                <th st-sort="lastLoginDateTime">last action / sync</th>
                 <th st-sort="accessDateEnd">valid. type</th>
                 <th st-sort="accessTimeStart">valid. time</th>
                 <th st-sort="keyMask"> keys & licenses</th>
@@ -65,7 +65,10 @@
                 <td>
                     {{row.registerDateTime | moment:'DD.MM.YYYY'}}
                 </td>
-                <td>{{row.lastLoginDateTime | moment:'DD.MM.YYYY HH:mm'}}</td>
+                <td>
+                    {{row.lastLoginDateTime | moment:'DD.MM.YYYY HH:mm'}}
+                    ({{row.lastSyncDateTime | moment:'DD.MM.YYYY HH:mm'}})
+                </td>
                 <td>
                         <span ng-show="row.accessType == 0">
                             no access

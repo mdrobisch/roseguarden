@@ -147,7 +147,8 @@ class Setting(db.Model):
         self.value = value
 
 class Action(db.Model):
-    ACTION_NONE = 0
+    ACTION_LOGONLY = 0
+    ACTION_OPENING_REQUEST = 1
 
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.DateTime)
@@ -164,7 +165,7 @@ class Action(db.Model):
     rollbackPoint = db.Column(db.Integer)
     synced = db.Column(db.Integer)
 
-    def __init__(self, date, nodeName, userName, userMail, logText, logType, logLevel, authType, authInfo, rollbackpoint = -1, action = ACTION_NONE, actionParameter = 0):
+    def __init__(self, date, nodeName, userName, userMail, logText, logType, logLevel, authType, authInfo, action = ACTION_LOGONLY, actionParameter = 0, rollbackpoint = -1):
         self.date = date
         self.nodeName = nodeName
         self.userName = userName

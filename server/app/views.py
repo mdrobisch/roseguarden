@@ -218,7 +218,7 @@ class SessionView(Resource):
         user = User.query.filter_by(email=form.email.data).first()
         if user and flask_bcrypt.check_password_hash(user.password, form.password.data):
             logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, user.firstName + ' ' + user.lastName,
-                           user.email, 'User login', 'User login', 'L2', 1, 'Web based')
+                           user.email, 'User login', 'User login', 'L2', 0, 'Web based')
             try:
                 db.session.add(logentry)
                 db.session.commit()
@@ -266,7 +266,7 @@ class OpeningRequestView(Resource):
         if (checkAccessResult == "access granted"):
 
             logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
-                           g.user.email, 'Opening request', 'Opening request', 'L2', 1, 'Web based')
+                           g.user.email, 'Opening request', 'Opening request', 'L2', 1, 'Web based', Action.ACTION_OPENING_REQUEST)
             try:
                 db.session.add(logentry)
                 db.session.commit()
@@ -325,8 +325,6 @@ class DoorRegistrationView(Resource):
             print "requested door unreachable"
             return 'requested door unreachable', 400
 
-        print "create new door"
-
         response_data = json.loads(response.content)
         newDoor = Door(name=response_data["name"], displayName= form.name.data, keyMask=response_data["keyMask"], address='http://' + form.address.data,
                        local=0, password = pwd)
@@ -365,18 +363,30 @@ class DoorListView(Resource):
 class LogAdminView(Resource):
     @auth.login_required
     def get(self):
-        if (g.user.role & 1) == 0:
+        if (g.user.role & 1) == 0 and (g.user.syncMaster == 0):
             return make_response(jsonify({'error': 'Not authorized'}), 403)
-        logs = Action.query.all()
+        logs = Action.query.order_by(Action.date).all()
         return LogSerializer().dump(logs, many=True).data
+
+    @auth.login_required
     def delete(self):
+        if (g.user.syncMaster == 0):
+            return make_response(jsonify({'error': 'Not authorized'}), 403)
+
+        print 'action-log deletetion requested'
+        Action.query.delete()
+        logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
+                       '', 'Removed all actions after syncing', 'Remove actions after sync',
+                       'L1', 0, 'Web based')
+        db.session.add(logentry)
+        db.session.commit()
         return '', 201
 
 
 class LogUserView(Resource):
     @auth.login_required
     def get(self):
-        logs = Action.query.filter_by(userMail=g.user.email).all()
+        logs = Action.query.filter_by(userMail=g.user.email).order_by(Action.date).all()
         return LogSerializer().dump(logs, many=True).data
 
 
@@ -429,8 +439,11 @@ class RfidTagAssignView(Resource):
                 db.session.rollback()
                 return make_response(jsonify({'error': 'user not found'}), 400)
             else:
+                logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
+                               g.user.email, 'Assign RFID-tag ' + form.rfidTagId.data + ' to ' + user.firstName + ' ' + user.lastName, 'Card administration',
+                               'L1', 0, 'Card based')
+                db.session.add(logentry)
                 db.session.commit()
-
         print 'Assigned cardID ' + form.rfidTagId.data + ' to ' + user.firstName + ' ' + user.lastName
         return '', 201
 
@@ -464,6 +477,12 @@ class RfidTagWitdrawView(Resource):
                 user.cardAuthKeyB = ''
                 db.session.commit()
                 print 'Withdraw cardID ' + form.rfidTagId.data + ' from ' + user.firstName + ' ' + user.lastName
+                logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
+                               g.user.email, 'Withdraw cardID-tag ' + form.rfidTagId.data + ' from ' + user.firstName + ' ' + user.lastName, 'Card administration',
+                               'L1', 0, 'Web based')
+                db.session.add(logentry)
+                db.session.commit()
+
                 return '', 201
         else:
             return make_response(jsonify({'error': 'bad request data'}), 400)

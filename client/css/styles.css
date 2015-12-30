@@ -126,6 +126,11 @@ a.gliphicons-small {
     width: 32px;
 }
 
+a.glyphicons-very-small {
+    float: none;
+    width: 24px;
+}
+
 a.width170px {
     width: 170px;
 }

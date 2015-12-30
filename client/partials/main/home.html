@@ -21,7 +21,7 @@
 
     <div>
         <button type="button" class="btn btn-warning btn-lg round"
-                ng-repeat="door in doors" ng-click="requestOpening(door)" ng-disabled="isAllowed(door)">Open {{door.name}}
+                ng-repeat="door in doors" ng-click="requestOpening(door)" ng-disabled="isAllowed(door)">Open {{door.displayName}}
         </button>
     </div>
 

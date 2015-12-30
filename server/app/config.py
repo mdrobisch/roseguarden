@@ -47,6 +47,15 @@ else:
     ALCHEMYDUMPS_FTP_PASSWORD = ''
     ALCHEMYDUMPS_FTP_PATH = ''
 
+cleanup_section = config['CLEANUP']
+
+CLEANUP_EANBLE = conf_entry_to_bool(cleanup_section['CLEANUP_EANBLE'])
+
+if CLEANUP_EANBLE == True:
+    CLEANUP_THRESHOLD = conf_entry_to_int(cleanup_section['CLEANUP_THRESHOLD'])
+else:
+    CLEANUP_THRESHOLD = 1000
+
 # settings for flask-mail, if available
 if NODE_MASTER == True:
     mail_section = config['MAIL']

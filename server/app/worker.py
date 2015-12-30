@@ -3,7 +3,7 @@ import requests
 __author__ = 'drobisch'
 
 import flask_alchemydumps
-from models import User, Door
+from models import User, Door, Action
 from server import app, db
 from serializers import LogSerializer, UserSyncSerializer, SessionInfoSerializer, DoorSerializer, RfidTagInfoSerializer
 from werkzeug.datastructures import MultiDict
@@ -30,11 +30,13 @@ class BackgroundWorker():
         self.requestTimer = 0
         self.syncTimer = 0
         self.backupTimer = 0
+        self.cleanupTimer = 0
         self.tagInfo = RfidTagInfo("", "")
         self.tagResetCount = 0
         self.lock = False
         self.lastBackupTime = datetime.datetime.now()
-        self.lastSynchronitationTime = datetime.datetime.now()
+        self.lastCleanupTime = datetime.datetime.now()
+        self.lastSyncTime = datetime.datetime.now()
         # setup gpio and set default (Low)
         GPIO.setmode(GPIO.BOARD)
         GPIO.setup(12, GPIO.OUT, initial=GPIO.HIGH)
@@ -44,21 +46,11 @@ class BackgroundWorker():
         # if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
         self.thr = threading.Timer(1, self.timer_cycle)
         self.thr.start()
-        # [('accessTimeStart', 'Sat, 05 Dec 2015 06:00:00 -0000'), ('firstName', u'Sync'), ('lastName', u'Master'), ('accessDayCounter', 0), ('cardID', u''), ('accessType', 0), ('accessDateStart', 'Sat, 05 Dec 2015 00:00:00 -0000'), ('keyMask', 0), ('email', u'syncmaster@roseguarden.org'), ('phone', u'0'), ('accessDaysMask', 127), ('role', 1), ('licenseMask', 0), ('lastLoginDateTime', 'Sat, 05 Dec 2015 00:26:47 -0000'), ('accessDateEnd', 'Sun, 01 Dec 2030 00:00:00 -0000'), ('budget', 0.0), ('accessTimeEnd', 'Sat, 05 Dec 2015 22:30:00 -0000'), ('registerDateTime', 'Sat, 05 Dec 2015 00:26:47 -0000'), ('id', 1), ('association', u'')]), OrderedDict([('accessTimeStart', 'Sat, 05 Dec 2015 06:00:00 -0000'), ('firstName', u'Konglomerat'), ('lastName', u'Kommando'), ('accessDayCounter', 0), ('cardID', u''), ('accessType', 1), ('accessDateStart', 'Sat, 05 Dec 2015 00:00:00 -0000'), ('keyMask', 0), ('email', u'kommando@konglomerat.org'), ('phone', u'0'), ('accessDaysMask', 127), ('role', 0), ('licenseMask', 0), ('lastLoginDateTime', 'Sat, 05 Dec 2015 00:26:47 -0000'), ('accessDateEnd', 'Sun, 01 Dec 2030 00:00:00 -0000'), ('budget', 0.0), ('accessTimeEnd', 'Sat, 05 Dec 2015 22:30:00 -0000'), ('registerDateTime', 'Sat, 05 Dec 2015 00:26:47 -0000'), ('id', 2), ('association', u'')]), OrderedDict([('accessTimeStart', 'Sat, 05 Dec 2015 06:00:00 -0000'), ('firstName', u'Marcus'), ('lastName', u'Drobisch'), ('accessDayCounter', 0), ('cardID', u''), ('accessType', 1), ('accessDateStart', 'Sat, 05 Dec 2015 00:00:00 -0000'), ('keyMask', 3), ('email', u'm.drobisch@googlemail.com'), ('phone', u'01754404298'), ('accessDaysMask', 127), ('role', 1), ('licenseMask', 0), ('lastLoginDateTime', 'Sat, 05 Dec 2015 00:26:48 -0000'), ('accessDateEnd', 'Sun, 01 Dec 2030 00:00:00 -0000'), ('budget', 0.0), ('accessTimeEnd', 'Sat, 05 Dec 2015 22:30:00 -0000'), ('registerDateTime', 'Sat, 05 Dec 2015 00:26:48 -0000'), ('id', 3), ('association', u'')]
         print 'started background-server'
 
     def resetTagInfo(self):
         self.tagInfo.tagId = ""
         self.tagInfo.userInfo = ""
-
-    def checkBackupHandle(self):
-        print "check for next backup"
-
-    def checkLogUpdaterHandle(self):
-        print "check for next log update"
-
-    def checkSynchronizerHandle(self):
-        print "check for next synchronizer update"
 
     def withdrawRFIDTag(self, user):
         while (self.lock == True):
@@ -343,6 +335,11 @@ class BackgroundWorker():
                         print "correct secret"
                         if user.checkUserAccessPrivleges() == "access granted":
                             self.requestOpening = True
+                            logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, user.firstName + ' ' + user.lastName,
+                                           user.email, 'Opening request', 'Opening request',
+                                           'L2', 1, 'Card based', Action.ACTION_OPENING_REQUEST)
+                            db.session.add(logentry)
+                            db.session.commit()
                         else:
                             print "no user-access privilege"
                     else:
@@ -365,11 +362,33 @@ class BackgroundWorker():
             print "unexpected error in checkRFIDTag"
             raise
 
+    def cleanup_cycle(self):
+        lasttime = self.lastCleanupTime
+        now = datetime.datetime.now()
+        past = now - datetime.timedelta(days=config.CLEANUP_THRESHOLD)
+
+        compare_time = lasttime.replace(hour=04, minute=55, second=0, microsecond=0)
+        if compare_time > lasttime:
+            next_time = compare_time
+        else:
+            next_time = compare_time + datetime.timedelta(days=1)
+
+        if(now > next_time):
+            print 'Doing a cleanup (' + str(datetime.datetime.now()) + ')'
+            Action.query.filter(Action.date <= past).delete()
+            logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, 'Sync Master',
+                           'syncmaster@roseguarden.org', 'Cleanup logs older than ' + str(config.CLEANUP_THRESHOLD) + ' days', 'Cleanup',
+                           'L1', 0, 'Internal')
+            db.session.add(logentry)
+            db.session.commit()
+            print 'Next cleanup @' + str(next_time) + ' (' + str(datetime.datetime.now()) + ')'
+            self.lastCleanupTime = now
+
     def backup_cycle(self):
         lasttime = self.lastBackupTime
         now = datetime.datetime.now()
 
-        compare_time = lasttime.replace(hour=4, minute=00, second=0, microsecond=0)
+        compare_time = lasttime.replace(hour=4, minute=35, second=0, microsecond=0)
         if compare_time > lasttime:
             next_time = compare_time
         else:
@@ -392,55 +411,118 @@ class BackgroundWorker():
                     app.config['ALCHEMYDUMPS_FTP_PASSWORD'] = config.ALCHEMYDUMPS_FTP_PASSWORD
                     app.config['ALCHEMYDUMPS_FTP_PATH'] = config.ALCHEMYDUMPS_FTP_PATH
             print 'Next backup @' + str(next_time) + ' (' + str(datetime.datetime.now()) + ')'
+            logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, 'Sync Master',
+                           'syncmaster@roseguarden.org', 'Backup database', 'Backup',
+                           'L1', 0, 'Internal')
+            db.session.add(logentry)
+            db.session.commit()
             self.lastBackupTime = now
 
+    def treat_actions(self):
+        logs = Action.query.all()
+        try:
+            for log in logs:
+                log.synced = 1
+            db.session.commit()
+        except:
+            db.session.rollback()
+            raise
 
-    def sync_door(self, door):
+    def sync_door_user(self, door):
         pwd = base64.b64decode(door.password)
         auth_token = 'Basic ' + base64.b64encode("syncmaster@roseguarden.org:" + pwd)
         headers = {'Authorization' : auth_token}
 
         if door.local != 1:
-            if door.name == config.NODE_NAME:
-                print 'danger: the node have the same nodename'
-            print 'sync the door'
-        else:
-            print 'the door is local'
+            if str(door.name) == config.NODE_NAME:
+                print 'warning: the node have the same node name'
+            else:
+                userList = User.query.filter_by(syncMaster=0).all()
+                serial = UserSyncSerializer().dump(userList, many=True).data
+                data = {'userList': serial}
 
+                try:
+                    request_address = str(door.address) + ":5000" + '/users'
+                    response = requests.post(request_address, json= data, headers=headers, timeout=4)
+                    print response
+                except:
+                    print "error while request users-sync"
+                    raise
 
+    def sync_door_log(self, door):
+        pwd = base64.b64decode(door.password)
+        auth_token = 'Basic ' + base64.b64encode("syncmaster@roseguarden.org:" + pwd)
+        headers = {'Authorization' : auth_token}
+
+        if door.local != 1:
+            if str(door.name) == config.NODE_NAME:
+                print 'warning: the node have the same node name'
+            else:
+                request_address = str(door.address) + ":5000" + '/actions/admin'
+                response = requests.get(request_address, headers= headers, timeout=4)
+                print str(response)
+
+                response_data = json.loads(response.content)
+                actionList, errors = LogSerializer().loads(response.content, many=True)
+
+                try:
+                    db.session.add_all(actionList)
+                    db.session.commit()
+                except:
+                    raise
+                    return
+
+                deletion_response = requests.delete(request_address, headers= headers, timeout=4)
+                print deletion_response
 
     def sync_cycle(self):
-        print "sync cycle"
-        door = Door.query.filter_by(id=0).first()
+        now = datetime.datetime.now()
+        lasttime = self.lastSyncTime
+        if config.NODE_SYNC_CYCLIC == True:
+            compare_time = lasttime + datetime.timedelta(minutes=config.NODE_SYNC_CYCLE)
+            if now > compare_time:
+                self.lastSyncTime = now
+            else:
+                return
+        else:
+            compare_time = lasttime.replace(hour=4, minute=15, second=0, microsecond=0)
+            if compare_time > lasttime:
+                next_time = compare_time
+            else:
+                next_time = compare_time + datetime.timedelta(days=1)
+
+            if(now > next_time):
+                self.lastSyncTime = now
+            else:
+                return
+
+        print "Doing a sync cycle"
+
         doorList = Door.query.all()
 
         for doorSync in doorList:
-            print doorSync.name
-            self.sync_door(doorSync)
+            if doorSync.local == 1:
+                print 'Sync actions of ' + doorSync.name + ' (local)'
+            else:
+                print 'Sync actions of ' + doorSync.name
+            self.sync_door_log(doorSync)
 
-        userList = User.query.filter_by(syncMaster=0).all()
-        adding = 0
+        print 'Treat actions'
+        self.treat_actions()
 
-        if adding == 1:
-            newUser = User("test" + str(datetime.datetime.now().hour) + '-' +  str(datetime.datetime.now().minute) + '-' + str(datetime.datetime.now().second) + "@gmx.de", "test", "newuser", "lastuser")
-            newUser.id = -1
-            userList.append(newUser)
-        else:
-            tempUserList = []
-            for usr in userList:
-                if userList.index(usr) < 2:
-                    tempUserList.append(usr)
-            userList = tempUserList
-
-        serial = UserSyncSerializer().dump(userList, many=True).data
-        print serial
-        data = {'userList': serial}
-        try:
-            response = requests.post('http://localhost:5000' + '/users', json= data, timeout=4)
-            #print response
-        except:
-            print "error while request users-sync"
-            raise
+        for doorSync in doorList:
+            if doorSync.local == 1:
+                print 'Sync user of ' + doorSync.name + ' (local)'
+            else:
+                print 'Sync user of ' + doorSync.name
+            self.sync_door_user(doorSync)
+            if doorSync.local == 0:
+                logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, 'Sync Master', 'syncmaster@roseguarden.org',
+                                'Synchronized ' + doorSync.displayName + ' (' + doorSync.name + ')',
+                                'Synchronization', 'L1', 0, 'Internal')
+                logentry.synced = 1
+                db.session.add(logentry)
+                db.session.commit()
 
     def timer_cycle(self):
         self.thr = threading.Timer(1, BackgroundWorker.timer_cycle, [self])
@@ -453,14 +535,20 @@ class BackgroundWorker():
             self.checkRFIDTag()
 
         self.backupTimer += 1
-        if self.backupTimer > 60:
-            self.backupTimer = 0;
+        if self.backupTimer > 113:
+            self.backupTimer = 0
             self.backup_cycle()
 
         self.syncTimer += 1
-        if self.syncTimer > 3:
-            self.syncTimer = -100000
+        if self.syncTimer > 55:
+            self.syncTimer = 0
             self.sync_cycle()
+
+        self.cleanupTimer +=1
+        if self.cleanupTimer > 121:
+            self.cleanupTimer = 0
+            if config.CLEANUP_EANBLE == True:
+                self.cleanup_cycle()
 
         # print "Check for opening request"
         if self.requestOpening == True:
