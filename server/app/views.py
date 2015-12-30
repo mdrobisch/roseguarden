@@ -328,7 +328,7 @@ class DoorRegistrationView(Resource):
         print "create new door"
 
         response_data = json.loads(response.content)
-        newDoor = Door(name=form.name.data, keyMask=response_data["keyMask"], address='http://' + form.address.data,
+        newDoor = Door(name=response_data["name"], displayName= form.name.data, keyMask=response_data["keyMask"], address='http://' + form.address.data,
                        local=0, password = pwd)
         logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
                        g.user.email, 'Door ' + newDoor.name + ' on ' + newDoor.address + ' checked and registered',

@@ -62,7 +62,7 @@ class RfidTagInfoSerializer(Schema):
 
 class DoorSerializer(Schema):
     class Meta:
-        fields = ("id", "name", "keyMask", "address", "local")
+        fields = ("id", "name", "displayName", "keyMask", "address", "local")
 
 class LogSerializer(Schema):
     class Meta:

@@ -10,6 +10,7 @@ from werkzeug.datastructures import MultiDict
 import threading
 import time
 import config
+import base64
 import json
 import datetime
 import os
@@ -167,8 +168,8 @@ class BackgroundWorker():
         while (self.lock == True):
             print "still locked (assignRFIDTag)"
             time.sleep(0.3)
-
         try:
+            # lock the access of the spi-access for the rfid
             self.lock = True
 
             time.sleep(0.2)
@@ -393,6 +394,21 @@ class BackgroundWorker():
             print 'Next backup @' + str(next_time) + ' (' + str(datetime.datetime.now()) + ')'
             self.lastBackupTime = now
 
+
+    def sync_door(self, door):
+        pwd = base64.b64decode(door.password)
+        auth_token = 'Basic ' + base64.b64encode("syncmaster@roseguarden.org:" + pwd)
+        headers = {'Authorization' : auth_token}
+
+        if door.local != 1:
+            if door.name == config.NODE_NAME:
+                print 'danger: the node have the same nodename'
+            print 'sync the door'
+        else:
+            print 'the door is local'
+
+
+
     def sync_cycle(self):
         print "sync cycle"
         door = Door.query.filter_by(id=0).first()
@@ -400,6 +416,7 @@ class BackgroundWorker():
 
         for doorSync in doorList:
             print doorSync.name
+            self.sync_door(doorSync)
 
         userList = User.query.filter_by(syncMaster=0).all()
         adding = 0
@@ -417,12 +434,13 @@ class BackgroundWorker():
 
         serial = UserSyncSerializer().dump(userList, many=True).data
         print serial
-        data = {'userList' : serial}
+        data = {'userList': serial}
         try:
             response = requests.post('http://localhost:5000' + '/users', json= data, timeout=4)
-            print response
+            #print response
         except:
             print "error while request users-sync"
+            raise
 
     def timer_cycle(self):
         self.thr = threading.Timer(1, BackgroundWorker.timer_cycle, [self])

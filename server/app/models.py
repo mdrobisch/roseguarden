@@ -3,6 +3,7 @@ __author__ = 'drobisch'
 from server import db, flask_bcrypt
 from wtforms.validators import Email
 import random
+import base64
 import datetime
 import marshmallow
 
@@ -181,17 +182,19 @@ class Action(db.Model):
 class Door(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text)
+    displayName = db.Column(db.Text)
     keyMask = db.Column(db.Integer)
     address = db.Column(db.Text)
     local = db.Column(db.Integer)
     password = db.Column(db.Text)
 
-    def __init__(self, name, keyMask, address, local, password = ''):
+    def __init__(self, name, displayName, keyMask, address, local, password = ''):
         self.name = name
+        self.displayName = displayName
         self.keyMask = keyMask
         self.address = address
         self.local = local
-        self.password = flask_bcrypt.generate_password_hash(password)
+        self.password = base64.b64encode(password)
 
 class RfidTagInfo(object):
     def __init__(self, tagId, userInfo):

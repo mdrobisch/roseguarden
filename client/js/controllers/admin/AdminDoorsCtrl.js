@@ -82,7 +82,6 @@ RoseGuardenApp.controller('AdminDoorsCtrl', function($scope,$q, Door, $modal, $l
         deferred = $q.defer();
         var newdoor = {name:$scope.newdoor.name, address: $scope.newdoor.address, password: btoa($scope.newdoor.password)};
 
-
         Door.register(newdoor).then(function(response_data) {
             $log.info('Response  ' + response_data);
 
