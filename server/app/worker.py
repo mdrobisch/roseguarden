@@ -513,8 +513,15 @@ class BackgroundWorker():
                 print 'Sync actions of ' + doorSync.name
             self.sync_door_log(doorSync)
 
-        print 'Treat actions'
-        self.update_user_actions()
+        if config.NODE_MASTER == True:
+            print 'Update actions'
+            self.update_user_actions()
+            logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, 'Sync Master', 'syncmaster@roseguarden.org',
+                            'Update and Synchronized actions and user',
+                            'Update & Sync.', 'L1', 0, 'Internal')
+            logentry.synced = 1
+            db.session.add(logentry)
+            db.session.commit()
 
         for doorSync in doorList:
             if doorSync.local == 1:
