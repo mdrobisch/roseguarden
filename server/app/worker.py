@@ -418,11 +418,14 @@ class BackgroundWorker():
             db.session.commit()
             self.lastBackupTime = now
 
-    def treat_actions(self):
+    def update_user_actions(self):
         logs = Action.query.all()
+        users = User.query.all()
         try:
             for log in logs:
                 log.synced = 1
+            for user in users:
+                user.lastSyncDateTime = datetime.datetime.now()
             db.session.commit()
         except:
             db.session.rollback()
@@ -511,7 +514,7 @@ class BackgroundWorker():
             self.sync_door_log(doorSync)
 
         print 'Treat actions'
-        self.treat_actions()
+        self.update_user_actions()
 
         for doorSync in doorList:
             if doorSync.local == 1:

@@ -7,10 +7,10 @@ import datetime
 
 class UserSerializer(Schema):
     class Meta:
-        fields = ("id", "email", "firstName", "lastName", "phone", "role", "licenseMask", "keyMask", "lastBudgetUpdateDate"
+        fields = ("id", "email", "firstName", "lastName", "phone", "role", "licenseMask", "keyMask", "lastBudgetUpdateDate",
                   "association", "registerDateTime", "lastLoginDateTime", "accessDateStart", "accessDateEnd", "lastAccessDaysUpdateDate",
                   "accessTimeStart", "accessTimeEnd", "lastSyncDateTime", "accessType", "accessDaysMask", "accessDayCounter",
-                  "budget", "cardID")
+                  "budget", "cardID", "accessDayCyclicBudget")
 
     #@post_dump(pass_many=True)
     #def wrap_if_many(self, data, many=False):
@@ -27,7 +27,7 @@ class UserSyncSerializer(Schema):
     class Meta:
         fields = ("id", "email", "firstName", "lastName", "phone", "role", "licenseMask", "keyMask",
                   "association", "registerDateTime", "lastLoginDateTime", "lastSyncDateTime", "lastAccessDaysUpdateDate",
-                  "accessDateStart", "accessDateEnd", "lastBudgetUpdateDate",
+                  "accessDateStart", "accessDateEnd", "lastBudgetUpdateDate", "accessDayCyclicBudget",
                   "accessTimeStart", "accessTimeEnd", "accessType", "accessDaysMask", "accessDayCounter",
                   "budget", "cardID", "password", "syncMaster", "active", "cardAuthBlock", "cardAuthSector",
                   "cardID", "cardSecret", "cardAuthKeyA", "cardAuthKeyB")

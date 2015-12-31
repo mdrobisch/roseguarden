@@ -60,7 +60,7 @@
         <div class="form-group" ng-show="user.accessType == 2">
             <label class="col-xs-3 control-label">Access. day bugdet</label>
             <div class="col-xs-8">
-                <label class="control-label">{{user.accessDayCounter}} days</label>
+                <label class="control-label">{{user.accessDayCounter}} days (last sync. {{user.lastSyncDateTime | moment:'DD.MM.YY HH:mm'}})</label>
             </div>
         </div>
 

@@ -35,6 +35,7 @@ class User(db.Model):
     accessTimeEnd = db.Column(db.DateTime)
     accessDaysMask = db.Column(db.Integer)
     accessDayCounter = db.Column(db.Integer)
+    accessDayCyclicBudget = db.Column(db.Integer)
     lastAccessDaysUpdateDate = db.Column(db.DateTime)
     lastLoginDateTime = db.Column(db.DateTime)
     lastSyncDateTime = db.Column(db.DateTime)
@@ -87,7 +88,7 @@ class User(db.Model):
         self.accessDaysMask = data['accessDaysMask']
         self.accessType = data['accessType']
         self.accessDayCounter = data['accessDayCounter']
-
+        self.accessDayCyclicBudget = data['accessDayCyclicBudget']
         self.lastAccessDaysUpdateDate = datetime.datetime.strptime(data['lastAccessDaysUpdateDate'][:19], '%Y-%m-%dT%H:%M:%S')
         self.accessDateStart = datetime.datetime.strptime(data['accessDateStart'][:19], '%Y-%m-%dT%H:%M:%S')
         self.accessDateEnd = datetime.datetime.strptime(data['accessDateEnd'][:19], '%Y-%m-%dT%H:%M:%S')
@@ -124,6 +125,7 @@ class User(db.Model):
         self.accessDaysMask = 127
         self.accessType = 0
         self.accessDayCounter = 0
+        self.accessDayCyclicBudget = 0
         self.lastAccessDaysUpdateDate = (datetime.datetime.today()).replace(hour=0, minute=0, second=0, microsecond=0)
         self.accessDateStart = (datetime.datetime.today()).replace(hour=0, minute=0, second=0, microsecond=0)
         self.accessDateEnd = (datetime.datetime.today() + datetime.timedelta(365*15)).replace(hour=0,minute=0,second=0,microsecond=0)
