@@ -482,6 +482,8 @@ class BackgroundWorker():
             compare_time = lasttime + datetime.timedelta(minutes=config.NODE_SYNC_CYCLE)
             if now > compare_time:
                 self.lastSyncTime = now
+                print 'Next sync @' + str(self.lastSyncTime + datetime.timedelta(minutes=config.NODE_SYNC_CYCLE)) + ' (' + str(datetime.datetime.now()) + ')'
+
             else:
                 return
         else:
@@ -493,6 +495,7 @@ class BackgroundWorker():
 
             if(now > next_time):
                 self.lastSyncTime = now
+                print 'Next sync @' + str(next_time) + ' (' + str(datetime.datetime.now()) + ')'
             else:
                 return
 

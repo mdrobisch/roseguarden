@@ -266,13 +266,12 @@ class OpeningRequestView(Resource):
         if (checkAccessResult == "access granted"):
 
             logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
-                           g.user.email, 'Opening request', 'Opening request', 'L2', 1, 'Web based', Action.ACTION_OPENING_REQUEST)
+                           g.user.email, 'Opening request', 'Opening request', 'L2', 0, 'Web based', Action.ACTION_OPENING_REQUEST)
             try:
                 db.session.add(logentry)
                 db.session.commit()
             except:
                 return '', 401
-
             backgroundWorker.requestOpening = True
             print "Check user privileges for opening request: " + checkAccessResult
             return '', 201
