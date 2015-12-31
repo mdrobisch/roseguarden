@@ -35,10 +35,12 @@ class User(db.Model):
     accessTimeEnd = db.Column(db.DateTime)
     accessDaysMask = db.Column(db.Integer)
     accessDayCounter = db.Column(db.Integer)
+    lastAccessDaysUpdateDate = db.Column(db.DateTime)
     lastLoginDateTime = db.Column(db.DateTime)
     lastSyncDateTime = db.Column(db.DateTime)
     registerDateTime = db.Column(db.DateTime)
     budget = db.Column(db.Float)
+    lastBudgetUpdateDate = db.Column(db.DateTime)
 
     def checkUserAccessPrivleges(self):
         # check for invalid accessType == no access
@@ -86,6 +88,7 @@ class User(db.Model):
         self.accessType = data['accessType']
         self.accessDayCounter = data['accessDayCounter']
 
+        self.lastAccessDaysUpdateDate = datetime.datetime.strptime(data['lastAccessDaysUpdateDate'][:19], '%Y-%m-%dT%H:%M:%S')
         self.accessDateStart = datetime.datetime.strptime(data['accessDateStart'][:19], '%Y-%m-%dT%H:%M:%S')
         self.accessDateEnd = datetime.datetime.strptime(data['accessDateEnd'][:19], '%Y-%m-%dT%H:%M:%S')
         self.accessTimeStart = datetime.datetime.strptime(data['accessTimeStart'][:19], '%Y-%m-%dT%H:%M:%S')
@@ -93,6 +96,7 @@ class User(db.Model):
         self.lastLoginDateTime = datetime.datetime.strptime(data['lastLoginDateTime'][:19], '%Y-%m-%dT%H:%M:%S')
         self.registerDateTime = datetime.datetime.strptime(data['registerDateTime'][:19], '%Y-%m-%dT%H:%M:%S')
 
+        self.lastBudgetUpdateDate = datetime.datetime.strptime(data['lastBudgetUpdateDate'][:19], '%Y-%m-%dT%H:%M:%S')
         self.budget = data['budget']
 
     def __repr__(self):
@@ -120,6 +124,7 @@ class User(db.Model):
         self.accessDaysMask = 127
         self.accessType = 0
         self.accessDayCounter = 0
+        self.lastAccessDaysUpdateDate = (datetime.datetime.today()).replace(hour=0, minute=0, second=0, microsecond=0)
         self.accessDateStart = (datetime.datetime.today()).replace(hour=0, minute=0, second=0, microsecond=0)
         self.accessDateEnd = (datetime.datetime.today() + datetime.timedelta(365*15)).replace(hour=0,minute=0,second=0,microsecond=0)
         self.accessTimeStart = datetime.datetime.today().replace(hour= 6, minute= 0, second=0, microsecond=0)
@@ -128,6 +133,7 @@ class User(db.Model):
         self.lastSyncDateTime = datetime.datetime.now()
         self.registerDateTime = datetime.datetime.today()
         self.budget = 0.00;
+        self.lastBudgetUpdateDate = (datetime.datetime.today()).replace(hour=0, minute=0, second=0, microsecond=0)
 
 class Setting(db.Model):
     WRITEONLY = 0x80
