@@ -3,7 +3,7 @@ Flask-Bcrypt==0.6.0
 Flask-HTTPAuth==2.2.1
 Flask-RESTful==0.2.12
 Flask-SQLAlchemy==1.0
-Flask-AlchemyDumps== 0.0.9
+Flask-AlchemyDumps== 0.0.10
 Flask-Mail==0.9.1
 Flask-WTF==0.12.0
 Flask-Migrate==1.6.0
