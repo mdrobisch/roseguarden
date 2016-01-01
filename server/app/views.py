@@ -62,55 +62,102 @@ class UserView(Resource):
             print form.errors
             return form.errors, 422
         user = User.query.filter_by(id=id).first()
+        log_text = ''
         if form.newpassword.data != None and form.newpassword.data != '':
-            print 'Change password' + base64.decodestring(form.newpassword.data)
             oldpwd = base64.decodestring(form.oldpassword.data)
             if not flask_bcrypt.check_password_hash(user.password, oldpwd):
                 print 'incoorect old password'
                 return make_response(jsonify({'error': 'Not authorized'}), 403)
             print 'correct old password'
+            if log_text != '':
+                log_text += '; '
+            log_text += 'Changed password'
             user.password = flask_bcrypt.generate_password_hash(base64.decodestring(form.newpassword.data))
             db.session.commit()
         if form.lastName.data != None and form.lastName.data != '':
-            print 'Change last name'
+            if user.lastName != form.lastName.data:
+                if log_text != '':
+                    log_text += '; '
+                log_text += 'Change last name from ' + user.lastName + ' to ' + form.lastName.data
             user.lastName = form.lastName.data
         if form.firstName.data != None and form.firstName.data != '':
-            print 'Change first name'
+            if user.firstName != form.firstName.data:
+                if log_text != '':
+                    log_text += '; '
+                log_text += 'Change first name from ' + user.firstName + ' to ' + form.firstName.data
             user.firstName = form.firstName.data
         if form.phone.data != None and form.phone.data != '':
-            print 'Change phone number'
+            if user.phone != form.phone.data:
+                if log_text != '':
+                    log_text += '; '
+                log_text +=  'Change phone number from ' + user.phone + ' to ' + form.phone.data
             user.phone = form.phone.data
         if form.role.data != None and form.role.data != '':
-            print 'Change role to ' + str(form.role.data)
+            if user.role != form.role.data:
+                if log_text != '':
+                    log_text += '; '
+                log_text += 'Change role from ' + str(user.role) + ' to ' + str(form.role.data)
             user.role = form.role.data
         if form.association.data != None and form.association.data != '':
-            print 'Change association to ' + str(form.association.data)
+            if user.association != form.association.data:
+                if log_text != '':
+                    log_text += '; '
+                log_text += 'Change association to ' + str(form.association.data)
             user.association = form.association.data
         if form.accessDaysMask.data != None and form.accessDaysMask.data != '':
-            print 'Change accessDaysMask to ' + str(form.accessDaysMask.data)
+            if user.accessDaysMask != form.accessDaysMask.data:
+                if log_text != '':
+                    log_text += '; '
+                log_text += 'Change accessDaysMask from ' + str(user.accessDaysMask) + ' to ' + str(form.accessDaysMask.data)
             user.accessDaysMask = form.accessDaysMask.data
         if form.accessDayCounter.data != None and form.accessDayCounter.data != '':
-            print 'Change accessDayCounter to ' + str(form.accessDayCounter.data)
+            if user.accessDayCounter != form.accessDayCounter.data:
+                if log_text != '':
+                    log_text += '; '
+                log_text += 'Change accessDayCounter from ' + str(user.accessDayCounter) + ' to ' + str(form.accessDayCounter.data)
             user.accessDayCounter = form.accessDayCounter.data
         if form.accessType.data != None and form.accessType.data != '':
-            print 'Change accessType to ' + str(form.accessType.data)
+            if user.accessType != form.accessType.data:
+                if log_text != '':
+                    log_text += '; '
+                log_text += 'Change accessType from ' + str(user.accessType) + ' to ' + str(form.accessType.data)
             user.accessType = form.accessType.data
         if form.keyMask.data != None and form.keyMask.data != '':
-            print 'Change keyMask to ' + str(form.keyMask.data)
+            if user.keyMask != form.keyMask.data:
+                if log_text != '':
+                    log_text += '; '
+                log_text += 'Change keyMask from ' + str(user.keyMask) + ' to ' + str(form.keyMask.data)
             user.keyMask = form.keyMask.data
         if form.accessDateStart.data != None and form.accessDateStart.data != '':
-            print 'Change accessDateStart to ' + str(form.accessDateStart.data)
+            if user.accessDateStart != datetime.datetime.strptime(form.accessDateStart.data, '%Y-%m-%dT%H:%M:%S.%fZ'):
+                if log_text != '':
+                    log_text += '; '
+                log_text += 'Change accessDateStart from ' + str(user.accessDateStart) + ' to ' + str(form.accessDateStart.data)
             user.accessDateStart = datetime.datetime.strptime(form.accessDateStart.data, '%Y-%m-%dT%H:%M:%S.%fZ')
         if form.accessDateEnd.data != None and form.accessDateEnd.data != '':
-            print 'Change accessDateEnd to ' + str(form.accessDateEnd.data)
+            if user.accessDateEnd != datetime.datetime.strptime(form.accessDateEnd.data, '%Y-%m-%dT%H:%M:%S.%fZ'):
+                if log_text != '':
+                    log_text += '; '
+                log_text += 'Change accessDateEnd from ' + str(user.accessDateEnd ) + ' to ' + str(form.accessDateEnd.data)
             user.accessDateEnd = datetime.datetime.strptime(form.accessDateEnd.data, '%Y-%m-%dT%H:%M:%S.%fZ')
         if form.accessTimeStart.data != None and form.accessTimeStart.data != '':
-            print 'Change accessTimeStart to ' + str(form.accessTimeStart.data)
+            if user.accessTimeStart != datetime.datetime.strptime(form.accessTimeStart.data, '%Y-%m-%dT%H:%M:%S.%fZ'):
+                if log_text != '':
+                    log_text += '; '
+                log_text += 'Change accessTimeStart from ' + str(user.accessTimeStart) + ' to ' + str(form.accessTimeStart.data)
             user.accessTimeStart = datetime.datetime.strptime(form.accessTimeStart.data, '%Y-%m-%dT%H:%M:%S.%fZ')
         if form.accessTimeEnd.data != None and form.accessTimeEnd.data != '':
-            print 'Change accessTimeEnd to ' + str(form.accessTimeEnd.data)
+            if user.accessTimeEnd != datetime.datetime.strptime(form.accessTimeEnd.data, '%Y-%m-%dT%H:%M:%S.%fZ'):
+                if log_text != '':
+                    log_text += '; '
+                log_text += 'Change accessTimeEnd from ' + str(user.accessTimeEnd) + ' to ' + str(form.accessTimeEnd.data)
             user.accessTimeEnd = datetime.datetime.strptime(form.accessTimeEnd.data, '%Y-%m-%dT%H:%M:%S.%fZ')
 
+        log_text = 'Update of ' + user.firstName + ' ' + user.lastName + ' (' + user.email + ')' + ' with the following changes: ' + log_text
+        logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
+                       g.user.email, log_text, 'User updated',
+                       'L1', 0, 'Web based')
+        db.session.add(logentry)
         db.session.commit()
 
         return '', 201
@@ -263,7 +310,7 @@ class OpeningRequestView(Resource):
     def post(self):
         print 'Opening request received'
         checkAccessResult = g.user.checkUserAccessPrivleges()
-        if (checkAccessResult == "access granted"):
+        if (checkAccessResult == "Access granted."):
 
             logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
                            g.user.email, 'Opening request', 'Opening request', 'L2', 0, 'Web based', Action.ACTION_OPENING_REQUEST)
@@ -274,7 +321,7 @@ class OpeningRequestView(Resource):
                 return '', 401
             backgroundWorker.requestOpening = True
             print "Check user privileges for opening request: " + checkAccessResult
-            return '', 201
+            return 'Access granted', 201
         else:
             print "Check user privileges for opening request: " + checkAccessResult
             return checkAccessResult, 201
@@ -364,7 +411,7 @@ class LogAdminView(Resource):
     def get(self):
         if (g.user.role & 1) == 0 and (g.user.syncMaster == 0):
             return make_response(jsonify({'error': 'Not authorized'}), 403)
-        logs = Action.query.order_by(Action.date).all()
+        logs = Action.query.order_by(Action.date.desc()).all()
         return LogSerializer().dump(logs, many=True).data
 
     @auth.login_required
@@ -385,7 +432,7 @@ class LogAdminView(Resource):
 class LogUserView(Resource):
     @auth.login_required
     def get(self):
-        logs = Action.query.filter_by(userMail=g.user.email).order_by(Action.date).all()
+        logs = Action.query.filter_by(userMail=g.user.email).order_by(Action.date.desc()).all()
         return LogSerializer().dump(logs, many=True).data
 
 

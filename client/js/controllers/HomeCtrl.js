@@ -17,12 +17,16 @@ RoseGuardenApp.controller('HomeCtrl', function($q, $scope, Door, AuthService, $l
     }
 
     $scope.requestOpening = function (door) {
-        $scope.message = 'Request send to the door (' + door.address +  ')';
+        $scope.message = 'Request send to door (' + door.address +  ') ... ';
         var me = this;
         deferred = $q.defer();
-        OpeningRequest.create(null, door.address).then(function() {
+        OpeningRequest.create(null, door.address).then(function(response) {
+            console.log(response)
+            $scope.message =  $scope.message + response;
             return deferred.resolve();
         }, function(response) {
+            console.log(response)
+            $scope.message =  $scope.message + response;
             return deferred.reject(response);
         });
         return deferred.promise

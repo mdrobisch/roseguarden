@@ -8,6 +8,12 @@ import datetime
 import marshmallow
 
 class User(db.Model):
+    ACCESSTYPE_NO_ACCESS = 0
+    ACCESSTYPE_ACCESS_PERIOD = 1
+    ACCESSTYPE_ACCESS_DAYS = 2
+    ACCESSTYPE_LIFETIME_ACCESS_= 3
+    ACCESSTYPE_MAX = 3
+
     id = db.Column(db.Integer, primary_key=True)
     syncMaster = db.Column(db.Integer)
     active = db.Column(db.Integer)
@@ -45,25 +51,25 @@ class User(db.Model):
 
     def checkUserAccessPrivleges(self):
         # check for invalid accessType == no access
-        if self.accessType == 0 or self.accessType > 3:
-            return 'invalid access because of access type'
+        if self.accessType == self.ACCESSTYPE_NO_ACCESS or self.accessType > self.ACCESSTYPE_MAX:
+            return 'Denied access because of unauthorized access type.'
         # check start-date and end-date for accessType == period
-        if self.accessType == 1:
+        if self.accessType == self.ACCESSTYPE_ACCESS_PERIOD:
             if self.accessDateStart > datetime.datetime.now():
-                return 'invalid access because of DateStart'
+                return 'Denied access because of invalid start of period.'
             if self.accessDateEnd < datetime.datetime.now():
-                return 'invalid access because of DateEnd'
+                return 'Denied access because of invalid end of period.'
         # check day counter for accessType == day-budget
-        if self.accessType == 2:
+        if self.accessType == self.ACCESSTYPE_ACCESS_DAYS:
             if self.accessDayCounter <= 0:
-                return 'invalid access because of day-counter'
+                return 'Denied access because of insufficient day-budget.'
         if (int(1 << datetime.datetime.now().weekday()) & self.accessDaysMask) == 0:
-            return 'invalid access because of access weekdays'
+            return 'Denied access because of invalid access weekday.'
         if self.accessTimeStart.time() > datetime.datetime.now().time():
-            return 'invalid access because of TimeStart'
+            return 'Denied access because of invalid day-time start.'
         if self.accessTimeEnd.time() < datetime.datetime.now().time():
-            return 'invalid access because of TimeEnd'
-        return "access granted"
+            return 'Denied access because of invalid day-time end.'
+        return "Access granted."
 
 
     def updateUserFromSyncDict(self, data):
@@ -89,15 +95,23 @@ class User(db.Model):
         self.accessType = data['accessType']
         self.accessDayCounter = data['accessDayCounter']
         self.accessDayCyclicBudget = data['accessDayCyclicBudget']
-        self.lastAccessDaysUpdateDate = datetime.datetime.strptime(data['lastAccessDaysUpdateDate'][:19], '%Y-%m-%dT%H:%M:%S')
+
+        if self.lastAccessDaysUpdateDate < datetime.datetime.strptime(data['lastAccessDaysUpdateDate'][:19], '%Y-%m-%dT%H:%M:%S'):
+            self.lastAccessDaysUpdateDate = datetime.datetime.strptime(data['lastAccessDaysUpdateDate'][:19], '%Y-%m-%dT%H:%M:%S')
+        if self.lastLoginDateTime < datetime.datetime.strptime(data['lastLoginDateTime'][:19], '%Y-%m-%dT%H:%M:%S'):
+            self.lastLoginDateTime = datetime.datetime.strptime(data['lastLoginDateTime'][:19], '%Y-%m-%dT%H:%M:%S')
+        if self.lastAccessDateTime < datetime.datetime.strptime(data['lastLoginDateTime'][:19], '%Y-%m-%dT%H:%M:%S'):
+            self.lastAccessDateTime = datetime.datetime.strptime(data['lastLoginDateTime'][:19], '%Y-%m-%dT%H:%M:%S')
+        if self.lastBudgetUpdateDate < datetime.datetime.strptime(data['lastBudgetUpdateDate'][:19], '%Y-%m-%dT%H:%M:%S'):
+            self.lastBudgetUpdateDate = datetime.datetime.strptime(data['lastBudgetUpdateDate'][:19], '%Y-%m-%dT%H:%M:%S')
+
+        self.registerDateTime = datetime.datetime.strptime(data['registerDateTime'][:19], '%Y-%m-%dT%H:%M:%S')
         self.accessDateStart = datetime.datetime.strptime(data['accessDateStart'][:19], '%Y-%m-%dT%H:%M:%S')
         self.accessDateEnd = datetime.datetime.strptime(data['accessDateEnd'][:19], '%Y-%m-%dT%H:%M:%S')
         self.accessTimeStart = datetime.datetime.strptime(data['accessTimeStart'][:19], '%Y-%m-%dT%H:%M:%S')
         self.accessTimeEnd = datetime.datetime.strptime(data['accessTimeEnd'][:19], '%Y-%m-%dT%H:%M:%S')
-        self.lastLoginDateTime = datetime.datetime.strptime(data['lastLoginDateTime'][:19], '%Y-%m-%dT%H:%M:%S')
-        self.registerDateTime = datetime.datetime.strptime(data['registerDateTime'][:19], '%Y-%m-%dT%H:%M:%S')
+        self.accessTimeEnd = datetime.datetime.strptime(data['accessTimeEnd'][:19], '%Y-%m-%dT%H:%M:%S')
 
-        self.lastBudgetUpdateDate = datetime.datetime.strptime(data['lastBudgetUpdateDate'][:19], '%Y-%m-%dT%H:%M:%S')
         self.budget = data['budget']
 
     def __repr__(self):
@@ -131,6 +145,7 @@ class User(db.Model):
         self.accessDateEnd = (datetime.datetime.today() + datetime.timedelta(365*15)).replace(hour=0,minute=0,second=0,microsecond=0)
         self.accessTimeStart = datetime.datetime.today().replace(hour= 6, minute= 0, second=0, microsecond=0)
         self.accessTimeEnd = datetime.datetime.today().replace(hour= 22, minute= 30, second=0, microsecond=0)
+        self.lastAccessDateTime = (datetime.datetime.today()).replace(hour=0, minute=0, second=0, microsecond=0)
         self.lastLoginDateTime = datetime.datetime.today()
         self.lastSyncDateTime = datetime.datetime.now()
         self.registerDateTime = datetime.datetime.today()

@@ -45,8 +45,11 @@ class BackgroundWorker():
     def run(self):
         # if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
         self.thr = threading.Timer(1, self.timer_cycle)
+
+        self.update_user_actions()
+
         self.thr.start()
-        print 'started background-server'
+        print 'started background-server ' + '(' + str(datetime.datetime.now()) + ')'
 
     def resetTagInfo(self):
         self.tagInfo.tagId = ""
@@ -333,7 +336,7 @@ class BackgroundWorker():
 
                     if readSecretString == user.cardSecret:
                         print "correct secret"
-                        if user.checkUserAccessPrivleges() == "access granted":
+                        if user.checkUserAccessPrivleges() == "Access granted.":
                             self.requestOpening = True
                             logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, user.firstName + ' ' + user.lastName,
                                            user.email, 'Opening request', 'Opening request',
@@ -419,13 +422,21 @@ class BackgroundWorker():
             self.lastBackupTime = now
 
     def update_user_actions(self):
-        logs = Action.query.all()
+        actions = Action.query.filter_by(synced=0).all()
         users = User.query.all()
+
+        userDict = {}
+
         try:
-            for log in logs:
-                log.synced = 1
             for user in users:
+                userDict[str(user.email)] = users.index(user)
                 user.lastSyncDateTime = datetime.datetime.now()
+            for action in actions:
+                action.synced = 1
+                if action.action == Action.ACTION_OPENING_REQUEST:
+                    userIndex = userDict[str(action.userMail)]
+                    users[userIndex].accessDayCounter -= 1
+                    print 'update day counter'
             db.session.commit()
         except:
             db.session.rollback()
@@ -517,7 +528,7 @@ class BackgroundWorker():
             print 'Update actions'
             self.update_user_actions()
             logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, 'Sync Master', 'syncmaster@roseguarden.org',
-                            'Update and Synchronized actions and user',
+                            'Update & synchronized actions and users',
                             'Update & Sync.', 'L1', 0, 'Internal')
             logentry.synced = 1
             db.session.add(logentry)
