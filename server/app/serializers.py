@@ -7,7 +7,7 @@ import datetime
 
 class UserSerializer(Schema):
     class Meta:
-        fields = ("id", "email", "firstName", "lastName", "phone", "role", "licenseMask", "keyMask", "lastBudgetUpdateDate",
+        fields = ("id", "email", "firstName", "lastName", "phone", "role", "licenseMask", "keyMask", "lastBudgetUpdateDate", "lastAccessDateTime",
                   "association", "registerDateTime", "lastLoginDateTime", "accessDateStart", "accessDateEnd", "lastAccessDaysUpdateDate",
                   "accessTimeStart", "accessTimeEnd", "lastSyncDateTime", "accessType", "accessDaysMask", "accessDayCounter",
                   "budget", "cardID", "accessDayCyclicBudget")
@@ -25,7 +25,7 @@ class UserSerializer(Schema):
 
 class UserSyncSerializer(Schema):
     class Meta:
-        fields = ("id", "email", "firstName", "lastName", "phone", "role", "licenseMask", "keyMask",
+        fields = ("id", "email", "firstName", "lastName", "phone", "role", "licenseMask", "keyMask", "lastAccessDateTime",
                   "association", "registerDateTime", "lastLoginDateTime", "lastSyncDateTime", "lastAccessDaysUpdateDate",
                   "accessDateStart", "accessDateEnd", "lastBudgetUpdateDate", "accessDayCyclicBudget",
                   "accessTimeStart", "accessTimeEnd", "accessType", "accessDaysMask", "accessDayCounter",

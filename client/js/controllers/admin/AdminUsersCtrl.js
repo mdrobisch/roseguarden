@@ -282,7 +282,7 @@ RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log, $q, Us
             var setupaccess = {keyMask: setupdata.keyMask, accessDaysMask : setupdata.accessDaysMask,
                                 accessDateStart : new Date(setupdata.accessDateStart), accessDateEnd : new Date(setupdata.accessDateEnd),
                                 accessTimeStart : new Date(setupdata.accessTimeStart), accessTimeEnd : new Date(setupdata.accessTimeEnd),
-                                accessType : setupdata.accessType, accessDayCounter : setupdata.accessDayCounter };
+                                accessType : setupdata.accessType, accessDayCounter : setupdata.accessDayCounter, accessDayCyclicBudget : setupdata.accessDayCyclicBudget};
 
             User.update(row.id, setupaccess).then(function() {
                 $scope.profileUpdatePending = false;
@@ -299,6 +299,7 @@ RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log, $q, Us
                 $scope.rowCollection[index].accessTimeEnd = setupdata.accessTimeEnd;
                 $scope.rowCollection[index].accessType = setupdata.accessType;
                 $scope.rowCollection[index].accessDayCounter = setupdata.accessDayCounter;
+                $scope.rowCollection[index].accessDayCyclicBudget = setupdata.accessDayCyclicBudget;
 
                 row.userUpdatePending = false;
 

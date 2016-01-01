@@ -37,6 +37,7 @@ class UserPatchForm(Form):
     accessType = IntegerField('accessType', validators=[Optional()])
     keyMask = IntegerField('keyMask', validators=[Optional()])
     accessDayCounter = IntegerField('accessDayCounter', validators=[Optional()])
+    accessDayCyclicBudget = IntegerField('accessDayCyclicBudget', validators=[Optional()])
     accessDaysMask = IntegerField('accessDaysMask', validators=[Optional()])
 
     accessDateStart = StringField('accessDateStart', validators=[Optional()])

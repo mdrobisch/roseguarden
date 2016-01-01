@@ -12,7 +12,9 @@ class User(db.Model):
     ACCESSTYPE_ACCESS_PERIOD = 1
     ACCESSTYPE_ACCESS_DAYS = 2
     ACCESSTYPE_LIFETIME_ACCESS_= 3
-    ACCESSTYPE_MAX = 3
+    ACCESSTYPE_MONTHLY_BUDGET = 4
+    ACCESSTYPE_QUARTERLY_BUDGET = 5
+    ACCESSTYPE_MAX = 6
 
     id = db.Column(db.Integer, primary_key=True)
     syncMaster = db.Column(db.Integer)
@@ -46,6 +48,7 @@ class User(db.Model):
     lastLoginDateTime = db.Column(db.DateTime)
     lastSyncDateTime = db.Column(db.DateTime)
     registerDateTime = db.Column(db.DateTime)
+    lastAccessDateTime = db.Column(db.DateTime)
     budget = db.Column(db.Float)
     lastBudgetUpdateDate = db.Column(db.DateTime)
 

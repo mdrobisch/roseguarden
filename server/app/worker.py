@@ -421,8 +421,8 @@ class BackgroundWorker():
             db.session.commit()
             self.lastBackupTime = now
 
-    def update_user_actions(self):
-        actions = Action.query.filter_by(synced=0).all()
+    def update_user_and_actions(self):
+        actions = Action.query.filter_by(synced=0).order_by(Action.date).all()
         users = User.query.all()
 
         userDict = {}
@@ -435,8 +435,13 @@ class BackgroundWorker():
                 action.synced = 1
                 if action.action == Action.ACTION_OPENING_REQUEST:
                     userIndex = userDict[str(action.userMail)]
-                    users[userIndex].accessDayCounter -= 1
-                    print 'update day counter'
+                    delta = action.date - users[userIndex].lastAccessDateTime
+                    #if
+                    if delta > datetime.timedelta(hours = 0, minutes=2, seconds=59):
+                        if users[userIndex].lastAccessDateTime < action.date:
+                            users[userIndex].lastAccessDateTime = action.date
+                            users[userIndex].accessDayCounter -= 1
+                            print 'update day counter of ' + users[userIndex].firstName + ' ' + users[userIndex].lastName + ' (' + users[userIndex].email + ')'
             db.session.commit()
         except:
             db.session.rollback()
@@ -526,7 +531,7 @@ class BackgroundWorker():
 
         if config.NODE_MASTER == True:
             print 'Update actions'
-            self.update_user_actions()
+            self.update_user_and_actions()
             logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, 'Sync Master', 'syncmaster@roseguarden.org',
                             'Update & synchronized actions and users',
                             'Update & Sync.', 'L1', 0, 'Internal')

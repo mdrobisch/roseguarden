@@ -7,7 +7,7 @@ RoseGuardenApp.controller('SetupUserAccessCtrl', function ($scope, $modalInstanc
   $scope.name = name;
 
   $scope.input = { num: 0   };
-  $scope.AccessTypevalues = ["No access","Access period","Access days","Lifetime access"];
+  $scope.AccessTypevalues = ["No access","Access period","Access days","Lifetime access", "Monthly day-budget", "Quarterly day-budget", ];
   $scope.selectedAccessType = selectedUser.accessType;
 
   $scope.accesDaysMaskMon =  (selectedUser.accessDaysMask & 0x01) != 0;
@@ -31,6 +31,8 @@ RoseGuardenApp.controller('SetupUserAccessCtrl', function ($scope, $modalInstanc
   $scope.accesDateEnd = new Date(selectedUser.accessDateEnd);
 
   $scope.accessDayCounter = selectedUser.accessDayCounter;
+
+  $scope.accessDayCyclicBudget = selectedUser.accessDayCyclicBudget;
 
   $scope.accesTimeStart = moment(new Date(selectedUser.accessTimeStart));
   $scope.accesTimeStart_display = $scope.accesTimeStart.subtract($scope.accesTimeStart.utcOffset(),"minute");
@@ -100,7 +102,7 @@ RoseGuardenApp.controller('SetupUserAccessCtrl', function ($scope, $modalInstanc
     $modalInstance.close( { accessDateStart : $scope.accesDateStart, accessDateEnd : $scope.accesDateEnd,
                             accessTimeStart : $scope.accesTimeStart , accessTimeEnd : $scope.accesTimeEnd,
                             accessDayCounter: $scope.accessDayCounter , accessType : $scope.selectedAccessType,
-                            keyMask: keyMask, accessDaysMask: accesDaysMask });
+                            keyMask : keyMask, accessDaysMask : accesDaysMask , accessDayCyclicBudget : $scope.accessDayCyclicBudget});
   };
 
   $scope.cancel = function () {

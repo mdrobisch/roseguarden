@@ -116,6 +116,12 @@ class UserView(Resource):
                     log_text += '; '
                 log_text += 'Change accessDayCounter from ' + str(user.accessDayCounter) + ' to ' + str(form.accessDayCounter.data)
             user.accessDayCounter = form.accessDayCounter.data
+        if form.accessDayCyclicBudget.data != None and form.accessDayCyclicBudget.data != '':
+            if user.accessDayCyclicBudget != form.accessDayCyclicBudget.data:
+                if log_text != '':
+                    log_text += '; '
+                log_text += 'Change accessDayCyclicBudget from ' + str(user.accessDayCyclicBudget) + ' to ' + str(form.accessDayCyclicBudget.data)
+            user.accessDayCyclicBudget = form.accessDayCyclicBudget.data
         if form.accessType.data != None and form.accessType.data != '':
             if user.accessType != form.accessType.data:
                 if log_text != '':
