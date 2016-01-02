@@ -58,7 +58,8 @@ class BackgroundWorker():
 
     def withdrawRFIDTag(self, user):
         while (self.lock == True):
-            print "still locked (withdrawRFIDTag)"
+            if config.DEBUG == False:
+                print "still locked (withdrawRFIDTag)"
             time.sleep(0.3)
 
         try:
