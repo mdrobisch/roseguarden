@@ -592,6 +592,13 @@ class BackgroundWorker():
                 db.session.add(logentry)
                 db.session.commit()
 
+    def open_the_door(self):
+
+        while(True):
+            print "Openening door"
+            time.sleep(1.0)
+            GPIO.output(12, GPIO.LOW)
+
     def timer_cycle(self):
         self.thr = threading.Timer(1, BackgroundWorker.timer_cycle, [self])
         self.thr.start()

@@ -26,6 +26,13 @@ def start():
     backgroundWorker.cancel()
 
 @manager.command
+def open_the_door():
+    "Force the local door openend"
+    backgroundWorker.run()
+    backgroundWorker.open_the_door()
+
+
+@manager.command
 def create_db():
     "Create RoseGuarden database"
 
