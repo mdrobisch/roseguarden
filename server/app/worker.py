@@ -29,8 +29,10 @@ class BackgroundWorker():
         self.requestOpening = False
         self.openingTimer = -1
         self.requestTimer = 0
-        self.syncTimer = 0
-        self.backupTimer = 0
+        self.syncTimer = 9999
+        self.startupSyncDone = False
+        self.startupBackupDone = False
+        self.backupTimer = 99999
         self.cleanupTimer = 0
         self.tagInfo = RfidTagInfo("", "")
         self.tagResetCount = 0
@@ -399,7 +401,7 @@ class BackgroundWorker():
         else:
             next_time = compare_time + datetime.timedelta(days=1)
 
-        if(now > next_time):
+        if now > next_time or self.startupBackupDone == False:
             print 'Doing a backup (' + str(datetime.datetime.now()) + ')'
             with app.app_context():
                 flask_alchemydumps.autoclean(True)
@@ -421,6 +423,7 @@ class BackgroundWorker():
                            'L1', 0, 'Internal')
             db.session.add(logentry)
             db.session.commit()
+            self.startupBackupDone = True
             self.lastBackupTime = now
 
     def update_users_and_actions(self):
@@ -543,7 +546,10 @@ class BackgroundWorker():
                 self.lastSyncTime = now
                 print 'Next sync @' + str(self.lastSyncTime + datetime.timedelta(minutes=config.NODE_SYNC_CYCLE)) + ' (' + str(datetime.datetime.now()) + ')'
             else:
-                return
+                if self.startupSyncDone == False:
+                    self.startupSyncDone = True
+                else:
+                    return
         else:
             compare_time = lasttime.replace(hour=4, minute=15, second=0, microsecond=0)
             if compare_time > lasttime:
@@ -555,7 +561,10 @@ class BackgroundWorker():
                 self.lastSyncTime = now
                 print 'Next sync @' + str(next_time) + ' (' + str(datetime.datetime.now()) + ')'
             else:
-                return
+                if self.startupSyncDone == False:
+                    self.startupSyncDone = True
+                else:
+                    return
 
         print "Doing a sync cycle"
 
