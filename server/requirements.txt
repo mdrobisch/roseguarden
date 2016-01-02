@@ -11,6 +11,7 @@ Flask-Script==2.0.5
 ConfigObj==4.7.2
 Jinja2==2.7.3
 MarkupSafe==0.23
+python-dateutil==2.4.2
 SQLAlchemy==0.9.7
 SQLAlchemy-Utils==0.26.9
 WTForms==2.0.1

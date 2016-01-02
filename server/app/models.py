@@ -11,7 +11,7 @@ class User(db.Model):
     ACCESSTYPE_NO_ACCESS = 0
     ACCESSTYPE_ACCESS_PERIOD = 1
     ACCESSTYPE_ACCESS_DAYS = 2
-    ACCESSTYPE_LIFETIME_ACCESS_= 3
+    ACCESSTYPE_LIFETIME_ACCESS = 3
     ACCESSTYPE_MONTHLY_BUDGET = 4
     ACCESSTYPE_QUARTERLY_BUDGET = 5
     ACCESSTYPE_MAX = 6
@@ -99,8 +99,6 @@ class User(db.Model):
         self.accessDayCounter = data['accessDayCounter']
         self.accessDayCyclicBudget = data['accessDayCyclicBudget']
 
-        if self.lastAccessDaysUpdateDate < datetime.datetime.strptime(data['lastAccessDaysUpdateDate'][:19], '%Y-%m-%dT%H:%M:%S'):
-            self.lastAccessDaysUpdateDate = datetime.datetime.strptime(data['lastAccessDaysUpdateDate'][:19], '%Y-%m-%dT%H:%M:%S')
         if self.lastLoginDateTime < datetime.datetime.strptime(data['lastLoginDateTime'][:19], '%Y-%m-%dT%H:%M:%S'):
             self.lastLoginDateTime = datetime.datetime.strptime(data['lastLoginDateTime'][:19], '%Y-%m-%dT%H:%M:%S')
         if self.lastAccessDateTime < datetime.datetime.strptime(data['lastLoginDateTime'][:19], '%Y-%m-%dT%H:%M:%S'):
@@ -108,6 +106,7 @@ class User(db.Model):
         if self.lastBudgetUpdateDate < datetime.datetime.strptime(data['lastBudgetUpdateDate'][:19], '%Y-%m-%dT%H:%M:%S'):
             self.lastBudgetUpdateDate = datetime.datetime.strptime(data['lastBudgetUpdateDate'][:19], '%Y-%m-%dT%H:%M:%S')
 
+        self.lastAccessDaysUpdateDate = datetime.datetime.strptime(data['lastAccessDaysUpdateDate'][:19], '%Y-%m-%dT%H:%M:%S')
         self.registerDateTime = datetime.datetime.strptime(data['registerDateTime'][:19], '%Y-%m-%dT%H:%M:%S')
         self.accessDateStart = datetime.datetime.strptime(data['accessDateStart'][:19], '%Y-%m-%dT%H:%M:%S')
         self.accessDateEnd = datetime.datetime.strptime(data['accessDateEnd'][:19], '%Y-%m-%dT%H:%M:%S')
@@ -141,13 +140,13 @@ class User(db.Model):
         self.licenseMask = licenseMask
         self.accessDaysMask = 127
         self.accessType = 0
-        self.accessDayCounter = 0
-        self.accessDayCyclicBudget = 0
+        self.accessDayCounter = 10
+        self.accessDayCyclicBudget = 10
         self.lastAccessDaysUpdateDate = (datetime.datetime.today()).replace(hour=0, minute=0, second=0, microsecond=0)
         self.accessDateStart = (datetime.datetime.today()).replace(hour=0, minute=0, second=0, microsecond=0)
         self.accessDateEnd = (datetime.datetime.today() + datetime.timedelta(365*15)).replace(hour=0,minute=0,second=0,microsecond=0)
-        self.accessTimeStart = datetime.datetime.today().replace(hour= 6, minute= 0, second=0, microsecond=0)
-        self.accessTimeEnd = datetime.datetime.today().replace(hour= 22, minute= 30, second=0, microsecond=0)
+        self.accessTimeStart = datetime.datetime.today().replace(hour= 0, minute= 1, second=0, microsecond=0)
+        self.accessTimeEnd = datetime.datetime.today().replace(hour= 23, minute= 59, second=0, microsecond=0)
         self.lastAccessDateTime = (datetime.datetime.today()).replace(hour=0, minute=0, second=0, microsecond=0)
         self.lastLoginDateTime = datetime.datetime.today()
         self.lastSyncDateTime = datetime.datetime.now()

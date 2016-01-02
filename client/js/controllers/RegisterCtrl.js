@@ -4,6 +4,9 @@ RoseGuardenApp.controller('RegisterCtrl', function($scope,$q, User, $modal, $log
     $scope.showSuccess = false;
     $scope.showError = false;
 
+    $scope.isAdminRegistration = function () {
+        return AuthService.isAdmin();
+    };
 
     $scope.registerAsAdmin = function () {
 
@@ -70,7 +73,7 @@ RoseGuardenApp.controller('RegisterCtrl', function($scope,$q, User, $modal, $log
             return deferred.reject(response);
         });
         return deferred.promise
-    }
+    };
 
 
     $scope.register = function() {

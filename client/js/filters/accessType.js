@@ -13,6 +13,10 @@ RoseGuardenApp.filter('accessTypeFilter', function () {
                 return "Access days"
             case 3:
                 return "Lifetime access"
+            case 4:
+                return "Monthly day-budget";
+            case 5:
+                return "Quarterly day-budget";
             default:
                 return "Invalid type";
         }

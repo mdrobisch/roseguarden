@@ -4,6 +4,10 @@
   text-align: center;
 }
 
+.normal-checkbox {
+    height: 24px;
+}
+
 .combobox {
   font-size: 14px;
   width: 100%;

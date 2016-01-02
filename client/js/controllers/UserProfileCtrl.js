@@ -1,4 +1,5 @@
 RoseGuardenApp.controller('UserProfileCtrl', function ($scope, $location, $q, AuthService, User) {
+
     $scope.updateProfile = function() {
         $scope.profileUpdatePending = true;
         var me = this;

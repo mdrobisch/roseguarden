@@ -13,6 +13,7 @@ import config
 import base64
 import json
 import datetime
+from dateutil.relativedelta import relativedelta
 import os
 from models import RfidTagInfo
 from RFID import RFIDReader
@@ -46,7 +47,7 @@ class BackgroundWorker():
         # if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
         self.thr = threading.Timer(1, self.timer_cycle)
 
-        self.update_user_actions()
+        self.update_users_and_actions()
 
         self.thr.start()
         print 'started background-server ' + '(' + str(datetime.datetime.now()) + ')'
@@ -421,27 +422,65 @@ class BackgroundWorker():
             db.session.commit()
             self.lastBackupTime = now
 
-    def update_user_and_actions(self):
+    def update_users_and_actions(self):
         actions = Action.query.filter_by(synced=0).order_by(Action.date).all()
         users = User.query.all()
 
         userDict = {}
-
         try:
             for user in users:
+                # create dictionary with indices
                 userDict[str(user.email)] = users.index(user)
+                # update sync-date
                 user.lastSyncDateTime = datetime.datetime.now()
+                # check for
+                if user.accessType == User.ACCESSTYPE_MONTHLY_BUDGET:
+                    now = datetime.datetime.now()
+                    lasttime = user.lastAccessDaysUpdateDate
+                    compare_time = lasttime.replace(day=1, hour=0, minute=0, second=1, microsecond=0)
+                    next_month_date = compare_time + relativedelta(months=1)
+                    if now > next_month_date:
+                        user.accessDayCounter = user.accessDayCyclicBudget
+                        print 'update monthly day budget of ' + user.firstName + ' ' + user.lastName + '(' + user.email + ')' + ' to ' + str(user.accessDayCounter)
+                        user.lastAccessDaysUpdateDate = now
+
+                if user.accessType == User.ACCESSTYPE_QUARTERLY_BUDGET:
+                    now = datetime.datetime.now()
+                    lasttime = user.lastAccessDaysUpdateDate
+                    compare_time = lasttime.replace(day=1, hour=0, minute=0, second=1, microsecond=0)
+                    next_month_date = compare_time + relativedelta(months=1)
+
+                    next_quarter_date = datetime.datetime.now()
+                    if next_month_date.month > 10:
+                        next_quarter_date = (next_month_date + relativedelta(years=1)).replace(month=1)
+                    else:
+                        if next_month_date.month > 7:
+                            next_quarter_date = next_month_date.replace(month=10)
+                        else:
+                            if next_month_date.month > 4:
+                                next_quarter_date = next_month_date.replace(month=7)
+                            else:
+                                next_quarter_date = next_month_date.replace(month=4)
+
+                    if now > next_quarter_date:
+                        user.accessDayCounter = user.accessDayCyclicBudget
+                        print 'update quarterly day budget of ' + user.firstName + ' ' + user.lastName + '(' + user.email + ')' + ' to ' + str(user.accessDayCounter)
+                        user.lastAccessDaysUpdateDate = now
+
             for action in actions:
                 action.synced = 1
                 if action.action == Action.ACTION_OPENING_REQUEST:
                     userIndex = userDict[str(action.userMail)]
                     delta = action.date - users[userIndex].lastAccessDateTime
-                    #if
-                    if delta > datetime.timedelta(hours = 0, minutes=2, seconds=59):
-                        if users[userIndex].lastAccessDateTime < action.date:
-                            users[userIndex].lastAccessDateTime = action.date
-                            users[userIndex].accessDayCounter -= 1
-                            print 'update day counter of ' + users[userIndex].firstName + ' ' + users[userIndex].lastName + ' (' + users[userIndex].email + ')'
+                    if users[userIndex].accessType == User.ACCESSTYPE_ACCESS_DAYS or \
+                        users[userIndex].accessType == User.ACCESSTYPE_MONTHLY_BUDGET or \
+                        users[userIndex].accessType == User.ACCESSTYPE_QUARTERLY_BUDGET:
+                        # check for opening request, happend at least 24 hours ago
+                        if delta > datetime.timedelta(hours = 23, minutes=30, seconds=0):
+                            if users[userIndex].lastAccessDateTime < action.date:
+                                users[userIndex].lastAccessDateTime = action.date
+                                users[userIndex].accessDayCounter -= 1
+                                print 'update day counter of ' + users[userIndex].firstName + ' ' + users[userIndex].lastName + ' (' + users[userIndex].email + ')'
             db.session.commit()
         except:
             db.session.rollback()
@@ -502,7 +541,6 @@ class BackgroundWorker():
             if now > compare_time:
                 self.lastSyncTime = now
                 print 'Next sync @' + str(self.lastSyncTime + datetime.timedelta(minutes=config.NODE_SYNC_CYCLE)) + ' (' + str(datetime.datetime.now()) + ')'
-
             else:
                 return
         else:
@@ -531,7 +569,7 @@ class BackgroundWorker():
 
         if config.NODE_MASTER == True:
             print 'Update actions'
-            self.update_user_and_actions()
+            self.update_users_and_actions()
             logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, 'Sync Master', 'syncmaster@roseguarden.org',
                             'Update & synchronized actions and users',
                             'Update & Sync.', 'L1', 0, 'Internal')

@@ -91,6 +91,16 @@
                             infinite access
                         </span>
 
+                        <span ng-show="row.accessType == 4">
+                            {{row.accessDayCounter}} day/s of
+                            monthly budget ({{row.accessDayCyclicBudget}} day/s)
+                        </span>
+
+                        <span ng-show="row.accessType == 5">
+                            {{row.accessDayCounter}} day/s of
+                            quarterly budget ({{row.accessDayCyclicBudget}} day/s)
+                        </span>
+
                 </td>
                 <td>
                         {{row.accessTimeStart | moment:'HH:mm'}}
