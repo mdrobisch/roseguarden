@@ -1,4 +1,8 @@
 <div ng-controller="AdminDoorsCtrl"   >
+
+    <p style="font-weight: bold ; margin: 30px 0 0 0"> Add doors</p>
+    <hr style="margin-top: 2px; margin-bottom: 10px">
+
     <table class="table table-striped">
         <thead >
             <tr>
@@ -36,6 +40,21 @@
     </div>
 
 
+    <p style="font-weight: bold ; margin: 30px 0 0 0"> Synhronize doors:</p>
+    <hr style="margin-top: 2px; margin-bottom: 10px">
+
+    <div >
+        <button type="button" ng-click="syncDoors()" class="btn btn-success">
+            <i class="glyphicon glyphicon-refresh">
+            </i>
+            Force synch.
+            <img ng-show="requestSyncing" src="images/loading.gif" >
+
+        </button>
+    </div>
+
+    <p style="font-weight: bold ; margin: 30px 0 0 0"> Door list:</p>
+    <hr style="margin-top: 2px; margin-bottom: 10px">
 
     <table st-table="displayedCollection" st-safe-src="rowCollection" class="table table-striped">
         <thead >

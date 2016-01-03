@@ -19,8 +19,19 @@ config = ConfigObj("config.ini")
 node_section = config['NODE']
 NODE_NAME = node_section['NODE_NAME']
 NODE_MASTER = conf_entry_to_bool(node_section['NODE_MASTER'])
-NODE_SYNC_CYCLIC = conf_entry_to_bool(node_section['NODE_SYNC_CYCLIC'])
-NODE_SYNC_CYCLE = conf_entry_to_int(node_section['NODE_SYNC_CYCLE'])
+NODE_DOOR_AVAILABLE = conf_entry_to_bool(node_section['NODE_DOOR_AVAILABLE'])
+
+if NODE_DOOR_AVAILABLE == True:
+    NODE_DOOR_NAME = node_section['NODE_DOOR_NAME']
+else:
+    NODE_DOOR_NAME = 'Not available'
+
+if NODE_MASTER == True:
+    NODE_SYNC_CYCLIC = conf_entry_to_bool(node_section['NODE_SYNC_CYCLIC'])
+    NODE_SYNC_CYCLE = conf_entry_to_int(node_section['NODE_SYNC_CYCLE'])
+else:
+    NODE_SYNC_CYCLIC = False
+    NODE_SYNC_CYCLE = 9000
 
 # flask settings
 flask_section = config['FLASK']

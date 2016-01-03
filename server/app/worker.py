@@ -29,10 +29,10 @@ class BackgroundWorker():
         self.requestOpening = False
         self.openingTimer = -1
         self.requestTimer = 0
-        self.syncTimer = 9999
-        self.startupSyncDone = False
-        self.startupBackupDone = False
-        self.backupTimer = 99999
+        self.syncTimer = 0
+        self.forceSync = True
+        self.forceBackup = True
+        self.backupTimer = 0
         self.cleanupTimer = 0
         self.tagInfo = RfidTagInfo("", "")
         self.tagResetCount = 0
@@ -401,7 +401,8 @@ class BackgroundWorker():
         else:
             next_time = compare_time + datetime.timedelta(days=1)
 
-        if now > next_time or self.startupBackupDone == False:
+        if now > next_time or self.forceBackup == True:
+            self.forceBackup = False
             print 'Doing a backup (' + str(datetime.datetime.now()) + ')'
             with app.app_context():
                 flask_alchemydumps.autoclean(True)
@@ -423,7 +424,6 @@ class BackgroundWorker():
                            'L1', 0, 'Internal')
             db.session.add(logentry)
             db.session.commit()
-            self.startupBackupDone = True
             self.lastBackupTime = now
 
     def update_users_and_actions(self):
@@ -505,7 +505,7 @@ class BackgroundWorker():
 
                 try:
                     request_address = str(door.address) + ":5000" + '/users'
-                    response = requests.post(request_address, json= data, headers=headers, timeout=4)
+                    response = requests.post(request_address, json= data, headers=headers, timeout=8)
                     print response
                 except:
                     print "error while request users-sync"
@@ -521,7 +521,7 @@ class BackgroundWorker():
                 print 'warning: the node have the same node name'
             else:
                 request_address = str(door.address) + ":5000" + '/actions/admin'
-                response = requests.get(request_address, headers= headers, timeout=4)
+                response = requests.get(request_address, headers= headers, timeout=8)
                 print str(response)
 
                 response_data = json.loads(response.content)
@@ -534,7 +534,7 @@ class BackgroundWorker():
                     raise
                     return
 
-                deletion_response = requests.delete(request_address, headers= headers, timeout=4)
+                deletion_response = requests.delete(request_address, headers= headers, timeout=8)
                 print deletion_response
 
     def sync_cycle(self):
@@ -546,8 +546,8 @@ class BackgroundWorker():
                 self.lastSyncTime = now
                 print 'Next sync @' + str(self.lastSyncTime + datetime.timedelta(minutes=config.NODE_SYNC_CYCLE)) + ' (' + str(datetime.datetime.now()) + ')'
             else:
-                if self.startupSyncDone == False:
-                    self.startupSyncDone = True
+                if self.forceSync == True:
+                    self.forceSync = False
                 else:
                     return
         else:
@@ -561,10 +561,13 @@ class BackgroundWorker():
                 self.lastSyncTime = now
                 print 'Next sync @' + str(next_time) + ' (' + str(datetime.datetime.now()) + ')'
             else:
-                if self.startupSyncDone == False:
-                    self.startupSyncDone = True
+                if self.forceSync == True:
+                    self.forceSync = False
                 else:
                     return
+
+        if config.NODE_MASTER == False:
+            return
 
         print "Doing a sync cycle"
 
@@ -577,15 +580,14 @@ class BackgroundWorker():
                 print 'Sync actions of ' + doorSync.name
             self.sync_door_log(doorSync)
 
-        if config.NODE_MASTER == True:
-            print 'Update actions'
-            self.update_users_and_actions()
-            logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, 'Sync Master', 'syncmaster@roseguarden.org',
-                            'Update & synchronized actions and users',
-                            'Update & Sync.', 'L1', 0, 'Internal')
-            logentry.synced = 1
-            db.session.add(logentry)
-            db.session.commit()
+        print 'Update actions'
+        self.update_users_and_actions()
+        logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, 'Sync Master', 'syncmaster@roseguarden.org',
+                        'Update & synchronized actions and users',
+                        'Update & Sync.', 'L1', 0, 'Internal')
+        logentry.synced = 1
+        db.session.add(logentry)
+        db.session.commit()
 
         for doorSync in doorList:
             if doorSync.local == 1:
@@ -609,23 +611,26 @@ class BackgroundWorker():
             GPIO.output(12, GPIO.LOW)
 
     def timer_cycle(self):
-        self.thr = threading.Timer(1, BackgroundWorker.timer_cycle, [self])
+        self.thr = threading.Timer(1.5, BackgroundWorker.timer_cycle, [self])
         self.thr.start()
 
         self.requestTimer += 1
 
-        if self.requestTimer >= 3:
+        if self.requestTimer >= 2:
             self.requestTimer = 0
             self.checkRFIDTag()
 
         self.backupTimer += 1
-        if self.backupTimer > 113:
+        if self.backupTimer > 113 or self.forceBackup == True:
             self.backupTimer = 0
             self.backup_cycle()
 
         self.syncTimer += 1
-        if self.syncTimer > 55:
+        if self.syncTimer > 55 or self.forceSync == True:
             self.syncTimer = 0
+            # if syncing is force wait some time to prevent pipe-breaking
+            if self.forceSync == True:
+                time.sleep(1.0)
             self.sync_cycle()
 
         self.cleanupTimer +=1

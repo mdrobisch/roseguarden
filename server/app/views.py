@@ -313,6 +313,15 @@ class DoorSyncView(Resource):
             print userItem
         return '', 201
 
+class SyncRequestView(Resource):
+    @auth.login_required
+    def post(self):
+        print 'Syncing request received'
+        if (g.user.role & 1) == 0:
+            return make_response(jsonify({'error': 'Not authorized'}), 403)
+        backgroundWorker.forceSync = True
+        return '', 201
+
 
 class OpeningRequestView(Resource):
     @auth.login_required
@@ -375,7 +384,7 @@ class DoorRegistrationView(Resource):
         headers = {'Authorization' : auth_token}
 
         try:
-            response = requests.get('http://' + form.address.data + ':5000' + '/request/doorinfo', timeout=4, headers = headers)
+            response = requests.get('http://' + form.address.data + ':5000' + '/request/doorinfo', timeout=6, headers = headers)
         except:
             print "requested door unreachable"
             return 'requested door unreachable', 400
@@ -411,7 +420,10 @@ class DoorInfoView(Resource):
 class DoorListView(Resource):
     @auth.login_required
     def get(self):
-        posts = Door.query.filter_by(local=0).all()
+        if config.NODE_DOOR_AVAILABLE == True:
+            posts = Door.query.filter_by(local=0).all()
+        else:
+            posts = Door.query.all()
         return DoorSerializer().dump(posts, many=True).data
 
 
@@ -559,6 +571,7 @@ api.add_resource(DoorListView, '/doors')
 api.add_resource(OpeningRequestView, '/request/opening')
 api.add_resource(LostPasswordView, '/request/password')
 api.add_resource(DoorInfoView, '/request/doorinfo')
+api.add_resource(SyncRequestView, '/request/sync')
 
 api.add_resource(RfidTagInfoView, '/tag/info')
 api.add_resource(RfidTagAssignView, '/tag/assign')

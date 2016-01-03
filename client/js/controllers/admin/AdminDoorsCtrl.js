@@ -1,4 +1,4 @@
-RoseGuardenApp.controller('AdminDoorsCtrl', function($scope,$q, Door, $modal, $log) {
+RoseGuardenApp.controller('AdminDoorsCtrl', function($scope,$q, Door, SyncRequest, $modal, $log) {
 
     var names = ['Front door', 'Back door'];
     var keyMasks = [0x01,-1];
@@ -17,6 +17,8 @@ RoseGuardenApp.controller('AdminDoorsCtrl', function($scope,$q, Door, $modal, $l
 
     $scope.rowCollection = [];
     $scope.displayedCollection = [];
+
+    $scope.requestSyncing = false;
 
     function generateRandomItem(id) {
 
@@ -76,6 +78,31 @@ RoseGuardenApp.controller('AdminDoorsCtrl', function($scope,$q, Door, $modal, $l
         $scope.rowCollection.push(generateRandomItem(id));
         id++;
     };
+
+    $scope.syncDoors = function syncDoors() {
+        $scope.showError = false;
+        $scope.requestSyncing = true;
+        deferred = $q.defer();
+        SyncRequest.create(true).then(function(response_data) {
+            $log.info('Response  ' + response_data);
+
+            $scope.dataLoading = false;
+            $scope.showError = false;
+            $scope.showSuccess = true;
+            $scope.requestSyncing = false;
+
+            return deferred.resolve();
+        }, function(response) {
+            $scope.error = 'Request door sync failed' + ' (' + response.data + ' )'
+            $scope.dataLoading = false;
+            $scope.showSuccess = false;
+            $scope.showError = true;
+            $scope.requestSyncing = false;
+            return deferred.reject(response);
+        });
+        return deferred.promise;
+    };
+
 
     $scope.addDoor = function addDoor() {
         $scope.showError = false;

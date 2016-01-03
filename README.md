@@ -95,9 +95,8 @@ If some new external pip-modules are introduces in a version you need to reload 
 
 - `sudo pip install -r requirements.txt`
 
-In addition a migration of the database is required, use roseGuarden.py.
+In addition a upgrade of the migration from the database is required, use roseGuarden.py.
 
-- `sudo python roseGuarden.py db migrate`
 - `sudo python roseGuarden.py db upgrade`
 
 After upgrading you can restart your roseGuarden-application again.
