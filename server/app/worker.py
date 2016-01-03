@@ -30,8 +30,11 @@ class BackgroundWorker():
         self.openingTimer = -1
         self.requestTimer = 0
         self.syncTimer = 0
-        self.forceSync = True
-        self.forceBackup = True
+        if config.NODE_SYNC_ON_STARTUP == True:
+            self.forceSync = True
+        else:
+            self.forceSync = False
+        self.forceBackup = False
         self.backupTimer = 0
         self.cleanupTimer = 0
         self.tagInfo = RfidTagInfo("", "")

@@ -29,8 +29,10 @@ else:
 if NODE_MASTER == True:
     NODE_SYNC_CYCLIC = conf_entry_to_bool(node_section['NODE_SYNC_CYCLIC'])
     NODE_SYNC_CYCLE = conf_entry_to_int(node_section['NODE_SYNC_CYCLE'])
+    NODE_SYNC_ON_STARTUP = conf_entry_to_bool(node_section['NODE_SYNC_ON_STARTUP'])
 else:
     NODE_SYNC_CYCLIC = False
+    NODE_SYNC_ON_STARTUP = False
     NODE_SYNC_CYCLE = 9000
 
 # flask settings
