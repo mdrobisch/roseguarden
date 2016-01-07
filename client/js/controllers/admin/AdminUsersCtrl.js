@@ -130,7 +130,7 @@ RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log, $q, Us
             $scope.rfidTagId = tagInfo.tagId;
 
             // debug setting
-            $scope.rfidTagId = "192.12.2.34";
+            // $scope.rfidTagId = "192.12.2.34";
 
             if($scope.rfidTagId == "")
             {
