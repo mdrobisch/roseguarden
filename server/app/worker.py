@@ -698,7 +698,7 @@ class BackgroundWorker():
 
         self.requestTimer += 1
 
-        if self.requestTimer >= 6:
+        if self.requestTimer >= 4:
             self.requestTimer = 0
             self.checkRFIDTag()
 
@@ -716,7 +716,7 @@ class BackgroundWorker():
             self.sync_cycle()
 
         self.cleanupTimer +=1
-        if self.cleanupTimer > 321:
+        if self.cleanupTimer > 221:
             self.cleanupTimer = 0
             if config.CLEANUP_EANBLE == True:
                 self.cleanup_cycle()
@@ -733,7 +733,7 @@ class BackgroundWorker():
             GPIO.output(GPIO_RELAY, GPIO.LOW)
 
             self.openingTimer += 1
-            if self.openingTimer >= 20:
+            if self.openingTimer >= 16:
                 self.openingTimer = -1
                 print "Closing door"
                 GPIO.output(GPIO_RELAY, GPIO.HIGH)
