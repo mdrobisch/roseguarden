@@ -48,7 +48,7 @@ class BackgroundWorker():
         self.ledState = self.LED_STATE_IDLE
         self.ledStateCounter = 0
 
-        self.systemUp = False
+        self.systemUp = True
         if config.NODE_SYNC_ON_STARTUP == True:
             self.forceSync = True
         else:
@@ -82,10 +82,12 @@ class BackgroundWorker():
     def run(self):
         # if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
         self.thr = threading.Timer(1, self.timer_cycle)
+        self.thrLED = threading.Timer(0.5, self.timer_led_cycle)
 
         self.update_users_and_actions()
 
         self.thr.start()
+        self.thrLED.start()
         print 'started background-server ' + '(' + str(datetime.datetime.now()) + ')'
 
     def resetTagInfo(self):
@@ -650,7 +652,6 @@ class BackgroundWorker():
         else:
             GPIO.output(GPIO_LED_YELLOW, GPIO.LOW)
 
-
         if self.ledState == self.LED_STATE_IDLE:
             self.ledStateCounter = 0
 
@@ -692,23 +693,31 @@ class BackgroundWorker():
             GPIO.output(GPIO_RELAY, GPIO.LOW)
             GPIO.output(GPIO_LED_GREEN, GPIO.HIGH)
 
+    def timer_led_cycle(self):
+        self.thrLED = threading.Timer(0.5, BackgroundWorker.timer_led_cycle(), [self])
+        self.ledStateTimer += 1
+        if self.ledStateTimer >= 0:
+            self.ledStateTimer = 0
+            self.led_cycle()
+
+
     def timer_cycle(self):
-        self.thr = threading.Timer(0.5, BackgroundWorker.timer_cycle, [self])
+        self.thr = threading.Timer(1.0, BackgroundWorker.timer_cycle, [self])
         self.thr.start()
 
         self.requestTimer += 1
 
-        if self.requestTimer >= 6:
+        if self.requestTimer >= 2:
             self.requestTimer = 0
             self.checkRFIDTag()
 
         self.backupTimer += 1
-        if self.backupTimer > 113 or self.forceBackup == True:
+        if self.backupTimer > 61 or self.forceBackup == True:
             self.backupTimer = 0
             self.backup_cycle()
 
         self.syncTimer += 1
-        if self.syncTimer > 155 or self.forceSync == True:
+        if self.syncTimer > 125 or self.forceSync == True:
             self.syncTimer = 0
             # if syncing is force wait some time to prevent pipe-breaking
             if self.forceSync == True:
@@ -716,7 +725,7 @@ class BackgroundWorker():
             self.sync_cycle()
 
         self.cleanupTimer +=1
-        if self.cleanupTimer > 321:
+        if self.cleanupTimer > 121:
             self.cleanupTimer = 0
             if config.CLEANUP_EANBLE == True:
                 self.cleanup_cycle()
@@ -733,19 +742,13 @@ class BackgroundWorker():
             GPIO.output(GPIO_RELAY, GPIO.LOW)
 
             self.openingTimer += 1
-            if self.openingTimer >= 20:
+            if self.openingTimer >= 10:
                 self.openingTimer = -1
                 print "Closing door"
                 GPIO.output(GPIO_RELAY, GPIO.HIGH)
                 self.ledState = self.LED_STATE_CLOSED
         else:
             GPIO.output(GPIO_RELAY, GPIO.HIGH)
-
-        self.ledStateTimer += 1
-        if self.ledStateTimer >= 0:
-            self.ledStateTimer = 0
-            self.led_cycle()
-
 
     def cancel(self):
         if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
