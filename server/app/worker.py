@@ -324,6 +324,7 @@ class BackgroundWorker():
                 user = User.query.filter_by(cardID=self.tagInfo.tagId).first()
 
                 if user is None:
+                    self.ledState = self.LED_STATE_ACCESS_DENIED
                     self.lock = False
                     return
 
@@ -382,7 +383,6 @@ class BackgroundWorker():
                             db.session.add(logentry)
                             db.session.commit()
                             self.ledState = self.LED_STATE_ACCESS_GRANTED
-
                         else:
                             self.ledState = self.LED_STATE_ACCESS_DENIED
                             print "no user-access privilege"
@@ -406,7 +406,7 @@ class BackgroundWorker():
         except:
             self.lock = False
             print "unexpected error in checkRFIDTag"
-            self.ledState = self.LED_STATE_ACCESS_DENIED             
+            self.ledState = self.LED_STATE_ACCESS_DENIED
             raise
 
     def cleanup_cycle(self):
@@ -662,10 +662,9 @@ class BackgroundWorker():
 
             self.ledStateCounter += 1
 
-            if self.ledStateCounter > 10:
+            if self.ledStateCounter > 15:
                 self.ledState = self.LED_STATE_IDLE
                 self.ledStateCounter = 0
-
 
         if self.ledState == self.LED_STATE_ACCESS_DENIED:
             if self.ledStateCounter % 2 == 0:
@@ -675,7 +674,7 @@ class BackgroundWorker():
 
             self.ledStateCounter += 1
 
-            if self.ledStateCounter > 10:
+            if self.ledStateCounter > 15:
                 self.ledState = self.LED_STATE_IDLE
                 self.ledStateCounter = 0
 
@@ -694,12 +693,12 @@ class BackgroundWorker():
             GPIO.output(GPIO_LED_GREEN, GPIO.HIGH)
 
     def timer_cycle(self):
-        self.thr = threading.Timer(1.5, BackgroundWorker.timer_cycle, [self])
+        self.thr = threading.Timer(0.5, BackgroundWorker.timer_cycle, [self])
         self.thr.start()
 
         self.requestTimer += 1
 
-        if self.requestTimer >= 2:
+        if self.requestTimer >= 6:
             self.requestTimer = 0
             self.checkRFIDTag()
 
@@ -709,7 +708,7 @@ class BackgroundWorker():
             self.backup_cycle()
 
         self.syncTimer += 1
-        if self.syncTimer > 55 or self.forceSync == True:
+        if self.syncTimer > 155 or self.forceSync == True:
             self.syncTimer = 0
             # if syncing is force wait some time to prevent pipe-breaking
             if self.forceSync == True:
@@ -717,7 +716,7 @@ class BackgroundWorker():
             self.sync_cycle()
 
         self.cleanupTimer +=1
-        if self.cleanupTimer > 121:
+        if self.cleanupTimer > 321:
             self.cleanupTimer = 0
             if config.CLEANUP_EANBLE == True:
                 self.cleanup_cycle()
@@ -734,7 +733,7 @@ class BackgroundWorker():
             GPIO.output(GPIO_RELAY, GPIO.LOW)
 
             self.openingTimer += 1
-            if self.openingTimer >= 7:
+            if self.openingTimer >= 20:
                 self.openingTimer = -1
                 print "Closing door"
                 GPIO.output(GPIO_RELAY, GPIO.HIGH)
