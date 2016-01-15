@@ -22,6 +22,11 @@ from GPIO import GPIO
 from GPIO import GPIOMockup
 
 
+GPIO_RELAY = 12
+GPIO_LED_GREEN = 11
+GPIO_LED_YELLOW = 13
+GPIO_LED_RED = 15
+
 class BackgroundWorker():
     def __init__(self, app):
         # initialize worker variables
@@ -43,10 +48,22 @@ class BackgroundWorker():
         self.lastBackupTime = datetime.datetime.now()
         self.lastCleanupTime = datetime.datetime.now()
         self.lastSyncTime = datetime.datetime.now()
+
         # setup gpio and set default (Low)
         GPIO.setmode(GPIO.BOARD)
-        GPIO.setup(12, GPIO.OUT, initial=GPIO.HIGH)
-        GPIO.output(12, GPIO.HIGH)
+        GPIO.setup(GPIO_RELAY, GPIO.OUT, initial=GPIO.HIGH)
+        GPIO.output(GPIO_RELAY, GPIO.HIGH)
+
+        GPIO.setup(GPIO_LED_GREEN, GPIO.OUT, initial=GPIO.LOW)
+        GPIO.output(GPIO_LED_GREEN, GPIO.LOW)
+
+        GPIO.setup(GPIO_LED_YELLOW, GPIO.OUT, initial=GPIO.LOW)
+        GPIO.output(GPIO_LED_YELLOW, GPIO.LOW)
+
+        GPIO.setup(GPIO_LED_RED, GPIO.OUT, initial=GPIO.LOW)
+        GPIO.output(GPIO_LED_RED, GPIO.LOW)
+
+
 
     def run(self):
         # if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
@@ -611,7 +628,8 @@ class BackgroundWorker():
         while(True):
             print "Openening door"
             time.sleep(1.0)
-            GPIO.output(12, GPIO.LOW)
+            GPIO.output(GPIO_RELAY, GPIO.LOW)
+            GPIO.output(GPIO_LED_GREEN, GPIO.HIGH)
 
     def timer_cycle(self):
         self.thr = threading.Timer(1.5, BackgroundWorker.timer_cycle, [self])
@@ -651,12 +669,14 @@ class BackgroundWorker():
         if self.openingTimer >= 0:
             if self.openingTimer == 0:
                 print "Openening door"
-            GPIO.output(12, GPIO.LOW)
+            GPIO.output(GPIO_RELAY, GPIO.LOW)
+            GPIO.output(GPIO_LED_GREEN, GPIO.HIGH)
             self.openingTimer += 1
             if self.openingTimer >= 7:
                 self.openingTimer = -1
                 print "Closing door"
-                GPIO.output(12, GPIO.HIGH)
+                GPIO.output(GPIO_RELAY, GPIO.HIGH)
+                GPIO.output(GPIO_LED_GREEN, GPIO.LOW)
 
                 # else:
                 # print "Closing door"

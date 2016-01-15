@@ -104,7 +104,10 @@ After upgrading you can restart your roseGuarden-application again.
 Install autostart and montoring (supervisor)
 ============================================
 
-Install supersior from distribution package
+After testing roseGuarden on the system you can add a autostart and monitoring of the application and the http-server.
+We use supervisor for this purpose.
+
+You can install supersior from distribution package
 
 - `sudo apt-get install supervisor`
 
@@ -195,6 +198,20 @@ Further documentation and information on components and installation could be fo
 
 Troubleshooting
 ===============
+
+*The WLAN connection breaks ofter some time*
+
+Normally the wlan connection timed out after a while.
+The default config of raspberry pi (wheezy) don't reconnect to disappearing networks.
+To fix this the following steps could enable the reconnection.
+
+- change to /etc/ifplugd/action.d/ with `cd /etc/ifplugd/action.d/`
+- copy the ifupdown file to ifupdown.original (for backup) with: `sudo cp ifupdown ifupdown.original`
+- overwrite ifupdown with the alternative ifupdown from the wpa_supplicant-folder with:  `sudo cp /etc/wpa_supplicant/ifupdown.sh ./ifupdown`
+- reboot with `sudo reboot`
+
+Alternativly you can tools like wicd-curses.
+Instructions for wicd-curses can be found in the internet.
 
 *The rfid don't read any tag*
 
