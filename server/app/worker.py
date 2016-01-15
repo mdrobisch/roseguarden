@@ -27,14 +27,28 @@ GPIO_LED_GREEN = 11
 GPIO_LED_YELLOW = 13
 GPIO_LED_RED = 15
 
+
+
 class BackgroundWorker():
+
     def __init__(self, app):
         # initialize worker variables
+        self.LED_STATE_IDLE = 0
+        self.LED_STATE_ACCESS_GRANTED = 1
+        self.LED_STATE_ACCESS_DENIED = 2
+        self.LED_STATE_CLOSED = 3
+
+
         self.app = app
         self.requestOpening = False
         self.openingTimer = -1
         self.requestTimer = 0
         self.syncTimer = 0
+        self.ledStateTimer = 0
+        self.ledState = self.LED_STATE_IDLE
+        self.ledStateCounter = 0
+
+        self.systemUp = False
         if config.NODE_SYNC_ON_STARTUP == True:
             self.forceSync = True
         else:
@@ -367,11 +381,15 @@ class BackgroundWorker():
                                            'L2', 1, 'Card based', Action.ACTION_OPENING_REQUEST)
                             db.session.add(logentry)
                             db.session.commit()
+                            self.ledState = self.LED_STATE_ACCESS_GRANTED
+
                         else:
+                            self.ledState = self.LED_STATE_ACCESS_DENIED
                             print "no user-access privilege"
                     else:
                         self.tagInfo.userInfo = user.email + '(inv. sec.)'
                         print "no user-access privilege"
+                        self.ledState = self.LED_STATE_ACCESS_DENIED
 
                     RFIDReader.MFRC522_StopCrypto1()
                     self.lock = False
@@ -379,6 +397,7 @@ class BackgroundWorker():
                 else:
                     self.tagInfo.userInfo = user.email + '(inv. key.)'
                     print "Authentication error"
+                    self.ledState = self.LED_STATE_ACCESS_DENIED
                     self.lock = False
                     return False
             else:
@@ -387,6 +406,7 @@ class BackgroundWorker():
         except:
             self.lock = False
             print "unexpected error in checkRFIDTag"
+            self.ledState = self.LED_STATE_ACCESS_DENIED             
             raise
 
     def cleanup_cycle(self):
@@ -623,8 +643,50 @@ class BackgroundWorker():
                 db.session.add(logentry)
                 db.session.commit()
 
-    def open_the_door(self):
 
+    def led_cycle(self):
+        if self.systemUp == True:
+            GPIO.output(GPIO_LED_YELLOW, GPIO.HIGH)
+        else:
+            GPIO.output(GPIO_LED_YELLOW, GPIO.LOW)
+
+
+        if self.ledState == self.LED_STATE_IDLE:
+            self.ledStateCounter = 0
+
+        if self.ledState == self.LED_STATE_ACCESS_GRANTED:
+            if self.ledStateCounter % 2 == 0:
+                GPIO.output(GPIO_LED_GREEN, GPIO.HIGH)
+            else:
+                GPIO.output(GPIO_LED_GREEN, GPIO.LOW)
+
+            self.ledStateCounter += 1
+
+            if self.ledStateCounter > 10:
+                self.ledState = self.LED_STATE_IDLE
+                self.ledStateCounter = 0
+
+
+        if self.ledState == self.LED_STATE_ACCESS_DENIED:
+            if self.ledStateCounter % 2 == 0:
+                GPIO.output(GPIO_LED_RED, GPIO.HIGH)
+            else:
+                GPIO.output(GPIO_LED_RED, GPIO.LOW)
+
+            self.ledStateCounter += 1
+
+            if self.ledStateCounter > 10:
+                self.ledState = self.LED_STATE_IDLE
+                self.ledStateCounter = 0
+
+        if self.ledState == self.LED_STATE_CLOSED:
+            self.ledState = self.LED_STATE_IDLE
+            self.ledStateCounter = 0
+            GPIO.output(GPIO_LED_RED, GPIO.LOW)
+            GPIO.output(GPIO_LED_GREEN, GPIO.LOW)
+
+
+    def open_the_door(self):
         while(True):
             print "Openening door"
             time.sleep(1.0)
@@ -670,19 +732,21 @@ class BackgroundWorker():
             if self.openingTimer == 0:
                 print "Openening door"
             GPIO.output(GPIO_RELAY, GPIO.LOW)
-            GPIO.output(GPIO_LED_GREEN, GPIO.HIGH)
+
             self.openingTimer += 1
             if self.openingTimer >= 7:
                 self.openingTimer = -1
                 print "Closing door"
                 GPIO.output(GPIO_RELAY, GPIO.HIGH)
-                GPIO.output(GPIO_LED_GREEN, GPIO.LOW)
+                self.ledState = self.LED_STATE_CLOSED
+        else:
+            GPIO.output(GPIO_RELAY, GPIO.HIGH)
 
-                # else:
-                # print "Closing door"
+        self.ledStateTimer += 1
+        if self.ledStateTimer >= 0:
+            self.ledStateTimer = 0
+            self.led_cycle()
 
-                # user = User.query.filter_by(id=0).first()
-                # print user.firstName
 
     def cancel(self):
         if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
