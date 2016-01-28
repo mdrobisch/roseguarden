@@ -32,6 +32,21 @@ Have a look at http://weworkweplay.com/play/raspberry-pi-nodejs/ for further inf
 The newest nodejs-version 4.2.1 suppose to have direct raspberry pi (ARM6/ARM7) support included.
 It has to be tested with RoseGuarden.
 
+Alternative way to install LTS version of nodejs (4.2.4) for raspberry pi
+
+for raspberry pi A,B,B+ :
+wget https://nodejs.org/dist/v4.2.4/node-v4.2.4-linux-armv6l.tar.xz
+tar -xvf node-v4.2.4-linux-armv6l.tar.xz
+cd node-v4.2.4-linux-armv6l
+sudo cp -R {bin,include,lib,share} /usr/local/
+
+
+or for raspberry pi 2:
+wget https://nodejs.org/dist/v4.2.4/node-v4.2.4-linux-armv7l.tar.xz
+tar -xvf node-v4.2.4-linux-armv7l.tar.xz
+cd node-v4.2.4-linux-armv7l
+sudo cp -R {bin,include,lib,share} /usr/local/
+
 First we install the nodejs-http-server
 For this step you have to switch to the `client`-directory and prompt
 
@@ -111,7 +126,7 @@ You can install supersior from distribution package
 
 - `sudo apt-get install supervisor`
 
-- `service supervisor restart`
+- `sudo service supervisor restart`
 
 
 
@@ -150,7 +165,7 @@ Here some photos of the assembled and mounted Roseguarden device in the early st
 Recommended bill of material
 ----------------------------
 
-We recommend the following devices, to use on the provided case:
+We recommend the following tested devices:
 
 - Rapsberry Pi 1 B (found on watterot, rs online, digikey)
 - KIS3R33S dc-dc converter (found on ebay from various distributoirs from about 3€ per piece)
