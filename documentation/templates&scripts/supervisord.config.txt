@@ -1,0 +1,39 @@
+; supervisor config file (/etc/supervisor/supervisord.conf)
+
+[unix_http_server]
+file=/var/run//supervisor.sock   ; (the path to the socket file)
+chmod=0700                       ; sockef file mode (default 0700)
+
+[inet_http_server]         ; inet (TCP) server disabled by default
+port=0.0.0.0:9001        ; (ip_address:port specifier, *:port for all iface)
+
+[supervisord]
+logfile=/var/log/supervisor/supervisord.log ; (main log file;default $CWD/supervisord.log)
+pidfile=/var/run/supervisord.pid ; (supervisord pidfile;default supervisord.pid)
+childlogdir=/var/log/supervisor            ; ('AUTO' child log dir, default $TEMP)
+
+[rpcinterface:supervisor]
+supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
+
+[supervisorctl]
+serverurl=unix:///var/run//supervisor.sock ; use a unix:// URL  for a unix socket
+
+[program:rosguarden-server]
+command=python roseGuarden.py start
+directory=/home/pi/roseguarden/server
+stdout_logfile = /var/log/supervisord/rosguarden-stdout.log
+stdout_logfile_maxbytes = 100MB
+stderr_logfile = /var/log/supervisord/rosguarden-stderr.log
+stderr_logfile_maxbytes = 100MB
+
+[program:http-server]
+command=python -m SimpleHTTPServer 8000              ; the program (relative uses PATH, can take args)
+directory=/home/pi/roseguarden/client                ; directory to cwd to before exec (def no cwd)
+redirect_stderr = true
+stdout_logfile = /var/log/supervisor/http-stdout.log
+stdout_logfile_maxbytes = 100MB
+stderr_logfile = /var/log/supervisor/http-stderr.log
+stderr_logfile_maxbytes = 100MB
+
+[include]
+files = /etc/supervisor/conf.d/*.conf 

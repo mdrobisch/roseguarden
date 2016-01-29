@@ -128,7 +128,9 @@ You can install supersior from distribution package
 
 - `sudo service supervisor restart`
 
-
+The config of supervisord is stored on your system in the following file: `/etc/supervisor/supervisord.conf`.
+There is a template in the repository `documentation/templates&scripts/supervisord.config`.
+Use the file to adapt it to your system (especially the pathes).
 
 Screenshots (Software)
 ======================
