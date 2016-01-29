@@ -175,7 +175,7 @@ class UserView(Resource):
 class UserListView(Resource):
     @auth.login_required
     def get(self):
-        users = User.query.filter_by(syncMaster=0).all()
+        users = User.query.filter_by(syncMaster=0).order_by(User.registerDateTime.desc()).all()
         return UserSerializer().dump(users, many=True).data
 
     def post(self):
