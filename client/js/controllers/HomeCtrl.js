@@ -35,7 +35,10 @@ RoseGuardenApp.controller('HomeCtrl', function($q, $scope, Door, AuthService, $l
 
     // starts here
     AuthService.loadCurrentUser().then(function(user) {
+
         $scope.user = user;
+        //console.log(user);
+
 
         Door.getList().then(function(doors) {
             $scope.doors = doors;

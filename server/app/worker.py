@@ -376,13 +376,25 @@ class BackgroundWorker():
                     if readSecretString == user.cardSecret:
                         print "correct secret"
                         if user.checkUserAccessPrivleges() == "Access granted.":
-                            self.requestOpening = True
-                            logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, user.firstName + ' ' + user.lastName,
-                                           user.email, 'Opening request', 'Opening request',
-                                           'L2', 1, 'Card based', Action.ACTION_OPENING_REQUEST)
-                            db.session.add(logentry)
-                            db.session.commit()
-                            self.ledState = self.LED_STATE_ACCESS_GRANTED
+                            if datetime.datetime.now() > g.user.lastAccessDateTime + datetime.timedelta(minutes=config.NODE_LOG_MERGE):
+                                g.user.lastAccessDateTime = datetime.datetime.now()
+
+                                logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, user.firstName + ' ' + user.lastName,
+                                               user.email, 'Opening request', 'Opening request',
+                                               'L2', 1, 'Card based', Action.ACTION_OPENING_REQUEST)
+                                print "Log-entry created"
+                            else:
+                                print "Log-entry is in merge-range ts = " + str(datetime.datetime.now()) + " last = " + str(g.user.lastAccessDateTime) + " merge = " + str(config.NODE_LOG_MERGE) + " minutes"
+
+                            try:
+                                db.session.add(logentry)
+                                db.session.commit()
+                                self.requestOpening = True
+                                self.ledState = self.LED_STATE_ACCESS_GRANTED
+                            except:
+                                self.ledState = self.LED_STATE_ACCESS_DENIED
+                                db.session.rollback()
+                                raise
                         else:
                             self.ledState = self.LED_STATE_ACCESS_DENIED
                             print "no user-access privilege"

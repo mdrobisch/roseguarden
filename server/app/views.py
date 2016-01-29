@@ -273,14 +273,22 @@ class SessionView(Resource):
 
         user = User.query.filter_by(email=form.email.data).first()
         if user and flask_bcrypt.check_password_hash(user.password, form.password.data):
-            logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, user.firstName + ' ' + user.lastName,
-                           user.email, 'User login', 'User login', 'L2', 0, 'Web based')
-            try:
-                db.session.add(logentry)
-                db.session.commit()
-            except:
-                raise
-                return '', 201
+            if datetime.datetime.now() > user.lastLoginDateTime + datetime.timedelta(minutes=config.NODE_LOG_MERGE):
+                logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, user.firstName + ' ' + user.lastName,
+                               user.email, 'User login', 'User login', 'L2', 0, 'Web based')
+                user.lastLoginDateTime = datetime.datetime.now()
+
+                try:
+                    db.session.add(logentry)
+                    db.session.commit()
+                except:
+                    raise
+                    return '', 201
+
+                print "Log-entry created"
+            else:
+                print "Log-entry is in merge-range ts = " + str(datetime.datetime.now()) + " last = " + str(user.lastLoginDateTime) + " merge = " + str(config.NODE_LOG_MERGE) + " minutes"
+
             return SessionInfoSerializer().dump(user).data, 201
         return '', 401
 
@@ -328,17 +336,22 @@ class OpeningRequestView(Resource):
     def post(self):
         print 'Opening request received'
         checkAccessResult = g.user.checkUserAccessPrivleges()
+        print "Check user privileges for opening request: " + checkAccessResult
         if (checkAccessResult == "Access granted."):
-
-            logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
-                           g.user.email, 'Opening request', 'Opening request', 'L2', 0, 'Web based', Action.ACTION_OPENING_REQUEST)
-            try:
-                db.session.add(logentry)
-                db.session.commit()
-            except:
-                return '', 401
-            backgroundWorker.requestOpening = True
-            print "Check user privileges for opening request: " + checkAccessResult
+            if datetime.datetime.now() > g.user.lastAccessDateTime + datetime.timedelta(minutes=config.NODE_LOG_MERGE):
+                g.user.lastAccessDateTime = datetime.datetime.now()
+                logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
+                               g.user.email, 'Opening request', 'Opening request', 'L2', 0, 'Web based', Action.ACTION_OPENING_REQUEST)
+                try:
+                    db.session.add(logentry)
+                    db.session.commit()
+                except:
+                    db.session.rollback()
+                    return '', 401
+                backgroundWorker.requestOpening = True
+                print "Log-entry created"
+            else:
+                print "Log-entry is in merge-range ts = " + str(datetime.datetime.now()) + " last = " + str(g.user.lastAccessDateTime) + " merge = " + str(config.NODE_LOG_MERGE) + " minutes"
             return 'Access granted', 201
         else:
             print "Check user privileges for opening request: " + checkAccessResult

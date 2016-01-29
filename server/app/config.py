@@ -35,6 +35,12 @@ else:
     NODE_SYNC_ON_STARTUP = False
     NODE_SYNC_CYCLE = 9000
 
+try:
+    NODE_LOG_MERGE = conf_entry_to_int(node_section['NODE_LOG_MERGE'])
+except KeyError:
+    print "Missing config NODE_LOG_MERGE in config.ini: set NODE_LOG_MERGE to 10 minutes"
+    NODE_LOG_MERGE = 10
+
 # flask settings
 flask_section = config['FLASK']
 DEBUG = conf_entry_to_bool(flask_section['DEBUG'])

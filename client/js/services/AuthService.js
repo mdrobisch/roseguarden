@@ -20,6 +20,9 @@ RoseGuardenApp.service('AuthService', AuthService = function($q, localStorageSer
         deferred = $q.defer();
         User.get(this.getCurrentUserID(),true).then(function(user) {
             currentUser = user;
+
+            //console.log(user);
+
             return deferred.resolve(user);
         }, function(response) {
             return deferred.reject(response);
