@@ -1,6 +1,6 @@
 __author__ = 'drobisch'
 
-from server import db, flask_bcrypt
+from server import db, flask_bcrypt, orm
 from wtforms.validators import Email
 import random
 import base64
@@ -51,6 +51,13 @@ class User(db.Model):
     lastAccessDateTime = db.Column(db.DateTime)
     budget = db.Column(db.Float)
     lastBudgetUpdateDate = db.Column(db.DateTime)
+
+    @orm.reconstructor
+    def init_on_load(self):
+        if self.cardID == "":
+            self.cardIDAssigned = 0
+        else:
+            self.cardIDAssigned = 1
 
     def checkUserAccessPrivleges(self):
         # check for invalid accessType == no access

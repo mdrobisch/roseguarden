@@ -1,6 +1,5 @@
 __author__ = 'drobisch'
 
-from flask_restful import Resource
 from models import User, Action
 from marshmallow import Schema, fields, post_load, post_dump
 import datetime
@@ -10,7 +9,7 @@ class UserSerializer(Schema):
         fields = ("id", "email", "firstName", "lastName", "phone", "role", "licenseMask", "keyMask", "lastBudgetUpdateDate", "lastAccessDateTime",
                   "association", "registerDateTime", "lastLoginDateTime", "accessDateStart", "accessDateEnd", "lastAccessDaysUpdateDate",
                   "accessTimeStart", "accessTimeEnd", "lastSyncDateTime", "accessType", "accessDaysMask", "accessDayCounter",
-                  "budget", "cardID", "accessDayCyclicBudget")
+                  "budget", "cardIDAssigned", "accessDayCyclicBudget")
 
     #@post_dump(pass_many=True)
     #def wrap_if_many(self, data, many=False):

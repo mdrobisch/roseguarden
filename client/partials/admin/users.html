@@ -51,7 +51,7 @@
                     <button ng-show="row.role == 1" popover-placement="right" popover="Admin" class="btn btn-default">
                         <i class="glyphicon glyphicon-star-empty"></i>
                     </button>
-                    <button ng-show="row.cardID" popover-placement="right" popover="{{row.cardID}}" class="btn btn-default">
+                    <button ng-show="row.cardIDAssigned" popover-placement="right" class="btn btn-default">
                         <i class="glyphicon glyphicon-credit-card"></i>
                     </button>
                     <button ng-show="row.budget != 0.00" popover-placement="right" popover="{{row.budget | number:2}}€" class="btn btn-default">
