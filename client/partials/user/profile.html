@@ -116,12 +116,18 @@
         </div>
 
         <div class="form-group">
+            <label class="col-xs-3 control-label">Role</label>
+            <div class="col-xs-8" >
+                <label class="control-label">{{user.role | rolesFilter}}</label>
+            </div>
+        </div>
+
+        <div class="form-group">
             <label class="col-xs-3 control-label">Licenses</label>
             <div class="col-xs-8" ng-hide="user.licenseMask">
                 <label class="control-label">-</label>
             </div>
         </div>
-
 
         <div class="form-group">
             <label class="col-xs-3 control-label">Bugdet</label>
