@@ -51,7 +51,7 @@
                     <button ng-show="row.role == 1" popover-placement="right" popover="Admin" class="btn btn-default">
                         <i class="glyphicon glyphicon-star-empty"></i>
                     </button>
-                    <button ng-show="row.cardIDAssigned" popover-placement="right" class="btn btn-default">
+                    <button ng-show="row.cardID" popover-placement="right" class="btn btn-default">
                         <i class="glyphicon glyphicon-credit-card"></i>
                     </button>
                     <button ng-show="row.budget != 0.00" popover-placement="right" popover="{{row.budget | number:2}}€" class="btn btn-default">
@@ -152,6 +152,7 @@
                             <li ng-show="row.role == 1" role="menuitem" ng-click="resetUserAdmin(row)"><a >Remove admin rights</a></li>
                             <li ng-show="rfidTagId != '' && row.cardID == '' && rfidTagUser == ''" role="menuitem" ng-click="assignUserRfidTag(row)"><a >Assign RFID ({{rfidTagId}})</a></li>
                             <li ng-show="rfidTagId != '' && rfidTagId == row.cardID" role="menuitem" ng-click="withdrawUserRfidTag(row)"><a >Withdraw RFID ({{rfidTagId}})</a></li>
+                            <li ng-show="row.cardID != ''" role="menuitem" ng-click="invalidateUserRfidTag(row)"><a >Invalidate RFID / Auth. card</a></li>
                             <li class="divider"></li>
                             <li role="menuitem"><a ng-click="removeUser(row)">Remove user</a></li>
                         </ul>

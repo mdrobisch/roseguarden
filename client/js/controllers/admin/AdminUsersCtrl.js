@@ -1,4 +1,4 @@
-RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log, $q, User, RfidTag) {
+RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log, $q, User, RfidTag, InvalidateAuthCardRequest) {
 
     var firstnames = ['Thomas', 'Marcus', 'Lischen', 'Stephanie'];
     var lastnames = ['Müller', 'Drobisch', 'Meier', 'Lehmann'];
@@ -130,7 +130,8 @@ RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log, $q, Us
             $scope.rfidTagId = tagInfo.tagId;
 
             // debug setting
-            // $scope.rfidTagId = "192.12.2.34";
+            console.error("Taginfo is in debug mode");
+            $scope.rfidTagId = "192.12.2.34";
 
             if($scope.rfidTagId == "")
             {
@@ -181,7 +182,45 @@ RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log, $q, Us
             return deferred.reject(response);
         });
         return deferred.promise;
-    }
+    };
+
+    $scope.invalidateUserRfidTag = function invalidateUserRfidTag(row) {
+
+        var modalInstance = $modal.open({
+              templateUrl: 'partials/modals/InvalidateRfidTag.html',
+              controller: 'InvalidateRFIDCtrl',
+              windowClass: 'center-modal',
+              resolve: {
+                name: function () {
+                    return row.firstName + ' ' + row.lastName; }
+              }
+            });
+
+        modalInstance.result.then(function (selected) {
+
+            InvalidateAuthCardRequest.create(row.id).then(function() {
+                $scope.profileUpdatePending = false;
+                $scope.success = 'Lost card successfully reported.'
+                $scope.showError = false;
+                $scope.showSuccess = true;
+
+                row.cardID = '';
+
+                return deferred.resolve();
+            }, function(response) {
+                $scope.error = 'Reporting lost card failed.'
+                $scope.profileUpdatePending = false;
+                $scope.showError = true;
+                $scope.showSuccess = false;
+                return deferred.reject(response);
+            });
+            return deferred.promise
+
+        }, function () {
+
+          $log.info('Modal dismissed at: ' + new Date());
+        });
+    };
 
     $scope.withdrawUserRfidTag = function withdrawUserRfidTag(row) {
         console.log("Request rfid tag withdraw");
@@ -194,7 +233,6 @@ RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log, $q, Us
             $scope.dataLoading = false;
             $scope.showError = false;
             $scope.showSuccess = true;
-
             var index = $scope.rowCollection.indexOf(row);
             $scope.rowCollection[index].cardID = "";
             return deferred.resolve();
@@ -206,7 +244,7 @@ RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log, $q, Us
             return deferred.reject(response);
         });
         return deferred.promise;
-    }
+    };
 
 
     $scope.resetUserAdmin = function resetUserAdmin(row) {

@@ -1,4 +1,4 @@
-RoseGuardenApp.controller('UserProfileCtrl', function ($scope, $location, $q, AuthService, User) {
+RoseGuardenApp.controller('UserProfileCtrl', function ($scope, $location, $q, AuthService, User, $modal, $log, InvalidateAuthCardRequest) {
 
     $scope.updateProfile = function() {
         $scope.profileUpdatePending = true;
@@ -19,6 +19,42 @@ RoseGuardenApp.controller('UserProfileCtrl', function ($scope, $location, $q, Au
         });
         return deferred.promise
     };
+
+    $scope.lostAuthCard = function() {
+
+        var modalInstance = $modal.open({
+          templateUrl: 'partials/modals/LostAuthCard.html',
+          controller: 'InvalidateRFIDCtrl',
+          windowClass: 'center-modal',
+          resolve: {
+            name: function () {
+                return 0; }
+          }
+        });
+
+        modalInstance.result.then(function (selected) {
+
+            InvalidateAuthCardRequest.create(AuthService.getCurrentUserID()).then(function() {
+                $scope.profileUpdatePending = false;
+                $scope.success = 'Lost card successfully reported.'
+                $scope.showError = false;
+                $scope.showSuccess = true;
+                $scope.user.cardIDAssigned = false;
+                return deferred.resolve();
+            }, function(response) {
+                $scope.error = 'Reporting lost card failed.'
+                $scope.profileUpdatePending = false;
+                $scope.showError = true;
+                $scope.showSuccess = false;
+                return deferred.reject(response);
+            });
+            return deferred.promise
+
+        }, function () {
+
+          $log.info('Modal dismissed at: ' + new Date());
+        });
+    }
 
     $scope.changepassword = function() {
         $scope.passwordUpdatePending = true;

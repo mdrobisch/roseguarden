@@ -4,6 +4,14 @@ from models import User, Action
 from marshmallow import Schema, fields, post_load, post_dump
 import datetime
 
+
+class UserListSerializer(Schema):
+    class Meta:
+        fields = ("id", "email", "firstName", "lastName", "phone", "role", "licenseMask", "keyMask", "lastBudgetUpdateDate", "lastAccessDateTime",
+                  "association", "registerDateTime", "lastLoginDateTime", "accessDateStart", "accessDateEnd", "lastAccessDaysUpdateDate",
+                  "accessTimeStart", "accessTimeEnd", "lastSyncDateTime", "accessType", "accessDaysMask", "accessDayCounter",
+                  "budget", "cardID", "accessDayCyclicBudget")
+
 class UserSerializer(Schema):
     class Meta:
         fields = ("id", "email", "firstName", "lastName", "phone", "role", "licenseMask", "keyMask", "lastBudgetUpdateDate", "lastAccessDateTime",

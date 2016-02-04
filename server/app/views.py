@@ -4,7 +4,7 @@ from flask import g, render_template, make_response, jsonify, request
 from flask_restful import Resource, fields, marshal_with
 from server import api, db, flask_bcrypt, auth, mail
 from models import User, Action, Door, RfidTagInfo
-from serializers import LogSerializer, UserSyncSerializer, UserSerializer, SessionInfoSerializer, DoorSerializer, RfidTagInfoSerializer
+from serializers import LogSerializer, UserSyncSerializer, UserListSerializer, UserSerializer, SessionInfoSerializer, DoorSerializer, RfidTagInfoSerializer
 from forms import UserPatchForm, DoorRegistrationForm, SessionCreateForm, LostPasswordForm, RegisterUserForm, \
     UserDeleteForm, RFIDTagAssignForm, RFIDTagWithdrawForm
 from worker import backgroundWorker
@@ -175,8 +175,11 @@ class UserView(Resource):
 class UserListView(Resource):
     @auth.login_required
     def get(self):
+        if (g.user.role & 1) == 0:
+            return make_response(jsonify({'error': 'Not authorized'}), 403)
+
         users = User.query.filter_by(syncMaster=0).order_by(User.registerDateTime.desc()).all()
-        return UserSerializer().dump(users, many=True).data
+        return UserListSerializer().dump(users, many=True).data
 
     def post(self):
         counter = 0
@@ -469,6 +472,32 @@ class LogUserView(Resource):
         logs = Action.query.filter_by(userMail=g.user.email).order_by(Action.date.desc()).all()
         return LogSerializer().dump(logs, many=True).data
 
+class InvalidateAuthCardView(Resource):
+    @auth.login_required
+    def post(self, id):
+
+        if g.user.id != id:
+            if (g.user.role & 1) == 0:
+                return '', 401
+
+        user = User.query.filter_by(id=id).first()
+        if user is None:
+            return '', 401
+
+
+        user.cardID = ""
+        logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
+                       g.user.email, 'Invalidate auth. card of ' + user.firstName + ' ' + user.lastName + ' (' + user.email + ')',
+                       'Invalidate lost auth. card', 'L2', 0, 'Web based', Action.ACTION_OPENING_REQUEST)
+        try:
+            db.session.add(logentry)
+            db.session.commit()
+        except:
+            db.session.rollback()
+            return '', 401
+        return '', 201
+
+
 
 class RfidTagInfoView(Resource):
     @auth.login_required
@@ -584,6 +613,7 @@ api.add_resource(DoorListView, '/doors')
 api.add_resource(OpeningRequestView, '/request/opening')
 api.add_resource(LostPasswordView, '/request/password')
 api.add_resource(DoorInfoView, '/request/doorinfo')
+api.add_resource(InvalidateAuthCardView, '/request/invalidateAuthCard/<int:id>')
 api.add_resource(SyncRequestView, '/request/sync')
 
 api.add_resource(RfidTagInfoView, '/tag/info')
