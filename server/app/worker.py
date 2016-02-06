@@ -371,6 +371,12 @@ class BackgroundWorker():
                     readSecretString = ''
                     i = 0
 
+                    if not readSecret:
+                        print "Read secret string is empty."
+                        self.lock = False
+                        RFIDReader.MFRC522_StopCrypto1()
+                        return False
+
                     for x in readSecret:
                         if i != 0:
                             readSecretString = readSecretString + '-'
