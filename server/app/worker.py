@@ -39,6 +39,7 @@ class BackgroundWorker():
         self.LED_STATE_CLOSED = 3
 
 
+        self.first = True
         self.app = app
         self.requestOpening = False
         self.openingTimer = -1
@@ -296,6 +297,11 @@ class BackgroundWorker():
             raise
 
     def checkRFIDTag(self):
+
+        if self.first == True:
+            self.first = False
+            raise ValueError('A very specific bad thing happened')
+
         while (self.lock == True):
             print "still locked (checkRFIDTag)"
             time.sleep(0.2)
@@ -712,12 +718,31 @@ class BackgroundWorker():
 
         if self.requestTimer >= 4:
             self.requestTimer = 0
-            self.checkRFIDTag()
+            try:
+               self.checkRFIDTag()
+            except Exception, e:
+                import traceback
+                print traceback.format_exc()
+                logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, 'Sync Master', 'syncmaster@roseguarden.org',
+                                'Error: ' + str(traceback.format_exc()),
+                                'Error occured', 'L1', 0, 'Internal')
+                db.session.add(logentry)
+                db.session.commit()
+
 
         self.backupTimer += 1
         if self.backupTimer > 113 or self.forceBackup == True:
             self.backupTimer = 0
-            self.backup_cycle()
+            try:
+                self.backup_cycle()
+            except Exception, e:
+                import traceback
+                print traceback.format_exc()
+                logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, 'Sync Master', 'syncmaster@roseguarden.org',
+                                'Error: ' + str(traceback.format_exc()),
+                                'Error occured', 'L1', 0, 'Internal')
+                db.session.add(logentry)
+                db.session.commit()
 
         self.syncTimer += 1
         if self.syncTimer > 155 or self.forceSync == True:
@@ -725,13 +750,32 @@ class BackgroundWorker():
             # if syncing is force wait some time to prevent pipe-breaking
             if self.forceSync == True:
                 time.sleep(1.0)
-            self.sync_cycle()
+            try:
+                self.sync_cycle()
+            except Exception, e:
+                import traceback
+                print traceback.format_exc()
+                logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, 'Sync Master', 'syncmaster@roseguarden.org',
+                                'Error: ' + str(traceback.format_exc()),
+                                'Error occured', 'L1', 0, 'Internal')
+                db.session.add(logentry)
+                db.session.commit()
 
         self.cleanupTimer +=1
         if self.cleanupTimer > 221:
             self.cleanupTimer = 0
             if config.CLEANUP_EANBLE == True:
-                self.cleanup_cycle()
+                try:
+                    self.cleanup_cycle()
+                except Exception, e:
+                    import traceback
+                    print traceback.format_exc()
+                    logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, 'Sync Master', 'syncmaster@roseguarden.org',
+                                    'Error: ' + str(traceback.format_exc()),
+                                    'Error occured', 'L1', 0, 'Internal')
+                    db.session.add(logentry)
+                    db.session.commit()
+
 
         # print "Check for opening request"
         if self.requestOpening == True:
@@ -756,7 +800,16 @@ class BackgroundWorker():
         self.ledStateTimer += 1
         if self.ledStateTimer >= 0:
             self.ledStateTimer = 0
-            self.led_cycle()
+            try:
+                self.led_cycle()
+            except Exception, e:
+                import traceback
+                print traceback.format_exc()
+                logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, 'Sync Master', 'syncmaster@roseguarden.org',
+                                'Error: ' + str(traceback.format_exc()),
+                                'Error occured', 'L1', 0, 'Internal')
+                db.session.add(logentry)
+                db.session.commit()
 
 
     def cancel(self):
