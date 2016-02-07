@@ -88,6 +88,10 @@ RoseGuardenApp.config(function($routeProvider, RestangularProvider) {
         templateUrl: 'partials/main/admin.html',
         controller: 'AdminSpaceCtrl'
       }).
+      when('/supervisor', {
+        templateUrl: 'partials/main/supervisor.html',
+        controller: 'SupervisorTabCtrl'
+      }).
       when('/login', {
         templateUrl: 'partials/session/login.html',
         controller: 'LoginCtrl'
@@ -96,6 +100,7 @@ RoseGuardenApp.config(function($routeProvider, RestangularProvider) {
         templateUrl: 'partials/session/register.html',
         controller: 'RegisterCtrl'
       }).
+
       when('/logout', {
         templateUrl: 'partials/session/logout.html',
         controller: 'LogoutCtrl'

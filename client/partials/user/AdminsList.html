@@ -1,0 +1,77 @@
+<div ng-controller="UserAdminsListCtrl"   >
+    <div class="alert alert-danger" ng-show="showError">
+        Loading data failed.
+    </div>
+
+
+    <span style="font-weight: bold ; margin: 30px 0 0 0">
+        <p>Admins </p>
+    </span>
+
+
+    <hr style="margin-top: 2px; margin-bottom: 10px">
+
+    <table st-table="displayedCollection" st-safe-src="rowCollection" class="table table-striped"">
+        <thead >
+            <tr>
+                <th st-sort="firstName">Name</th>
+                <th st-sort="association">Association</th>
+                <th st-sort="email">eMail</th>
+                <th st-sort="phone">Phone</th>
+                <th st-sort="role">Role</th>
+            </tr>
+            <tr>
+                <th colspan="6"><input st-search="" class="form-control" placeholder="global search ..." type="text"/></th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr st-select-row="row" st-select-mode="single" ng-repeat="row in displayedCollection">
+                <td>
+                    <span> {{row.firstName}} {{row.lastName}} </span> <br>
+                </td>
+
+                <td>
+                    <span> {{row.association}}</span> <br>
+                </td>
+
+                <td>
+                    <a href="mailto:{{row.email}}" class="btn btn-default gliphicons" >
+                        <i class="glyphicon glyphicon-envelope"></i>
+                    </a>
+                </td>
+
+                <td>
+                    <button popover-placement="right" popover="{{row.phone}}" class="btn btn-default">
+                        <i class="glyphicon glyphicon-phone-alt"></i>
+                    </button>
+                </td>
+
+                <td>
+                    <span> {{row.role | rolesFilter}}</span>
+                    <button ng-show="row.role == 1" popover-placement="right" popover="Admins are allowed to: add and remove use or doorsr, view the full log, change access of users, assign/withdraw authentification card, assign new roles (admins/supervisors)" class="btn btn-default">
+                        <i class="glyphicon glyphicon-info-sign"></i>
+                    </button>
+                    <button ng-show="row.role == 2" popover-placement="right" popover="Supervisors are allowed to: change access of users and assign/withdraw authentification cards. They are not allowed to see the full log, or add/remove users and doors" class="btn btn-default">
+                        <i class="glyphicon glyphicon-info-sign"></i>
+                    </button>
+
+                </td>
+
+            </tr>
+        </tbody>
+
+        <tfoot>
+            <tr>
+                <td colspan="6" class="text-center">
+                    <div st-pagination="" st-items-by-page="itemsByPage" st-displayed-pages="10"></div>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <div class="alert alert-info" ng-show="isLoading">
+        Loading data ...
+        <img src="images/loading.gif" >
+    </div>
+</div>

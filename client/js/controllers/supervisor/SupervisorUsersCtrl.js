@@ -1,4 +1,4 @@
-RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log, $q, User, RfidTag, InvalidateAuthCardRequest) {
+RoseGuardenApp.controller('SupervisorUsersCtrl', function($scope,$modal, $log, $q, User, RfidTag, InvalidateAuthCardRequest) {
 
     var firstnames = ['Thomas', 'Marcus', 'Lischen', 'Stephanie'];
     var lastnames = ['Müller', 'Drobisch', 'Meier', 'Lehmann'];
@@ -244,87 +244,6 @@ RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log, $q, Us
             return deferred.reject(response);
         });
         return deferred.promise;
-    };
-
-
-    $scope.resetUserRole = function resetUserRole(row) {
-
-        $log.info('reset user role');
-        var rolechange = {role: 0};
-
-        User.update(row.id, rolechange).then(function() {
-            $scope.profileUpdatePending = false;
-            $scope.success = 'Successfully reset admin role.';
-            $scope.showError = false;
-            $scope.showSuccess = true;
-
-            var index = $scope.rowCollection.indexOf(row);
-            $scope.rowCollection[index].role = 0;
-
-            return deferred.resolve();
-        }, function(response) {
-            $scope.error = 'Reset admin role failed.';
-            $scope.profileUpdatePending = false;
-            $scope.showError = true;
-            $scope.showSuccess = false;
-            return deferred.reject(response);
-        });
-        return deferred.promise
-
-    };
-
-    $scope.setUserToAdmin = function setUserToAdmin(row) {
-
-        $log.info('set user to admin');
-
-        var rolechange = {role: 1};
-
-        User.update(row.id, rolechange).then(function() {
-            $scope.profileUpdatePending = false;
-            $scope.success = 'Successfully set user to admin.';
-            $scope.showError = false;
-            $scope.showSuccess = true;
-
-            var index = $scope.rowCollection.indexOf(row);
-            $scope.rowCollection[index].role = 1;
-
-            return deferred.resolve();
-        }, function(response) {
-            $scope.error = 'Set user to admin failed.';
-            $scope.profileUpdatePending = false;
-            $scope.showError = true;
-            $scope.showSuccess = false;
-            return deferred.reject(response);
-        });
-        return deferred.promise
-
-    };
-
-    $scope.setUserToSupervisor = function setUserToSupervisor(row) {
-
-        $log.info('set user to supervisor');
-
-        var rolechange = {role: 2};
-
-        User.update(row.id, rolechange).then(function() {
-            $scope.profileUpdatePending = false;
-            $scope.success = 'Successfully set user to supervisor.';
-            $scope.showError = false;
-            $scope.showSuccess = true;
-
-            var index = $scope.rowCollection.indexOf(row);
-            $scope.rowCollection[index].role = 2;
-
-            return deferred.resolve();
-        }, function(response) {
-            $scope.error = 'Set user to supervisor failed.';
-            $scope.profileUpdatePending = false;
-            $scope.showError = true;
-            $scope.showSuccess = false;
-            return deferred.reject(response);
-        });
-        return deferred.promise
-
     };
 
     $scope.setupUserAccess = function setupUserAccess(row) {

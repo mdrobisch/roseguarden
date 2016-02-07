@@ -1,0 +1,63 @@
+<div ng-controller="AdminDebugCtrl"   >
+
+    <div class="alert alert-danger" ng-show="showError">
+        {{error}}
+    </div>
+
+    <table st-table="displayedCollection" st-safe-src="rowCollection" class="table table-striped"">
+        <thead >
+            <tr>
+                <th st-sort="logLevel">level</th>
+                <th st-sort="date">date</th>
+                <th st-sort="nodeName">node</th>
+                <th st-sort="logType">type</th>
+                <th st-sort="userName">user</th>
+            </tr>
+            <tr>
+                <th colspan="5"><input st-search="" class="form-control" placeholder="global search ..." type="text"/></th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr st-select-row="row" st-select-mode="single" ng-repeat="row in displayedCollection">
+                <td>
+                    <a ng-show="true" class="btn btn-default gliphicons-small" tooltip="loglevel {{row.logLevel}}" >
+                        {{row.logLevel}}
+                    </a>
+                </td>
+                <td>
+                    {{row.date | moment:'DD.MM.YY HH:mm'}}
+                    <a ng-show="row.synced == 1" class="btn btn-default gliphicons-small" tooltip="synced" >
+                        <i class="glyphicon glyphicon-refresh"></i>
+                    </a>
+                </td>
+                <td>{{row.nodeName}}</td>
+                <td>
+                    {{row.logType}}
+
+                    <a ng-show="true" class="btn btn-default gliphicons-small" tooltip="{{row.logText}}" >
+                        <i class="glyphicon glyphicon-info-sign"></i>
+                    </a>
+                </td>
+                <td>
+                    <span>{{row.userName}}</span>
+                </td>
+
+            </tr>
+        </tbody>
+
+        <tfoot>
+            <tr>
+                <td colspan="5" class="text-center">
+                    <div st-pagination="" st-items-by-page="itemsByPage" st-displayed-pages="7"></div>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <div class="alert alert-info" ng-show="isLoading">
+        Loading data ...
+        <img src="images/loading.gif" >
+    </div>
+
+</div>

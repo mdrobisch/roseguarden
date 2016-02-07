@@ -5,7 +5,8 @@ RoseGuardenApp.controller('AdminTabCtrl', function ($scope, $location) {
       { title : 'Users', active : true, template : 'partials/admin/users.html', glyphicon : 'glyphicon-user' },
       { title : 'Doors', template : 'partials/admin/doors.html', glyphicon : 'glyphicon-lock' },
       //{ title : 'Devices', template : 'partials/admin/devices.html'},
-      { title : 'Log', template : 'partials/admin/log.html', glyphicon : 'glyphicon-list'}
+      { title : 'Log', template : 'partials/admin/log.html', glyphicon : 'glyphicon-list'},
+      { title : 'Debug', template : 'partials/admin/debug.html', glyphicon : 'glyphicon-exclamation-sign'}
     ];
 
     $scope.currentTab = $scope.tabs[1];

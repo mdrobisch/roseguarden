@@ -1,4 +1,4 @@
-RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log, $q, User, RfidTag, InvalidateAuthCardRequest) {
+RoseGuardenApp.controller('UserAdminsListCtrl', function($scope,$modal, $log, $q, User, RfidTag, InvalidateAuthCardRequest) {
 
     var firstnames = ['Thomas', 'Marcus', 'Lischen', 'Stephanie'];
     var lastnames = ['Müller', 'Drobisch', 'Meier', 'Lehmann'];
@@ -85,7 +85,7 @@ RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log, $q, Us
 
         $scope.isLoading = true;
         deferred = $q.defer();
-        User.getList(true).then(function(data) {
+        User.getAdminsList(true).then(function(data) {
               console.log(data.length)
               for(i=0;i < data.length;i++) {
                   $scope.rowCollection.push(data[i]);
@@ -247,19 +247,19 @@ RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log, $q, Us
     };
 
 
-    $scope.resetUserRole = function resetUserRole(row) {
+    $scope.resetUserRights = function resetUserRight(row) {
 
-        $log.info('reset user role');
-        var rolechange = {role: 0};
+        $log.info('reset user admin');
+        var rolechange = {role: (row.role & 0xFE)};
 
         User.update(row.id, rolechange).then(function() {
             $scope.profileUpdatePending = false;
-            $scope.success = 'Successfully reset admin role.';
+            $scope.success = 'Successfully reset user role.';
             $scope.showError = false;
             $scope.showSuccess = true;
 
             var index = $scope.rowCollection.indexOf(row);
-            $scope.rowCollection[index].role = 0;
+            $scope.rowCollection[index].role &= ~(0x01);
 
             return deferred.resolve();
         }, function(response) {
@@ -273,11 +273,11 @@ RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log, $q, Us
 
     };
 
-    $scope.setUserToAdmin = function setUserToAdmin(row) {
+    $scope.setUserAdmin = function setUserAdmin(row) {
 
-        $log.info('set user to admin');
+        $log.info('set user admin');
 
-        var rolechange = {role: 1};
+        var rolechange = {role: (row.role | 0x01)};
 
         User.update(row.id, rolechange).then(function() {
             $scope.profileUpdatePending = false;
@@ -286,38 +286,11 @@ RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log, $q, Us
             $scope.showSuccess = true;
 
             var index = $scope.rowCollection.indexOf(row);
-            $scope.rowCollection[index].role = 1;
+            $scope.rowCollection[index].role |= 0x01;
 
             return deferred.resolve();
         }, function(response) {
             $scope.error = 'Set user to admin failed.';
-            $scope.profileUpdatePending = false;
-            $scope.showError = true;
-            $scope.showSuccess = false;
-            return deferred.reject(response);
-        });
-        return deferred.promise
-
-    };
-
-    $scope.setUserToSupervisor = function setUserToSupervisor(row) {
-
-        $log.info('set user to supervisor');
-
-        var rolechange = {role: 2};
-
-        User.update(row.id, rolechange).then(function() {
-            $scope.profileUpdatePending = false;
-            $scope.success = 'Successfully set user to supervisor.';
-            $scope.showError = false;
-            $scope.showSuccess = true;
-
-            var index = $scope.rowCollection.indexOf(row);
-            $scope.rowCollection[index].role = 2;
-
-            return deferred.resolve();
-        }, function(response) {
-            $scope.error = 'Set user to supervisor failed.';
             $scope.profileUpdatePending = false;
             $scope.showError = true;
             $scope.showSuccess = false;

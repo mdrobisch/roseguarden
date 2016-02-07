@@ -8,6 +8,13 @@ RoseGuardenApp.controller('ApplicationCtrl', function($scope, $location, AuthSer
             $scope.isAdmin = false;
         }
 
+        if (AuthService.isSupervisor()) {
+            $scope.isSupervisor = true;
+        } else {
+            $scope.isSupervisor = false;
+        }
+
+
         if($location.path() === "/logout") {
             $scope.isLoggedIn = false;
         }

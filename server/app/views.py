@@ -4,7 +4,7 @@ from flask import g, render_template, make_response, jsonify, request
 from flask_restful import Resource, fields, marshal_with
 from server import api, db, flask_bcrypt, auth, mail
 from models import User, Action, Door, RfidTagInfo
-from serializers import LogSerializer, UserSyncSerializer, UserListSerializer, UserSerializer, SessionInfoSerializer, DoorSerializer, RfidTagInfoSerializer
+from serializers import LogSerializer, UserSyncSerializer, AdminsListSerializer, UserListForSupervisorsSerializer, UserListSerializer, UserSerializer, SessionInfoSerializer, DoorSerializer, RfidTagInfoSerializer
 from forms import UserPatchForm, DoorRegistrationForm, SessionCreateForm, LostPasswordForm, RegisterUserForm, \
     UserDeleteForm, RFIDTagAssignForm, RFIDTagWithdrawForm
 from worker import backgroundWorker
@@ -31,7 +31,7 @@ class UserView(Resource):
     @auth.login_required
     def get(self, id):
         if id != g.user.id:
-            if (g.user.role & 1) == 0:
+            if g.user.role != 1:
                 return make_response(jsonify({'error': 'Not authorized'}), 403)
         user = User.query.filter_by(id=id).first()
         return UserSerializer().dump(user).data
@@ -44,7 +44,7 @@ class UserView(Resource):
 
             logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
                            g.user.email, 'User ' + user.firstName + ' on ' + user.lastName + ' removed', 'User removed',
-                           'L1', 1, 'Web based')
+                           'L2', 1, 'Web based')
             db.session.add(logentry)
             db.session.commit()
 
@@ -55,7 +55,7 @@ class UserView(Resource):
     @auth.login_required
     def post(self, id):
         if id != g.user.id:
-            if (g.user.role & 1) == 0:
+            if g.user.role != 1:
                 return make_response(jsonify({'error': 'Not authorized'}), 403)
         form = UserPatchForm()
         if not form.validate_on_submit():
@@ -92,25 +92,35 @@ class UserView(Resource):
                     log_text += '; '
                 log_text +=  'Change phone number from ' + user.phone + ' to ' + form.phone.data
             user.phone = form.phone.data
-        if form.role.data != None and form.role.data != '':
-            if user.role != form.role.data:
-                if log_text != '':
-                    log_text += '; '
-                log_text += 'Change role from ' + str(user.role) + ' to ' + str(form.role.data)
-            user.role = form.role.data
         if form.association.data != None and form.association.data != '':
             if user.association != form.association.data:
                 if log_text != '':
                     log_text += '; '
                 log_text += 'Change association to ' + str(form.association.data)
             user.association = form.association.data
+
+        # this properties can only be changed by a admin or a superuser
+
+        if form.role.data != None and form.role.data != '':
+            if g.user.role != 1:
+                return make_response(jsonify({'error': 'Not authorized'}), 403)
+            if user.role != form.role.data:
+                if log_text != '':
+                    log_text += '; '
+                log_text += 'Change role from ' + str(user.role) + ' to ' + str(form.role.data)
+            user.role = form.role.data
+
         if form.accessDaysMask.data != None and form.accessDaysMask.data != '':
+            if g.user.role != 1 and g.user.role != 2:
+                return make_response(jsonify({'error': 'Not authorized'}), 403)
             if user.accessDaysMask != form.accessDaysMask.data:
                 if log_text != '':
                     log_text += '; '
                 log_text += 'Change accessDaysMask from ' + str(user.accessDaysMask) + ' to ' + str(form.accessDaysMask.data)
             user.accessDaysMask = form.accessDaysMask.data
         if form.accessDayCounter.data != None and form.accessDayCounter.data != '':
+            if g.user.role != 1 and g.user.role != 2:
+                return make_response(jsonify({'error': 'Not authorized'}), 403)
             if user.accessDayCounter != form.accessDayCounter.data:
                 if log_text != '':
                     log_text += '; '
@@ -118,6 +128,8 @@ class UserView(Resource):
                 user.lastAccessDaysUpdateDate = datetime.datetime.today()
             user.accessDayCounter = form.accessDayCounter.data
         if form.accessDayCyclicBudget.data != None and form.accessDayCyclicBudget.data != '':
+            if g.user.role != 1 and g.user.role != 2:
+                return make_response(jsonify({'error': 'Not authorized'}), 403)
             if user.accessDayCyclicBudget != form.accessDayCyclicBudget.data:
                 if log_text != '':
                     log_text += '; '
@@ -125,6 +137,8 @@ class UserView(Resource):
                 user.lastAccessDaysUpdateDate = datetime.datetime.today()
             user.accessDayCyclicBudget = form.accessDayCyclicBudget.data
         if form.accessType.data != None and form.accessType.data != '':
+            if g.user.role != 1 and g.user.role != 2:
+                return make_response(jsonify({'error': 'Not authorized'}), 403)
             if user.accessType != form.accessType.data:
                 if log_text != '':
                     log_text += '; '
@@ -132,30 +146,40 @@ class UserView(Resource):
                 user.lastAccessDaysUpdateDate = datetime.datetime.today()
             user.accessType = form.accessType.data
         if form.keyMask.data != None and form.keyMask.data != '':
+            if g.user.role != 1 and g.user.role != 2:
+                return make_response(jsonify({'error': 'Not authorized'}), 403)
             if user.keyMask != form.keyMask.data:
                 if log_text != '':
                     log_text += '; '
                 log_text += 'Change keyMask from ' + str(user.keyMask) + ' to ' + str(form.keyMask.data)
             user.keyMask = form.keyMask.data
         if form.accessDateStart.data != None and form.accessDateStart.data != '':
+            if g.user.role != 1 and g.user.role != 2:
+                return make_response(jsonify({'error': 'Not authorized'}), 403)
             if user.accessDateStart != datetime.datetime.strptime(form.accessDateStart.data, '%Y-%m-%dT%H:%M:%S.%fZ'):
                 if log_text != '':
                     log_text += '; '
                 log_text += 'Change accessDateStart from ' + str(user.accessDateStart) + ' to ' + str(form.accessDateStart.data)
             user.accessDateStart = datetime.datetime.strptime(form.accessDateStart.data, '%Y-%m-%dT%H:%M:%S.%fZ')
         if form.accessDateEnd.data != None and form.accessDateEnd.data != '':
+            if g.user.role != 1 and g.user.role != 2:
+                return make_response(jsonify({'error': 'Not authorized'}), 403)
             if user.accessDateEnd != datetime.datetime.strptime(form.accessDateEnd.data, '%Y-%m-%dT%H:%M:%S.%fZ'):
                 if log_text != '':
                     log_text += '; '
                 log_text += 'Change accessDateEnd from ' + str(user.accessDateEnd ) + ' to ' + str(form.accessDateEnd.data)
             user.accessDateEnd = datetime.datetime.strptime(form.accessDateEnd.data, '%Y-%m-%dT%H:%M:%S.%fZ')
         if form.accessTimeStart.data != None and form.accessTimeStart.data != '':
+            if g.user.role != 1 and g.user.role != 2:
+                return make_response(jsonify({'error': 'Not authorized'}), 403)
             if user.accessTimeStart != datetime.datetime.strptime(form.accessTimeStart.data, '%Y-%m-%dT%H:%M:%S.%fZ'):
                 if log_text != '':
                     log_text += '; '
                 log_text += 'Change accessTimeStart from ' + str(user.accessTimeStart) + ' to ' + str(form.accessTimeStart.data)
             user.accessTimeStart = datetime.datetime.strptime(form.accessTimeStart.data, '%Y-%m-%dT%H:%M:%S.%fZ')
         if form.accessTimeEnd.data != None and form.accessTimeEnd.data != '':
+            if g.user.role != 1 and g.user.role != 2:
+                return make_response(jsonify({'error': 'Not authorized'}), 403)
             if user.accessTimeEnd != datetime.datetime.strptime(form.accessTimeEnd.data, '%Y-%m-%dT%H:%M:%S.%fZ'):
                 if log_text != '':
                     log_text += '; '
@@ -165,21 +189,31 @@ class UserView(Resource):
         log_text = 'Update of ' + user.firstName + ' ' + user.lastName + ' (' + user.email + ')' + ' with the following changes: ' + log_text
         logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
                        g.user.email, log_text, 'User updated',
-                       'L1', 0, 'Web based')
+                       'L2', 0, 'Web based')
         db.session.add(logentry)
         db.session.commit()
 
         return '', 201
 
 
+class AdminsListView(Resource):
+    @auth.login_required
+    def get(self):
+        users = User.query.filter_by(syncMaster=0).filter(User.role != 0).all()
+        return AdminsListSerializer().dump(users, many=True).data
+
+
 class UserListView(Resource):
     @auth.login_required
     def get(self):
-        if (g.user.role & 1) == 0:
-            return make_response(jsonify({'error': 'Not authorized'}), 403)
-
-        users = User.query.filter_by(syncMaster=0).order_by(User.registerDateTime.desc()).all()
-        return UserListSerializer().dump(users, many=True).data
+        if g.user.role == 1:
+            users = User.query.filter_by(syncMaster=0).order_by(User.registerDateTime.desc()).all()
+            return UserListSerializer().dump(users, many=True).data
+        if g.user.role == 2:
+            users = User.query.filter_by(syncMaster=0).order_by(User.registerDateTime.desc()).all()
+            return UserListForSupervisorsSerializer().dump(users, many=True).data
+        # other roles have no authorization
+        return make_response(jsonify({'error': 'Not authorized'}), 403)
 
     def post(self):
         counter = 0
@@ -239,7 +273,7 @@ class RegisterUserView(Resource):
                     phone=form.phone.data, association=form.association.data)
         logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, user.firstName + ' ' + user.lastName, user.email,
                        'User registered ' + user.firstName + ' ' + user.lastName + ' ' + user.email, 'User registered',
-                       'L1', 1, 'Web based')
+                       'L2', 1, 'Web based')
 
         try:
             db.session.add(logentry)
@@ -328,7 +362,7 @@ class SyncRequestView(Resource):
     @auth.login_required
     def post(self):
         print 'Syncing request received'
-        if (g.user.role & 1) == 0:
+        if g.user.role != 1:
             return make_response(jsonify({'error': 'Not authorized'}), 403)
         backgroundWorker.forceSync = True
         return '', 201
@@ -371,7 +405,7 @@ class DoorView(Resource):
             print 'delete door ' + door.name + ' ' + door.address + ' (id=' + str(door.id) + ') from database'
             logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
                            g.user.email, 'Door (' + door.name + ' on ' + door.address + ') removed', 'Door removed',
-                           'L1', 1, 'Web based')
+                           'L2', 1, 'Web based')
             try:
                 db.session.add(logentry)
                 db.session.commit()
@@ -390,7 +424,7 @@ class DoorRegistrationView(Resource):
         if not form.validate_on_submit():
             return form.errors, 422
 
-        if (g.user.role & 1) == 0:
+        if g.user.role != 1:
             return make_response(jsonify({'error': 'Not authorized'}), 403)
 
         print 'Request door info from ' + 'http://' + form.address.data + ':5000' + '/request/doorinfo'
@@ -410,7 +444,7 @@ class DoorRegistrationView(Resource):
                        local=0, password = pwd)
         logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
                        g.user.email, 'Door ' + newDoor.name + ' on ' + newDoor.address + ' checked and registered',
-                       'Door registered', 'L1', 1, 'Web based')
+                       'Door registered', 'L2', 1, 'Web based')
         try:
             db.session.add(logentry)
             db.session.commit()
@@ -442,13 +476,21 @@ class DoorListView(Resource):
             posts = Door.query.all()
         return DoorSerializer().dump(posts, many=True).data
 
+class LogDebugView(Resource):
+    @auth.login_required
+    def get(self):
+        if g.user.role != 1:
+            if g.user.role != 2:
+                return make_response(jsonify({'error': 'Not authorized'}), 403)
+        logs = Action.query.filter(Action.logLevel == 'L1').order_by(Action.date.desc()).all()
+        return LogSerializer().dump(logs, many=True).data
 
 class LogAdminView(Resource):
     @auth.login_required
     def get(self):
-        if (g.user.role & 1) == 0 and (g.user.syncMaster == 0):
+        if g.user.role != 1 and (g.user.syncMaster == 0):
             return make_response(jsonify({'error': 'Not authorized'}), 403)
-        logs = Action.query.order_by(Action.date.desc()).all()
+        logs = Action.query.filter(Action.logLevel != 'L1').order_by(Action.date.desc()).all()
         return LogSerializer().dump(logs, many=True).data
 
     @auth.login_required
@@ -477,13 +519,12 @@ class InvalidateAuthCardView(Resource):
     def post(self, id):
 
         if g.user.id != id:
-            if (g.user.role & 1) == 0:
+            if g.user.role != 1:
                 return '', 401
 
         user = User.query.filter_by(id=id).first()
         if user is None:
             return '', 401
-
 
         user.cardID = ""
         logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
@@ -515,7 +556,7 @@ class RfidTagAssignView(Resource):
         if not form.validate_on_submit():
             return form.errors, 422
         # check admin rights
-        if (g.user.role & 1) == 0:
+        if g.user.role != 1:
             return make_response(jsonify({'error': 'Not authorized'}), 403)
 
         user = User.query.filter_by(email=form.email.data).first()
@@ -550,7 +591,7 @@ class RfidTagAssignView(Resource):
             else:
                 logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
                                g.user.email, 'Assign RFID-tag ' + form.rfidTagId.data + ' to ' + user.firstName + ' ' + user.lastName, 'Card administration',
-                               'L1', 0, 'Card based')
+                               'L2', 0, 'Card based')
                 db.session.add(logentry)
                 db.session.commit()
         print 'Assigned cardID ' + form.rfidTagId.data + ' to ' + user.firstName + ' ' + user.lastName
@@ -566,7 +607,7 @@ class RfidTagWitdrawView(Resource):
         if not form.validate_on_submit():
             return form.errors, 422
         # check admin rights
-        if (g.user.role & 1) == 0:
+        if g.user.role != 1:
             return make_response(jsonify({'error': 'Not authorized'}), 403)
 
         user = User.query.filter_by(email=form.email.data).first()
@@ -588,7 +629,7 @@ class RfidTagWitdrawView(Resource):
                 print 'Withdraw cardID ' + form.rfidTagId.data + ' from ' + user.firstName + ' ' + user.lastName
                 logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
                                g.user.email, 'Withdraw cardID-tag ' + form.rfidTagId.data + ' from ' + user.firstName + ' ' + user.lastName, 'Card administration',
-                               'L1', 0, 'Web based')
+                               'L2', 0, 'Web based')
                 db.session.add(logentry)
                 db.session.commit()
 
@@ -601,9 +642,11 @@ api.add_resource(SessionView, '/sessions')
 
 api.add_resource(UserView, '/user/<int:id>')
 api.add_resource(UserListView, '/users')
+api.add_resource(AdminsListView, '/admins')
 
 api.add_resource(LogUserView, '/actions/user')
 api.add_resource(LogAdminView, '/actions/admin')
+api.add_resource(LogDebugView, '/actions/debug')
 
 api.add_resource(DoorView, '/door/<int:id>')
 api.add_resource(DoorSyncView, '/door/<int:id>/sync')

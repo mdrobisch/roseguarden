@@ -3,6 +3,7 @@ import requests
 __author__ = 'drobisch'
 
 import flask_alchemydumps
+from sqlalchemy import func
 from models import User, Door, Action
 from server import app, db
 from serializers import LogSerializer, UserSyncSerializer, SessionInfoSerializer, DoorSerializer, RfidTagInfoSerializer
@@ -61,7 +62,7 @@ class BackgroundWorker():
         self.tagResetCount = 0
         self.lock = False
         self.lastBackupTime = datetime.datetime.now()
-        self.lastCleanupTime = datetime.datetime.now()
+        self.lastCleanupTime = datetime.datetime.now().replace(1910)
         self.lastSyncTime = datetime.datetime.now()
 
         # setup gpio and set default (Low)
@@ -298,9 +299,9 @@ class BackgroundWorker():
 
     def checkRFIDTag(self):
 
-        if self.first == True:
-            self.first = False
-            raise ValueError('A very specific bad thing happened')
+        #if self.first == True:
+        #    self.first = False
+        #    raise ValueError('A very specific bad thing happened')
 
         while (self.lock == True):
             print "still locked (checkRFIDTag)"
@@ -433,6 +434,11 @@ class BackgroundWorker():
             self.ledState = self.LED_STATE_ACCESS_DENIED
             raise
 
+    def get_query_count(self, q):
+        count_q = q.statement.with_only_columns([func.count()]).order_by(None)
+        count = q.session.execute(count_q).scalar()
+        return count
+
     def cleanup_cycle(self):
         lasttime = self.lastCleanupTime
         now = datetime.datetime.now()
@@ -446,11 +452,15 @@ class BackgroundWorker():
 
         if(now > next_time):
             print 'Doing a cleanup (' + str(datetime.datetime.now()) + ')'
-            Action.query.filter(Action.date <= past).delete()
-            logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, 'Sync Master',
-                           'syncmaster@roseguarden.org', 'Cleanup logs older than ' + str(config.CLEANUP_THRESHOLD) + ' days', 'Cleanup',
-                           'L1', 0, 'Internal')
-            db.session.add(logentry)
+            actions = Action.query.filter(Action.date <= past)
+            action_count = self.get_query_count(actions)
+            print str(action_count) + ' items to cleanup'
+            if action_count > 0:
+                logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, 'Sync Master',
+                               'syncmaster@roseguarden.org', 'Cleanup ' + action_count + ' logs older than ' + str(config.CLEANUP_THRESHOLD) + ' days', 'Cleanup',
+                               'L1', 0, 'Internal')
+                db.session.add(logentry)
+            actions.delete()
             db.session.commit()
             print 'Next cleanup @' + str(next_time) + ' (' + str(datetime.datetime.now()) + ')'
             self.lastCleanupTime = now
@@ -729,7 +739,7 @@ class BackgroundWorker():
             except Exception, e:
                 import traceback
                 print traceback.format_exc()
-                logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, 'Sync Master', 'syncmaster@roseguarden.org',
+                logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, 'Background Worker', 'background@roseguarden.org',
                                 'Error: ' + str(traceback.format_exc()),
                                 'Error occured', 'L1', 0, 'Internal')
                 db.session.add(logentry)
@@ -768,7 +778,7 @@ class BackgroundWorker():
                 db.session.commit()
 
         self.cleanupTimer +=1
-        if self.cleanupTimer > 221:
+        if self.cleanupTimer > 205:
             self.cleanupTimer = 0
             if config.CLEANUP_EANBLE == True:
                 try:

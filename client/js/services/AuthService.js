@@ -30,10 +30,23 @@ RoseGuardenApp.service('AuthService', AuthService = function($q, localStorageSer
         return deferred.promise
     };
 
+    this.isSupervisor = function() {
+        var token = localStorageService.get('role');
+        if(token) {
+            if(token == 2)
+                return true;
+            else
+                return false;
+        } else {
+            return false;
+        }
+    };
+
+
     this.isAdmin = function() {
         var token = localStorageService.get('role');
         if(token) {
-            if((token & 0x01) != 0)
+            if(token == 1)
                 return true;
             else
                 return false;

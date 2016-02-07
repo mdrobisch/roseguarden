@@ -13,6 +13,12 @@ RoseGuardenApp.factory('User', function(Restangular) {
                 .withHttpConfig({bypassErrorInterceptor: bypassErrorInterceptor})
                 .getList();
         },
+        getAdminsList: function (bypassErrorInterceptor) {
+            return Restangular
+                .all('admins')
+                .withHttpConfig({bypassErrorInterceptor: bypassErrorInterceptor})
+                .getList();
+        },
         update: function(id,data) {
             return Restangular
                 .one('user',id)

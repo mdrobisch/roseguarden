@@ -5,12 +5,24 @@ from marshmallow import Schema, fields, post_load, post_dump
 import datetime
 
 
+class UserListForSupervisorsSerializer(Schema):
+    class Meta:
+        fields = ("id", "email", "firstName", "lastName", "phone", "role", "licenseMask", "keyMask", "lastBudgetUpdateDate",
+                  "association", "accessDateStart", "accessDateEnd", "lastAccessDaysUpdateDate",
+                  "accessTimeStart", "accessTimeEnd", "lastSyncDateTime", "accessType", "accessDaysMask", "accessDayCounter",
+                  "budget", "cardID", "accessDayCyclicBudget")
+
 class UserListSerializer(Schema):
     class Meta:
         fields = ("id", "email", "firstName", "lastName", "phone", "role", "licenseMask", "keyMask", "lastBudgetUpdateDate", "lastAccessDateTime",
                   "association", "registerDateTime", "lastLoginDateTime", "accessDateStart", "accessDateEnd", "lastAccessDaysUpdateDate",
                   "accessTimeStart", "accessTimeEnd", "lastSyncDateTime", "accessType", "accessDaysMask", "accessDayCounter",
                   "budget", "cardID", "accessDayCyclicBudget")
+
+class AdminsListSerializer(Schema):
+    class Meta:
+        fields = ("email", "firstName", "lastName", "phone", "role", "association")
+
 
 class UserSerializer(Schema):
     class Meta:

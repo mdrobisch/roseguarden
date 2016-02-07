@@ -10,12 +10,18 @@ RoseGuardenApp.factory('Log', function(Restangular) {
                 .withHttpConfig({bypassErrorInterceptor: bypassErrorInterceptor})
                 .getList();
         },
+        getDebugLog: function (bypassErrorInterceptor) {
+            return Restangular
+                .all('actions/debug')
+                .withHttpConfig({bypassErrorInterceptor: bypassErrorInterceptor})
+                .getList();
+        },
         getUserLog: function (bypassErrorInterceptor) {
             return Restangular
                 .all('actions/user')
                 .withHttpConfig({bypassErrorInterceptor: bypassErrorInterceptor})
                 .getList();
-        },
+        }
 
 
     };
