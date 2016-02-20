@@ -328,6 +328,28 @@ class SessionView(Resource):
                 print "Log-entry is in merge-range ts = " + str(datetime.datetime.now()) + " last = " + str(user.lastLoginDateTime) + " merge = " + str(config.NODE_LOG_MERGE) + " minutes"
 
             return SessionInfoSerializer().dump(user).data, 201
+        else:
+            lastlogEntry = Action.query.filter_by(logType='Failed login attempt', userMail=form.email.data).order_by(Action.date.desc()).first()
+            addNewlogEntry = True
+
+            if lastlogEntry is None:
+                addNewlogEntry = True
+            else:
+                if datetime.datetime.utcnow() > (lastlogEntry.date + datetime.timedelta(minutes=60)):
+                    addNewlogEntry = True
+                else:
+                    addNewlogEntry = False
+
+            if addNewlogEntry == True:
+                logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, 'Security warning', form.email.data,
+                                'Failed login for ' + form.email.data + ' ( 1 invalid attempts)',
+                                'Failed login attempt', 'L1', 0, 'Internal')
+                db.session.add(logentry)
+            else:
+                lastlogEntry.actionParameter += 1
+                lastlogEntry.logText = 'Failed login for ' + form.email.data + ' (' + str(lastlogEntry.actionParameter + 1) + ' invalid attempts)'
+            db.session.commit()
+
         return '', 401
 
 

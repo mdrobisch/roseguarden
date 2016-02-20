@@ -16,6 +16,7 @@ class StatisticsManager(object):
     STATISTICS_STATID_DOORS        =   5
     STATISTICS_STATID_WEEKDAYS     =   6
     STATISTICS_STATID_LOGINS       =   7
+    STATISTICS_STATID_SECURITY     =   8
 
     BINNING_NONE = 0
 
@@ -30,9 +31,33 @@ class StatisticsManager(object):
     SERIES_SUCCESFULL_LOGINS = 0
     SERIES_FAILED_LOGINS = 1
 
+    SERIES_SECURITY_FAILED_LOGINS = 0
+    SERIES_SECURITY_FAILED_API_AUTH = 1
+    SERIES_SECURITY_WORKER_ERRORS = 2
+
     @staticmethod
     def updateUserCountStat():
-        print "userCount stat"
+        print "Update UserCount stat"
+
+    @staticmethod
+    def updateAccessesStat():
+        print "Update Accesses stat"
+
+    @staticmethod
+    def updateWeekdaysStat():
+        print "Update Weekdate stat"
+
+    @staticmethod
+    def updateDoorsStat():
+        print "Update Door stat"
+
+    @staticmethod
+    def updateLoginStat():
+        print "Update Login stat"
+
+    @staticmethod
+    def updateSecurityStat():
+        print "Update Security stat"
 
     @staticmethod
     def raiseUserCountChangedEvent():

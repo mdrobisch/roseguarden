@@ -46,12 +46,14 @@ def seed_statistic():
     weekdayStat = Statistic("Accesses per weekday", StatisticsManager.STATISTICS_STATID_WEEKDAYS, Statistic.STATTYPE_RADAR_SERIES, 7, 1, "Weekdays")
     doorStat = Statistic("Accesses per door", StatisticsManager.STATISTICS_STATID_DOORS, Statistic.STATTYPE_DOUGHNUT_CLASSES, 2, 0)
     loginsCountStat = Statistic("Logins", StatisticsManager.STATISTICS_STATID_LOGINS, Statistic.STATTYPE_LINE_SERIES, 0, 2, "Logins", "Failed attempts")
+    secuirityStat = Statistic("Security warnings", StatisticsManager.STATISTICS_STATID_SECURITY, Statistic.STATTYPE_LINE_SERIES, 0, 3, "Failed login", "Failed API auth.", "Worker errors")
 
     db.session.add(userCountStat)
     db.session.add(accessesStat)
     db.session.add(doorStat)
     db.session.add(loginsCountStat)
     db.session.add(weekdayStat)
+    db.session.add(secuirityStat)
 
     # add entry for usercount
     for year in range(2015,2017):
@@ -59,22 +61,20 @@ def seed_statistic():
             if year >= datetime.datetime.now().year:
                 if month > datetime.datetime.now().month:
                     break
-
-            userCountEntry = StatisticEntry(StatisticsManager.STATISTICS_STATID_USERCOUNT, str(month) + "/" + str(year % 1000), random.randrange(20, 120), StatisticsManager.SERIES_GENERALUSER, month, year, StatisticsManager.BINNING_NONE)
-            superCountEntry = StatisticEntry(StatisticsManager.STATISTICS_STATID_USERCOUNT, str(month) + "/" + str(year % 1000), random.randrange(5, 15), StatisticsManager.SERIES_SUPERUSER, month, year, StatisticsManager.BINNING_NONE)
-            adminCountEntry = StatisticEntry(StatisticsManager.STATISTICS_STATID_USERCOUNT, str(month) + "/" + str(year % 1000), random.randrange(2, 6), StatisticsManager.SERIES_ADMINUSER, month, year, StatisticsManager.BINNING_NONE)
-            accessesCardCountEntry = StatisticEntry(StatisticsManager.STATISTICS_STATID_ACCESSES, str(month) + "/" + str(year % 1000), random.randrange(20, 120), StatisticsManager.SERIES_CARD_ACCESSES, month, year, StatisticsManager.BINNING_NONE)
-            accessesWebCountEntry = StatisticEntry(StatisticsManager.STATISTICS_STATID_ACCESSES, str(month) + "/" + str(year % 1000), random.randrange(20, 120), StatisticsManager.SERIES_WEB_ACCESSES, month, year, StatisticsManager.BINNING_NONE)
-            loginsCountEntry = StatisticEntry(StatisticsManager.STATISTICS_STATID_LOGINS, str(month) + "/" + str(year % 1000), random.randrange(20, 120), StatisticsManager.SERIES_SUCCESFULL_LOGINS, month, year, StatisticsManager.BINNING_NONE)
-            failedLoginsCountEntry = StatisticEntry(StatisticsManager.STATISTICS_STATID_LOGINS, str(month) + "/" + str(year % 1000), random.randrange(20, 120), StatisticsManager.SERIES_FAILED_LOGINS, month, year, StatisticsManager.BINNING_NONE)
-            db.session.add(userCountEntry)
-            db.session.add(superCountEntry)
-            db.session.add(adminCountEntry)
-            db.session.add(accessesCardCountEntry)
-            db.session.add(accessesWebCountEntry)
-            db.session.add(loginsCountEntry)
-            db.session.add(failedLoginsCountEntry)
-
+            # STATISTICS_STATID_USERCOUNT entries
+            db.session.add(StatisticEntry(StatisticsManager.STATISTICS_STATID_USERCOUNT, str(month) + "/" + str(year % 1000), random.randrange(20, 120), StatisticsManager.SERIES_GENERALUSER, month, year, StatisticsManager.BINNING_NONE))
+            db.session.add(StatisticEntry(StatisticsManager.STATISTICS_STATID_USERCOUNT, str(month) + "/" + str(year % 1000), random.randrange(5, 15), StatisticsManager.SERIES_SUPERUSER, month, year, StatisticsManager.BINNING_NONE))
+            db.session.add(StatisticEntry(StatisticsManager.STATISTICS_STATID_USERCOUNT, str(month) + "/" + str(year % 1000), random.randrange(2, 6), StatisticsManager.SERIES_ADMINUSER, month, year, StatisticsManager.BINNING_NONE))
+            # STATISTICS_STATID_ACCESSES entries
+            db.session.add(StatisticEntry(StatisticsManager.STATISTICS_STATID_ACCESSES, str(month) + "/" + str(year % 1000), random.randrange(20, 120), StatisticsManager.SERIES_CARD_ACCESSES, month, year, StatisticsManager.BINNING_NONE))
+            db.session.add(StatisticEntry(StatisticsManager.STATISTICS_STATID_ACCESSES, str(month) + "/" + str(year % 1000), random.randrange(20, 120), StatisticsManager.SERIES_WEB_ACCESSES, month, year, StatisticsManager.BINNING_NONE))
+            # STATISTICS_STATID_LOGINS entries
+            db.session.add(StatisticEntry(StatisticsManager.STATISTICS_STATID_LOGINS, str(month) + "/" + str(year % 1000), random.randrange(20, 120), StatisticsManager.SERIES_SUCCESFULL_LOGINS, month, year, StatisticsManager.BINNING_NONE))
+            db.session.add(StatisticEntry(StatisticsManager.STATISTICS_STATID_LOGINS, str(month) + "/" + str(year % 1000), random.randrange(20, 120), StatisticsManager.SERIES_FAILED_LOGINS, month, year, StatisticsManager.BINNING_NONE))
+            # STATISTICS_STATID_SECURITY entries
+            db.session.add(StatisticEntry(StatisticsManager.STATISTICS_STATID_SECURITY, str(month) + "/" + str(year % 1000), random.randrange(20, 120), StatisticsManager.SERIES_SECURITY_FAILED_LOGINS, month, year, StatisticsManager.BINNING_NONE))
+            db.session.add(StatisticEntry(StatisticsManager.STATISTICS_STATID_SECURITY, str(month) + "/" + str(year % 1000), random.randrange(20, 120), StatisticsManager.SERIES_SECURITY_FAILED_API_AUTH, month, year, StatisticsManager.BINNING_NONE))
+            db.session.add(StatisticEntry(StatisticsManager.STATISTICS_STATID_SECURITY, str(month) + "/" + str(year % 1000), random.randrange(20, 120), StatisticsManager.SERIES_SECURITY_WORKER_ERRORS, month, year, StatisticsManager.BINNING_NONE))
 
     for day in range(0,7):
         daynamesList = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
