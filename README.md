@@ -104,17 +104,25 @@ To update the software to the latest version on github, use git.
 - `git fetch --all`
 - `git reset --hard origin/master`
 
-Noe switch to the `server`-directory:
+Now switch to the `server`-directory:
 
 If some new external pip-modules are introduces in a version you need to reload the `requirements.txt`.
 
 - `sudo pip install -r requirements.txt`
 
+
 In addition a upgrade of the migration from the database is required, use roseGuarden.py.
 
 - `sudo python roseGuarden.py db upgrade`
 
-After upgrading you can restart your roseGuarden-application again.
+To update the client switch to your client directory e.g the `client`-directory:
+
+Here we have to install/uninstall all new/old packages of bower.
+
+- `sudo bower install`
+
+After updating please restart your roseGuarden-application again.
+It should be work after this with the newest version for server and client.
 
 Install autostart and montoring (supervisor)
 ============================================

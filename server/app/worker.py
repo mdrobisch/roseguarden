@@ -3,7 +3,6 @@ import requests
 __author__ = 'drobisch'
 
 import flask_alchemydumps
-from sqlalchemy import func
 from models import User, Door, Action
 from server import app, db
 from serializers import LogSerializer, UserSyncSerializer, SessionInfoSerializer, DoorSerializer, RfidTagInfoSerializer
@@ -14,6 +13,7 @@ import config
 import base64
 import json
 import datetime
+import helpers
 from dateutil.relativedelta import relativedelta
 import os
 from models import RfidTagInfo
@@ -434,10 +434,7 @@ class BackgroundWorker():
             self.ledState = self.LED_STATE_ACCESS_DENIED
             raise
 
-    def get_query_count(self, q):
-        count_q = q.statement.with_only_columns([func.count()]).order_by(None)
-        count = q.session.execute(count_q).scalar()
-        return count
+
 
     def cleanup_cycle(self):
         lasttime = self.lastCleanupTime
@@ -453,11 +450,11 @@ class BackgroundWorker():
         if(now > next_time):
             print 'Doing a cleanup (' + str(datetime.datetime.now()) + ')'
             actions = Action.query.filter(Action.date <= past)
-            action_count = self.get_query_count(actions)
+            action_count = helpers.get_query_count(actions)
             print str(action_count) + ' items to cleanup'
             if action_count > 0:
                 logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, 'Sync Master',
-                               'syncmaster@roseguarden.org', 'Cleanup ' + action_count + ' logs older than ' + str(config.CLEANUP_THRESHOLD) + ' days', 'Cleanup',
+                               'syncmaster@roseguarden.org', 'Cleanup ' + str(action_count) + ' logs older than ' + str(config.CLEANUP_THRESHOLD) + ' days', 'Cleanup',
                                'L1', 0, 'Internal')
                 db.session.add(logentry)
             actions.delete()
@@ -744,7 +741,6 @@ class BackgroundWorker():
                                 'Error occured', 'L1', 0, 'Internal')
                 db.session.add(logentry)
                 db.session.commit()
-
 
         self.backupTimer += 1
         if self.backupTimer > 113 or self.forceBackup == True:

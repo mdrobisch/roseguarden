@@ -35,9 +35,10 @@
                 <td>
                     {{row.logType}}
 
-                    <a ng-show="true" class="btn btn-default gliphicons-small" tooltip="{{row.logText}}" >
+                    <button popover-placement="left" popover="{{row.logText}}" class="btn btn-default">
                         <i class="glyphicon glyphicon-info-sign"></i>
-                    </a>
+                    </button>
+
                 </td>
                 <td>
                     <span>{{row.userName}}</span>
@@ -49,7 +50,7 @@
         <tfoot>
             <tr>
                 <td colspan="5" class="text-center">
-                    <div st-pagination="" st-items-by-page="itemsByPage" st-displayed-pages="7"></div>
+                    <div st-pagination="" st-items-by-page="20" st-displayed-pages="7"></div>
                 </td>
             </tr>
         </tfoot>

@@ -6,6 +6,7 @@ RoseGuardenApp.controller('AdminTabCtrl', function ($scope, $location) {
       { title : 'Doors', template : 'partials/admin/doors.html', glyphicon : 'glyphicon-lock' },
       //{ title : 'Devices', template : 'partials/admin/devices.html'},
       { title : 'Log', template : 'partials/admin/log.html', glyphicon : 'glyphicon-list'},
+      { title : 'Statistics', template : 'partials/admin/stats.html', glyphicon : 'glyphicon-stats'},
       { title : 'Debug', template : 'partials/admin/debug.html', glyphicon : 'glyphicon-exclamation-sign'}
     ];
 

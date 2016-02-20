@@ -41,6 +41,19 @@ except KeyError:
     print "Missing config NODE_LOG_MERGE in config.ini: set NODE_LOG_MERGE to 10 minutes"
     NODE_LOG_MERGE = 10
 
+try:
+    statistics_section = config['STATISTICS']
+    try:
+        STATISTICS_ENABLE = conf_entry_to_bool(statistics_section['STATISTICS_ENABLE'])
+    except KeyError:
+        print "Missing config STATISTICS_ENABLE in config.ini: set STATISTICS_ENABLE to false"
+        STATISTICS_ENABLE = False
+except KeyError:
+    print "Missing config STATISTICS section in config.ini:"
+    print "     Set STATISTICS_ENABLE to false"
+    STATISTICS_ENABLE = False
+
+
 # flask settings
 flask_section = config['FLASK']
 DEBUG = conf_entry_to_bool(flask_section['DEBUG'])

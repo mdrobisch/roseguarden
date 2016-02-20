@@ -3,8 +3,9 @@ from email import send_email
 from flask import g, render_template, make_response, jsonify, request
 from flask_restful import Resource, fields, marshal_with
 from server import api, db, flask_bcrypt, auth, mail
-from models import User, Action, Door, RfidTagInfo
-from serializers import LogSerializer, UserSyncSerializer, AdminsListSerializer, UserListForSupervisorsSerializer, UserListSerializer, UserSerializer, SessionInfoSerializer, DoorSerializer, RfidTagInfoSerializer
+from models import User, Action, Door, RfidTagInfo, Statistic, StatisticEntry
+from serializers import LogSerializer, UserSyncSerializer, AdminsListSerializer, UserListForSupervisorsSerializer, UserListSerializer, \
+    UserSerializer, SessionInfoSerializer, DoorSerializer, RfidTagInfoSerializer, StatisticListSerializer, StatisticEntryListSerializer
 from forms import UserPatchForm, DoorRegistrationForm, SessionCreateForm, LostPasswordForm, RegisterUserForm, \
     UserDeleteForm, RFIDTagAssignForm, RFIDTagWithdrawForm
 from worker import backgroundWorker
@@ -529,7 +530,7 @@ class InvalidateAuthCardView(Resource):
         user.cardID = ""
         logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
                        g.user.email, 'Invalidate auth. card of ' + user.firstName + ' ' + user.lastName + ' (' + user.email + ')',
-                       'Invalidate lost auth. card', 'L2', 0, 'Web based', Action.ACTION_OPENING_REQUEST)
+                       'Invalidate auth. card', 'L2', 0, 'Web based', Action.ACTION_OPENING_REQUEST)
         try:
             db.session.add(logentry)
             db.session.commit()
@@ -638,6 +639,39 @@ class RfidTagWitdrawView(Resource):
             return make_response(jsonify({'error': 'bad request data'}), 400)
 
 
+class StatisticsListView(Resource):
+    @auth.login_required
+    def get(self):
+
+        if g.user.id != id:
+            if g.user.role != 1:
+                return '', 401
+
+        stats = Statistic.query.all()
+        if stats is None:
+            return '', 401
+
+        return StatisticListSerializer().dump(stats, many=True).data
+
+class StatisticEntriesListView(Resource):
+    @auth.login_required
+    def get(self, id):
+
+        if g.user.id != id:
+            if g.user.role != 1:
+                return '', 401
+
+        stats = Statistic.query.filter(Statistic.id == id).first();
+        if stats is None:
+            return '', 405
+
+        statsEntries = StatisticEntry.query.filter(StatisticEntry.statId == stats.statId).all()
+        if statsEntries is None:
+            return '', 405
+
+        return StatisticEntryListSerializer().dump(statsEntries, many=True).data
+
+
 api.add_resource(SessionView, '/sessions')
 
 api.add_resource(UserView, '/user/<int:id>')
@@ -652,6 +686,10 @@ api.add_resource(DoorView, '/door/<int:id>')
 api.add_resource(DoorSyncView, '/door/<int:id>/sync')
 api.add_resource(DoorRegistrationView, '/door')
 api.add_resource(DoorListView, '/doors')
+
+api.add_resource(StatisticsListView, '/statistics')
+api.add_resource(StatisticEntriesListView, '/statistic/<int:id>')
+
 
 api.add_resource(OpeningRequestView, '/request/opening')
 api.add_resource(LostPasswordView, '/request/password')

@@ -82,9 +82,11 @@ def datetime_tz_test():
 
     #datetime.datetime.strptime(dt_str, '%Y-%m-%dT%H:%M:%S%Z')
 
+def weekday_test():
+    print str((datetime.datetime.now() - datetime.timedelta(2)).year)
+
 def environ_test():
     #os.environ['ROSEGUARDEN_GLOBAL_RFID_PASSWORD'] = str("Test")
     print os.environ.get('ROSEGUARDEN_GLOBAL_RFID_PASSWORD')
 
-daily_worker_test()
-
+weekday_test()

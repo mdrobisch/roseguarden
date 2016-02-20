@@ -8,6 +8,18 @@
     height: 24px;
 }
 
+.popover {
+    max-width: 768px;
+}
+
+.popover-content {
+  white-space: pre;
+}
+
+.alert-info {
+  white-space: pre;
+}
+
 .combobox {
   font-size: 14px;
   width: 100%;

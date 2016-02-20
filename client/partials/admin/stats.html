@@ -1,0 +1,61 @@
+<div ng-controller="AdminStatsCtrl">
+
+     <div class="alert alert-success" ng-show="showSuccess">
+        {{success}}
+    </div>
+
+     <div class="alert alert-danger" ng-show="showError">
+        {{error}}
+    </div>
+
+    <div class="alert alert-info" ng-show="showInfo">
+        {{info}}
+    </div>
+
+
+    <div class="alert alert-info" ng-show="isLoading">
+        Loading data ...
+        <img src="images/loading.gif" >
+    </div>
+
+    <div ng-show="statsAvailable">
+        <p></p>
+
+        <span style="font-size: 20px ; font-weight: bold"> {{statTitle}} <br>
+
+        <p></p>
+
+        <div ng-show="showYearPicker" class="row center-block text-center">
+            <div class="center-block" style="width: 100px">
+                <p class="input-group">
+                  <input type="text" class="form-control" show-button-bar="false" ng-model="dt"
+                  datepicker-popup="{{format}}" datepicker-options="{{datepickerOptions}}"
+                  is-open="opened" ng-focus="open($event)"
+                  date-disabled="disabled(date, mode)" ng-required="true" close-text="Close"></input>
+                  <span class="input-group-btn">
+                    <button type="button" class="btn btn-default" ng-click="open($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+                  </span>
+                </p>
+            </div>
+        </div>
+
+        <p></p>
+
+        <canvas id="chartCanvas" class="chart-base" chart-type="statType"
+          chart-data="statData" chart-legend="true" chart-labels="statLabels" chart-series="statSeries">
+        </canvas>
+
+
+        <img ng-show="isLoadingData" src="images/loading.gif" >
+
+        <span style="font-size: 14px ; font-weight: normal">
+
+        <div>
+            <uib-pagination total-items="totalStats" max-size="maxSize"  items-per-page="1" ng-model="currentPage" ng-change="pageChanged()"></uib-pagination>
+        </div>
+
+        <p></p>
+
+        <p></p>
+    </div>
+</div>

@@ -1,6 +1,5 @@
 //Define an angular module for our app
-var RoseGuardenApp = angular.module('RoseGuardenApp', ['ngRoute','ui.bootstrap', 'angularNumberPicker','restangular', 'LocalStorageModule', 'smart-table']);
-
+var RoseGuardenApp = angular.module('RoseGuardenApp', ['ngRoute','ui.bootstrap', 'ngSanitize', 'chart.js', 'angularNumberPicker','restangular', 'LocalStorageModule', 'smart-table']);
 
 
 RoseGuardenApp.run(function($location, Restangular, AuthService) {

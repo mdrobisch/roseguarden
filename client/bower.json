@@ -25,6 +25,7 @@
     "angular-number-picker": "~1.2.2",
     "moment": "~2.10.6",
     "angular-i18n": "~1.4.7",
-    "angular-chart.js": "~0.8.8"
+    "angular-chart.js": "~0.8.8",
+    "angular-sanitize": "~1.5.0"
   }
 }

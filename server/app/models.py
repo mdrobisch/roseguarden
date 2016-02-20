@@ -16,6 +16,9 @@ class User(db.Model):
     ACCESSTYPE_QUARTERLY_BUDGET = 5
     ACCESSTYPE_MAX = 6
 
+    AUTHTYPE_WEB    = 0
+    AUTHTYPE_RFID   = 1
+
     id = db.Column(db.Integer, primary_key=True)
     syncMaster = db.Column(db.Integer)
     active = db.Column(db.Integer)
@@ -35,6 +38,12 @@ class User(db.Model):
     cardAuthKeyB = db.Column(db.Text)
     cardSecret = db.Column(db.Text)
     licenseMask = db.Column(db.Integer)
+    weeklyAccessAverage = db.Column(db.Integer)
+    weeklyAccessWeekNumber = db.Column(db.Integer)
+    weeklyAccessCount = db.Column(db.Integer)
+    monthlyAccessAverage = db.Column(db.Integer)
+    monthlyAccessMonthNumber = db.Column(db.Integer)
+    monthlyAccessCount = db.Column(db.Integer)
     keyMask = db.Column(db.Integer)
     accessType = db.Column(db.Integer)
     accessDateStart = db.Column(db.DateTime)
@@ -149,6 +158,12 @@ class User(db.Model):
         self.accessType = 0
         self.accessDayCounter = 10
         self.accessDayCyclicBudget = 10
+        self.weeklyAccessAverage = 0
+        self.weeklyAccessWeekNumber = datetime.datetime.now().isocalendar()[1]
+        self.weeklyAccessCount = 0
+        self.monthlyAccessAverage = 0
+        self.monthlyAccessMonthNumber = datetime.datetime.now().month
+        self.monthlyAccessCount = 0
         self.lastAccessDaysUpdateDate = (datetime.datetime.today()).replace(hour=0, minute=0, second=0, microsecond=0)
         self.accessDateStart = (datetime.datetime.today()).replace(hour=0, minute=0, second=0, microsecond=0)
         self.accessDateEnd = (datetime.datetime.today() + datetime.timedelta(365*15)).replace(hour=0,minute=0,second=0,microsecond=0)
@@ -211,6 +226,66 @@ class Action(db.Model):
         self.action = action
         self.actionParameter = actionParameter
         self.rollbackPoint = rollbackpoint
+
+class StatisticEntry(db.Model):
+
+    id = db.Column(db.Integer, primary_key=True)
+    statId = db.Column(db.Integer)
+    month = db.Column(db.Integer)
+    year = db.Column(db.Integer)
+    binningId = db.Column(db.Integer)
+    series = db.Column(db.Integer)
+    label = db.Column(db.Text)
+    value = db.Column(db.Float)
+
+    def __init__(self, statId, label, value, series, month, year, binningId):
+        self.statId = statId
+        self.label = label
+        self.value = value
+        self.series = series
+        self.month = month
+        self.year = year
+        self.binningId = binningId
+
+
+class Statistic(db.Model):
+    STATTYPE_LINE_SERIES = 1
+    STATTYPE_BAR_SERIES = 2
+    STATTYPE_RADAR_SERIES = 3
+    STATTYPE_DOUGHNUT_CLASSES = 5
+    STATTYPE_RADAR_CLASSES = 6
+
+    STATTYPE_YEARLY_LINE_SERIES = 11
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.Text)
+    statId = db.Column(db.Integer)
+    statType = db.Column(db.Integer)
+    binningCount = db.Column(db.Integer)
+    seriesCount = db.Column(db.Integer)
+    seriesName1 = db.Column(db.Text)
+    seriesName2 = db.Column(db.Text)
+    seriesName3 = db.Column(db.Text)
+    seriesName4 = db.Column(db.Text)
+    seriesName5 = db.Column(db.Text)
+    seriesName6 = db.Column(db.Text)
+    seriesName7 = db.Column(db.Text)
+    seriesName8 = db.Column(db.Text)
+
+    def __init__(self, name, statId, statType, binningCount = 0, seriesCount = 0, seriesName1 = '', seriesName2 = '', seriesName3 = '', seriesName4 = '', seriesName5 = '', seriesName6 = '', seriesName7 = '', seriesName8 = ''):
+        self.name = name
+        self.statId = statId
+        self.statType = statType
+        self.binningCount = binningCount
+        self.seriesCount = seriesCount
+        self.seriesName1 = seriesName1
+        self.seriesName2 = seriesName2
+        self.seriesName3 = seriesName3
+        self.seriesName4 = seriesName4
+        self.seriesName5 = seriesName5
+        self.seriesName6 = seriesName6
+        self.seriesName7 = seriesName7
+        self.seriesName8 = seriesName8
 
 class Door(db.Model):
     id = db.Column(db.Integer, primary_key=True)
