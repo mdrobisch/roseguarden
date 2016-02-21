@@ -3,6 +3,17 @@ RoseGuarden
 
 A remote door api and web application for Raspberry Pi, Odroid, Orange Pi or BeagleBoard (based on python).
 
+Features
+==========
+
+* affordable access-control system
+* authentication by rfid-tags or webserver-application (smarthone, tablet)
+* easily extendable for additional doors. through network based system
+* 3 different user-roles (user, supervisor, admin) for managing accesses and viewing logs
+* different types of accesses (period, days-budget)
+* additional options to adjust accesses (by given time, weekdays, differenet door-licences)
+* basic statistics (total users, total accesses, accesses per weekday, accesses per door/node)
+
 Quickstart
 ==========
 
@@ -149,6 +160,9 @@ Screenshots (Software)
 
 ![users](documentation/screenshots/admin_users.png)
 
+![users](documentation/screenshots/admin_stats.png)
+
+![users](documentation/screenshots/suervisor_space.png)
 
 Hardware
 ========
