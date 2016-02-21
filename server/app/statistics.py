@@ -5,22 +5,24 @@ import config
 import helpers
 from models import User, Action, Door, RfidTagInfo, Statistic, StatisticEntry
 from server import db
+import random
 
 class StatisticsManager(object):
 
     # Monthly stats.
-    STATISTICS_STATID_USERCOUNT    =   1
-    STATISTICS_STATID_ACCESSES     =   2
-    STATISTICS_STATID_AUTH_CARDS   =   3
-    STATISTICS_STATID_WEB_CLIENT   =   4
-    STATISTICS_STATID_DOORS        =   5
-    STATISTICS_STATID_WEEKDAYS     =   6
-    STATISTICS_STATID_LOGINS       =   7
-    STATISTICS_STATID_SECURITY     =   8
+    STATISTICS_STATID_USERCOUNT     =   1
+    STATISTICS_STATID_ACCESSES      =   2
+    STATISTICS_STATID_AUTH_CARDS    =   3
+    STATISTICS_STATID_WEB_CLIENT    =   4
+    STATISTICS_STATID_NODE_ACCESSES =   5
+    STATISTICS_STATID_WEEKDAYS      =   6
+    STATISTICS_STATID_LOGINS        =   7
+    STATISTICS_STATID_SECURITY      =   8
 
     BINNING_NONE = 0
 
     SERIES_NONE = 0
+
     SERIES_GENERALUSER = 0
     SERIES_SUPERUSER = 1
     SERIES_ADMINUSER = 2
@@ -36,20 +38,81 @@ class StatisticsManager(object):
     SERIES_SECURITY_WORKER_ERRORS = 2
 
     @staticmethod
-    def updateUserCountStat():
+    def staticEntryAddOrUpdate(statTye, statId, label, value, month, year, binningId, series):
+        statEntry = StatisticEntry.query.filter_by(statId = statId, label = label,series = series, month = month, year = year).first()
+        if statEntry is None:
+            newEntry = StatisticEntry(statId, label, value, series, month, year, binningId)
+            db.session.add(newEntry)
+        else:
+            statEntry.value = value
+        db.session.commit()
+
+    @staticmethod
+    def incrementalEntryAddOrUpdate(statTye, statId, label, value, month, year, binningId, series):
+        statEntry = StatisticEntry.query.filter_by(statId = statId, label = label,series = series, month = month, year = year).first()
+        if statEntry is None:
+            newEntry = StatisticEntry(statId, label, value, series, month, year, binningId)
+            db.session.add(newEntry)
+        else:
+            statEntry.value += value
+        db.session.commit()
+
+    @staticmethod
+    def updateUserCountStat(updateData):
         print "Update UserCount stat"
+        stat = Statistic.query.filter(Statistic.statId == StatisticsManager.STATISTICS_STATID_USERCOUNT).first()
+        if stat == None:
+            newStat = Statistic("User total", StatisticsManager.STATISTICS_STATID_USERCOUNT, Statistic.STATTYPE_LINE_SERIES, 0, 3, "Users", "Supervisors", "Admins")
+            db.session.add(newStat)
+            db.session.commit()
+
+        now = datetime.datetime.now() #- datetime.timedelta(days=30)
+        month = now.month
+        year = now.year
+        for i in range(0, 3):
+            StatisticsManager.staticEntryAddOrUpdate(Statistic.STATTYPE_LINE_SERIES, StatisticsManager.STATISTICS_STATID_USERCOUNT, str(month) + "/" + str(year % 1000), updateData[i], month, year, StatisticsManager.BINNING_NONE, i)
+
 
     @staticmethod
-    def updateAccessesStat():
+    def updateAccessesStat(updateData):
         print "Update Accesses stat"
+        stat = Statistic.query.filter(Statistic.statId == StatisticsManager.STATISTICS_STATID_ACCESSES).first()
+        if stat == None:
+            newStat = Statistic("Accesses total", StatisticsManager.STATISTICS_STATID_ACCESSES, Statistic.STATTYPE_LINE_SERIES, 0, 2, "Card auth.", "Web auth.")
+            db.session.add(newStat)
+            db.session.commit()
+
+        for year in updateData:
+            for month in updateData[year]:
+                for seriesIndex in range(len(updateData[year][month])):
+                    StatisticsManager.incrementalEntryAddOrUpdate(Statistic.STATTYPE_LINE_SERIES, StatisticsManager.STATISTICS_STATID_ACCESSES, str(month) + "/" + str(year % 1000), updateData[year][month][seriesIndex], month, year, StatisticsManager.BINNING_NONE, seriesIndex)
 
     @staticmethod
-    def updateWeekdaysStat():
+    def updateWeekdaysStat(updateData):
         print "Update Weekdate stat"
+        stat = Statistic.query.filter(Statistic.statId == StatisticsManager.STATISTICS_STATID_WEEKDAYS).first()
+        if stat == None:
+            newStat = Statistic("Accesses per weekday", StatisticsManager.STATISTICS_STATID_WEEKDAYS, Statistic.STATTYPE_RADAR_SERIES, 7, 1, "Weekdays")
+            db.session.add(newStat)
+            db.session.commit()
+
+        for day in range(0,7):
+            daynamesList = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+            dayname = daynamesList[day]
+            #dayEntry = StatisticEntry(StatisticsManager.STATISTICS_STATID_WEEKDAYS,dayname,random.randrange(10,100), 0, 0, 0, day)
+            StatisticsManager.incrementalEntryAddOrUpdate(Statistic.STATTYPE_RADAR_SERIES,StatisticsManager.STATISTICS_STATID_WEEKDAYS,dayname,updateData[day], 0, 0, day, 0)
 
     @staticmethod
-    def updateDoorsStat():
-        print "Update Door stat"
+    def updateNodeAccessStat(updateData):
+        print "Update node accesses stat"
+        stat = Statistic.query.filter(Statistic.statId == StatisticsManager.STATISTICS_STATID_NODE_ACCESSES).first()
+        if stat == None:
+            newStat = Statistic("Accesses per node", StatisticsManager.STATISTICS_STATID_NODE_ACCESSES, Statistic.STATTYPE_DOUGHNUT_CLASSES, 0, 0)
+            db.session.add(newStat)
+            db.session.commit()
+
+        for nodeName in updateData:
+            StatisticsManager.incrementalEntryAddOrUpdate(Statistic.STATTYPE_DOUGHNUT_CLASSES, StatisticsManager.STATISTICS_STATID_NODE_ACCESSES,nodeName,updateData[nodeName],0,0,0,0)
 
     @staticmethod
     def updateLoginStat():
@@ -58,87 +121,4 @@ class StatisticsManager(object):
     @staticmethod
     def updateSecurityStat():
         print "Update Security stat"
-
-    @staticmethod
-    def raiseUserCountChangedEvent():
-        print "raise Usercount change"
-        stat = Statistic.query.filter(Statistic.statId == StatisticsManager.STATISTICS_STATID_USERCOUNT).first()
-        if stat == None:
-            newStat = Statistic("User count", StatisticsManager.STATISTICS_STATID_USERCOUNT, Statistic.STATTYPE_LINE_SERIES, 0, 3, "Users", "Admins", "Supervisors")
-            db.session.add(newStat)
-            db.session.commit()
-            print "statistic not present"
-
-        userCount = helpers.get_query_count(User.query.filter(User.syncMaster == 0).filter(User.role == 0))
-        adminCount = helpers.get_query_count(User.query.filter(User.syncMaster == 0).filter(User.role == 1))
-        supervisorCount = helpers.get_query_count(User.query.filter(User.syncMaster == 0).filter(User.role == 2))
-
-        currentMonth = datetime.datetime.now().month
-        currentYear = int(datetime.datetime.now().year) % 100
-        currentStatEntry = StatisticEntry.query.filter(StatisticEntry.month == currentMonth).all()
-
-        if currentStatEntry == []:
-            newStatEntryUsers = StatisticEntry(StatisticsManager.STATISTICS_STATID_USERCOUNT,str(currentMonth) + '/' + str(currentYear), userCount, 0, currentMonth, currentYear, 0)
-            newStatEntrySupervisors = StatisticEntry(StatisticsManager.STATISTICS_STATID_USERCOUNT,str(currentMonth) + '/' + str(currentYear), supervisorCount, 1, currentMonth,currentYear,0)
-            newStatEntryAdmins = StatisticEntry(StatisticsManager.STATISTICS_STATID_USERCOUNT,str(currentMonth) + '/' + str(currentYear), adminCount, 2, currentMonth, currentYear, 0)
-            try:
-                db.session.add(newStatEntryUsers)
-                db.session.add(newStatEntrySupervisors)
-                db.session.add(newStatEntryAdmins)
-                db.session.commit()
-            except:
-                db.session.rollback()
-                raise
-
-    @staticmethod
-    def raiseAccessEvent(authType):
-        print "raise Usercount change"
-        stat = Statistic.query.filter(Statistic.statId == StatisticsManager.STATISTICS_STATID_ACCESSES).first()
-        if stat == None:
-            newStat = Statistic("Access count", StatisticsManager.STATISTICS_STATID_ACCESSES, Statistic.STATTYPE_LINE_SERIES, 0, 3, "Card based", "Web based")
-            db.session.add(newStat)
-            db.session.commit()
-            print "statistic not present"
-
-        userCount = helpers.get_query_count(User.query.filter(User.syncMaster == 0).filter(User.role == 0))
-        adminCount = helpers.get_query_count(User.query.filter(User.syncMaster == 0).filter(User.role == 1))
-        supervisorCount = helpers.get_query_count(User.query.filter(User.syncMaster == 0).filter(User.role == 2))
-
-        currentMonth = datetime.datetime.now().month
-        currentYear = int(datetime.datetime.now().year) % 100
-        currentStatEntry = StatisticEntry.query.filter(StatisticEntry.month == currentMonth).all()
-
-        if currentStatEntry == []:
-            newStatEntryCard = StatisticEntry(StatisticsManager.STATISTICS_STATID_ACCESSES,str(currentMonth) + '/' + str(currentYear), 0, 0, currentMonth, currentYear, 0)
-            newStatEntryWeb = StatisticEntry(StatisticsManager.STATISTICS_STATID_ACCESSES,str(currentMonth) + '/' + str(currentYear), 0, 1, currentMonth,currentYear,0)
-            try:
-                db.session.add(newStatEntryCard)
-                db.session.add(newStatEntryWeb)
-                db.session.commit()
-            except:
-                db.session.rollback()
-                raise
-
-        entry = None
-        if authType == User.AUTHTYPE_RFID:
-            entry = StatisticEntry.query.filter(StatisticEntry.statId == StatisticsManager.STATISTICS_STATID_ACCESSES).filter(StatisticEntry.series == 0).first()
-        if authType == User.AUTHTYPE_WEB:
-            entry = StatisticEntry.query.filter(StatisticEntry.statId == StatisticsManager.STATISTICS_STATID_ACCESSES).filter(StatisticEntry.series == 1).first()
-        if entry is not None:
-            entry.value =  entry.value + 1
-            db.session.commit()
-
-    @staticmethod
-    def raiseAuthCardsEvent(statId):
-        print "raise Usercount"
-
-
-    @staticmethod
-    def raiseEvent(statId):
-        print "Raise event"
-        StatisticsManager.raiseAccessEvent(User.AUTHTYPE_WEB)
-        #user = User.query.filter_by(id=id).first()
-        #logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
-        #               g.user.email, 'Invalidate auth. card of ' + user.firstName + ' ' + user.lastName + ' (' + user.email + ')',
-        #               'Invalidate lost auth. card', 'L2', 0, 'Web based', Action.ACTION_OPENING_REQUEST)
 

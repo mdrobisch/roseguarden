@@ -325,7 +325,7 @@ class SessionView(Resource):
 
                 print "Log-entry created"
             else:
-                print "Log-entry is in merge-range ts = " + str(datetime.datetime.now()) + " last = " + str(user.lastLoginDateTime) + " merge = " + str(config.NODE_LOG_MERGE) + " minutes"
+                print "Log-entry is in merge-range ts = " + str(datetime.datetime.utcnow()) + " last = " + str(user.lastLoginDateTime) + " merge = " + str(config.NODE_LOG_MERGE) + " minutes"
 
             return SessionInfoSerializer().dump(user).data, 201
         else:
@@ -335,7 +335,7 @@ class SessionView(Resource):
             if lastlogEntry is None:
                 addNewlogEntry = True
             else:
-                if datetime.datetime.utcnow() > (lastlogEntry.date + datetime.timedelta(minutes=60)):
+                if datetime.datetime.utcnow() > (lastlogEntry.date + datetime.timedelta(minutes=30)):
                     addNewlogEntry = True
                 else:
                     addNewlogEntry = False
@@ -343,11 +343,11 @@ class SessionView(Resource):
             if addNewlogEntry == True:
                 logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, 'Security warning', form.email.data,
                                 'Failed login for ' + form.email.data + ' ( 1 invalid attempts)',
-                                'Failed login attempt', 'L1', 0, 'Internal')
+                                'Failed login attempt', 'L1', 0, 'Internal', Action.ACTION_LOGONLY, 1)
                 db.session.add(logentry)
             else:
                 lastlogEntry.actionParameter += 1
-                lastlogEntry.logText = 'Failed login for ' + form.email.data + ' (' + str(lastlogEntry.actionParameter + 1) + ' invalid attempts)'
+                lastlogEntry.logText = 'Failed login for ' + form.email.data + ' (' + str(lastlogEntry.actionParameter) + ' invalid attempts)'
             db.session.commit()
 
         return '', 401
@@ -401,17 +401,46 @@ class OpeningRequestView(Resource):
             if datetime.datetime.now() > g.user.lastAccessDateTime + datetime.timedelta(minutes=config.NODE_LOG_MERGE):
                 g.user.lastAccessDateTime = datetime.datetime.now()
                 logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
-                               g.user.email, 'Opening request', 'Opening request', 'L2', 0, 'Web based', Action.ACTION_OPENING_REQUEST)
+                               g.user.email, 'Opening request for ' + config.NODE_DOOR_NAME + ' ( ' + str(1) + ' attempts)', 'Opening request', 'L2', 0, 'Web based', Action.ACTION_OPENING_REQUEST, 1)
+                print "Log-entry created"
+
                 try:
                     db.session.add(logentry)
                     db.session.commit()
                 except:
                     db.session.rollback()
                     return '', 401
-                backgroundWorker.requestOpening = True
-                print "Log-entry created"
+
             else:
+                lastlogEntry = Action.query.filter_by(logType='Opening request', userMail=g.user.email).order_by(Action.date.desc()).first()
+                if lastlogEntry is not None:
+                    print str(lastlogEntry.synced)
+                    if lastlogEntry.synced is 0:
+                        print "is not None / False"
+                        lastlogEntry.date = datetime.datetime.utcnow()
+                        lastlogEntry.actionParameter += 1
+                        lastlogEntry.logText = 'Opening request for ' + config.NODE_DOOR_NAME + ' ( ' + str(lastlogEntry.actionParameter) + ' attempts)';
+                    else:
+                        print "is not None / True"
+                        lastlogEntry.synced = 0
+                        lastlogEntry.date = datetime.datetime.utcnow()
+                        lastlogEntry.actionParameter = 1
+                        lastlogEntry.logText = 'Opening request for ' + config.NODE_DOOR_NAME + ' ( ' + str(lastlogEntry.actionParameter) + ' attempts)';
+                    print str(lastlogEntry.synced)
+
+                else:
+                    print "is None"
+
                 print "Log-entry is in merge-range ts = " + str(datetime.datetime.now()) + " last = " + str(g.user.lastAccessDateTime) + " merge = " + str(config.NODE_LOG_MERGE) + " minutes"
+
+                try:
+                    db.session.commit()
+                except:
+                    db.session.rollback()
+                    return '', 401
+
+            backgroundWorker.requestOpening = True
+
             return 'Access granted', 201
         else:
             print "Check user privileges for opening request: " + checkAccessResult
@@ -552,7 +581,7 @@ class InvalidateAuthCardView(Resource):
         user.cardID = ""
         logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
                        g.user.email, 'Invalidate auth. card of ' + user.firstName + ' ' + user.lastName + ' (' + user.email + ')',
-                       'Invalidate auth. card', 'L2', 0, 'Web based', Action.ACTION_OPENING_REQUEST)
+                       'Invalidate auth. card', 'L2', 0, 'Web based', Action.ACTION_LOGONLY)
         try:
             db.session.add(logentry)
             db.session.commit()

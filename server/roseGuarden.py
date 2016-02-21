@@ -22,7 +22,6 @@ def start():
     # start backgroundworker
     backgroundWorker.run()
 
-    StatisticsManager.raiseEvent(StatisticsManager.STATISTICS_STATID_ACCESSES)
     # running the flask app
     app.run('0.0.0.0', threaded=True)
 
@@ -44,7 +43,7 @@ def seed_statistic():
     userCountStat = Statistic("User total", StatisticsManager.STATISTICS_STATID_USERCOUNT, Statistic.STATTYPE_LINE_SERIES, 0, 3, "Users", "Admins", "Supervisors")
     accessesStat = Statistic("Accesses total", StatisticsManager.STATISTICS_STATID_ACCESSES, Statistic.STATTYPE_LINE_SERIES, 0, 2, "Card auth.", "Web auth.")
     weekdayStat = Statistic("Accesses per weekday", StatisticsManager.STATISTICS_STATID_WEEKDAYS, Statistic.STATTYPE_RADAR_SERIES, 7, 1, "Weekdays")
-    doorStat = Statistic("Accesses per door", StatisticsManager.STATISTICS_STATID_DOORS, Statistic.STATTYPE_DOUGHNUT_CLASSES, 2, 0)
+    doorStat = Statistic("Accesses per node", StatisticsManager.STATISTICS_STATID_NODE_ACCESSES, Statistic.STATTYPE_DOUGHNUT_CLASSES, 2, 0)
     loginsCountStat = Statistic("Logins", StatisticsManager.STATISTICS_STATID_LOGINS, Statistic.STATTYPE_LINE_SERIES, 0, 2, "Logins", "Failed attempts")
     secuirityStat = Statistic("Security warnings", StatisticsManager.STATISTICS_STATID_SECURITY, Statistic.STATTYPE_LINE_SERIES, 0, 3, "Failed login", "Failed API auth.", "Worker errors")
 
@@ -83,9 +82,9 @@ def seed_statistic():
         db.session.add(dayEntry)
 
     for door in range(0,2):
-        doorsnamesList = ["Kongs Door", "Rons Door"]
+        doorsnamesList = ["Elfe", "Duftwolke"]
         doorname = doorsnamesList[door]
-        doorEntry = StatisticEntry(StatisticsManager.STATISTICS_STATID_DOORS,doorname,random.randrange(10,100), 0, 0, 0, door)
+        doorEntry = StatisticEntry(StatisticsManager.STATISTICS_STATID_NODE_ACCESSES,doorname,random.randrange(10,100), 0, 0, 0, door)
         db.session.add(doorEntry)
 
     db.session.commit()

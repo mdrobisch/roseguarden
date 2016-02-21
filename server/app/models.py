@@ -19,6 +19,10 @@ class User(db.Model):
     AUTHTYPE_WEB    = 0
     AUTHTYPE_RFID   = 1
 
+    ROLE_USER           = 0
+    ROLE_ADMIN          = 1
+    ROLE_SUPERVISOR     = 2
+
     id = db.Column(db.Integer, primary_key=True)
     syncMaster = db.Column(db.Integer)
     active = db.Column(db.Integer)

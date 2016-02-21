@@ -6,6 +6,7 @@ import flask_alchemydumps
 from models import User, Door, Action
 from server import app, db
 from serializers import LogSerializer, UserSyncSerializer, SessionInfoSerializer, DoorSerializer, RfidTagInfoSerializer
+from statistics import StatisticsManager
 from werkzeug.datastructures import MultiDict
 import threading
 import time
@@ -393,21 +394,39 @@ class BackgroundWorker():
                                 g.user.lastAccessDateTime = datetime.datetime.now()
 
                                 logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, user.firstName + ' ' + user.lastName,
-                                               user.email, 'Opening request', 'Opening request',
-                                               'L2', 1, 'Card based', Action.ACTION_OPENING_REQUEST)
+                                               user.email, 'Opening request for ' + config.NODE_DOOR_NAME + ' (' + str(1) + ' attempts)', 'Opening request',
+                                               'L2', 1, 'Card based', Action.ACTION_OPENING_REQUEST, 1)
                                 print "Log-entry created"
-                            else:
-                                print "Log-entry is in merge-range ts = " + str(datetime.datetime.now()) + " last = " + str(g.user.lastAccessDateTime) + " merge = " + str(config.NODE_LOG_MERGE) + " minutes"
+                                try:
+                                    db.session.add(logentry)
+                                    db.session.commit()
+                                except:
+                                    self.ledState = self.LED_STATE_ACCESS_DENIED
+                                    db.session.rollback()
+                                    raise
 
-                            try:
-                                db.session.add(logentry)
-                                db.session.commit()
-                                self.requestOpening = True
-                                self.ledState = self.LED_STATE_ACCESS_GRANTED
-                            except:
-                                self.ledState = self.LED_STATE_ACCESS_DENIED
-                                db.session.rollback()
-                                raise
+                            else:
+                                lastlogEntry = Action.query.filter_by(logType='Opening request', userMail=user.email).order_by(Action.date.desc()).first()
+                                if lastlogEntry is not None:
+                                    if lastlogEntry.synced is 0:
+                                        lastlogEntry.date = datetime.datetime.utcnow()
+                                        lastlogEntry.actionParameter += 1
+                                        lastlogEntry.logText = 'Opening request for ' + config.NODE_DOOR_NAME + ' (' + str(lastlogEntry.actionParameter) + ' attempts)'
+                                    else:
+                                        lastlogEntry.synced = 0
+                                        lastlogEntry.date = datetime.datetime.utcnow()
+                                        lastlogEntry.actionParameter = 1
+                                        lastlogEntry.logText = 'Opening request for ' + config.NODE_DOOR_NAME + ' (' + str(lastlogEntry.actionParameter) + ' attempts)'
+                                print "Log-entry is in merge-range ts = " + str(datetime.datetime.now()) + " last = " + str(g.user.lastAccessDateTime) + " merge = " + str(config.NODE_LOG_MERGE) + " minutes"
+                                try:
+                                    db.session.commit()
+                                except:
+                                    self.ledState = self.LED_STATE_ACCESS_DENIED
+                                    db.session.rollback()
+                                    raise
+
+                            self.requestOpening = True
+                            self.ledState = self.LED_STATE_ACCESS_GRANTED
                         else:
                             self.ledState = self.LED_STATE_ACCESS_DENIED
                             print "no user-access privilege"
@@ -500,9 +519,13 @@ class BackgroundWorker():
     def update_users_and_actions(self):
         actions = Action.query.filter_by(synced=0).order_by(Action.date).all()
         users = User.query.all()
-
         userDict = {}
         try:
+            statDict_NodeAccess = {}
+            statDict_UserCount = [0,0,0]
+            statDict_Accesses = {}
+            statDict_Weekdays = [0,0,0,0,0,0,0]
+
             for user in users:
                 # create dictionary with indices
                 userDict[str(user.email)] = users.index(user)
@@ -542,6 +565,18 @@ class BackgroundWorker():
                         print 'update quarterly day budget of ' + user.firstName + ' ' + user.lastName + '(' + user.email + ')' + ' to ' + str(user.accessDayCounter)
                         user.lastAccessDaysUpdateDate = now
 
+                #SERIES_GENERALUSER = 0
+                #SERIES_SUPERUSER = 1
+                #SERIES_ADMINUSER = 2
+
+                if user.syncMaster == 0:
+                    if user.role == User.ROLE_USER:
+                        statDict_UserCount[StatisticsManager.SERIES_GENERALUSER] += 1
+                    if user.role == User.ROLE_ADMIN:
+                        statDict_UserCount[StatisticsManager.SERIES_ADMINUSER] += 1
+                    if user.role == User.ROLE_SUPERVISOR:
+                        statDict_UserCount[StatisticsManager.SERIES_SUPERUSER] += 1
+
             for action in actions:
                 action.synced = 1
                 if action.action == Action.ACTION_OPENING_REQUEST:
@@ -556,7 +591,32 @@ class BackgroundWorker():
                                 users[userIndex].lastAccessDateTime = action.date
                                 users[userIndex].accessDayCounter -= 1
                                 print 'update day counter of ' + users[userIndex].firstName + ' ' + users[userIndex].lastName + ' (' + users[userIndex].email + ')'
+
+                    # update stat. dictionaries
+                    if action.nodeName in statDict_NodeAccess:
+                        statDict_NodeAccess[action.nodeName] += action.actionParameter
+                    else:
+                        statDict_NodeAccess[action.nodeName] = action.actionParameter
+
+                    year = action.date.year
+                    month = action.date.month
+                    if year not in statDict_Accesses:
+                        statDict_Accesses[year] = {}
+                    if month not in statDict_Accesses[year]:
+                        statDict_Accesses[year][month] = [0,0]
+
+                    if action.authType == user.AUTHTYPE_WEB:
+                        statDict_Accesses[year][month][StatisticsManager.SERIES_WEB_ACCESSES] += action.actionParameter
+                    if action.authType == user.AUTHTYPE_RFID:
+                        statDict_Accesses[year][month][StatisticsManager.SERIES_CARD_ACCESSES] += action.actionParameter
+
+                    statDict_Weekdays[action.date.weekday()] += action.actionParameter
+
             db.session.commit()
+            StatisticsManager.updateAccessesStat(statDict_Accesses)
+            StatisticsManager.updateUserCountStat(statDict_UserCount)
+            StatisticsManager.updateNodeAccessStat(statDict_NodeAccess)
+            StatisticsManager.updateWeekdaysStat(statDict_Weekdays)
         except:
             db.session.rollback()
             raise
