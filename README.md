@@ -162,7 +162,7 @@ Screenshots (Software)
 
 ![users](documentation/screenshots/admin_stats.png)
 
-![users](documentation/screenshots/suervisor_space.png)
+![users](documentation/screenshots/supervisor_space.png)
 
 Hardware
 ========
