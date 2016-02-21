@@ -1,65 +1,70 @@
 <div ng-controller="AdminSettingsCtrl">
 
-     <div class="alert alert-success" ng-show="showSuccess">
+    <div class="alert alert-success" ng-show="showSuccess">
         {{success}}
     </div>
 
-     <div class="alert alert-danger" ng-show="showError">
+    <div class="alert alert-danger" ng-show="showError">
         {{error}}
+    </div>
+
+    <div class="alert alert-info" ng-show="showInfo">
+        {{info}}
+    </div>
+
+    <div class="alert alert-info" ng-show="isLoading">
+        Loading data ...
+        <img src="images/loading.gif" >
     </div>
 
     <p></p>
 
-    <form name="form" ng-submit="updateSettings()" role="form" class="form-horizontal" >
+    <p style="font-weight: bold; margin: 0"> Node Settings</p>
+    <hr style="margin-top: 2px">
 
-        <p style="font-weight: bold; margin: 0"> Node Settings</p>
-        <hr style="margin-top: 2px">
-
+    <form ng-show="settingsAvailable" name="form" ng-submit="updateKeyMaskSettings()" role="form" class="form-horizontal" >
         <div class="form-group">
-
             <label class="col-xs-3 control-label">Valid Keys</label>
-            <div class="col-xs-8">
-                <span>
-                    <input type="checkbox" ng-model="keyMaskRed">
+            <div class="col-xs-6 setting-col ">
+                <span class="setting-span">
+                    <input type="checkbox" ng-model="formModel_keyMask[0]">
                     <i class="glyphicon glyphicon-thumbs-up gliphicon-red" tooltip="red key"></i>
                 </span>
-                <span>
-                    <input type="checkbox" ng-model="keyMaskGreen">
+                <span class="setting-span">
+                    <input type="checkbox" ng-model="formModel_keyMask[1]">
                     <i class="glyphicon glyphicon-thumbs-up gliphicon-green" tooltip="green key"></i>
                 </span>
-                <span>
-                    <input type="checkbox" ng-model="keyMaskBlack">
+                <span class="setting-span">
+                    <input type="checkbox" ng-model="formModel_keyMask[2]">
                     <i class="glyphicon glyphicon-thumbs-up gliphicon-black" tooltip="black key"></i>
                 </span>
-                <span>
-                    <input type="checkbox" ng-model="keyMaskPink">
+                <span class="setting-span">
+                    <input type="checkbox" ng-model="formModel_keyMask[3]">
                     <i class="glyphicon glyphicon-thumbs-up gliphicon-pink" tooltip="pink key"></i>
                 </span>
-                <span>
-                    <input type="checkbox" ng-model="keyMaskMarine">
+                <span class="setting-span">
+                    <input type="checkbox" ng-model="formModel_keyMask[4]">
                     <i class="glyphicon glyphicon-thumbs-up gliphicon-marine" tooltip="marine key"></i>
                 </span>
-                <span>
-                    <input type="checkbox" ng-model="keyMaskOrange">
+                <span class="setting-span">
+                    <input type="checkbox" ng-model="formModel_keyMask[5]">
                     <i class="glyphicon glyphicon-thumbs-up gliphicon-orange" tooltip="orange key"></i>
                 </span>
-                <span>
-                    <input type="checkbox" ng-model="keyMaskOlive">
+                <span class="setting-span">
+                    <input type="checkbox" ng-model="formModel_keyMask[6]">
                     <i class="glyphicon glyphicon-thumbs-up gliphicon-olive" tooltip="olive key"></i>
-
                 </span>
-                <span>
-                    <input type="checkbox" ng-model="keyMaskPurple">
+                <span class="setting-span">
+                    <input type="checkbox" ng-model="formModel_keyMask[7]">
                     <i class="glyphicon glyphicon-thumbs-up gliphicon-purple" tooltip="purple key"></i>
                 </span>
             </div>
-        </div>
 
-        <div class="form-actions" class="col-xs-3 control-label">
-            <button type="submit" ng-disabled="form.$invalid || settingsUpdatePending" class="btn btn-success">Change settings</button>
-            <img ng-if="passwordUpdatePending" src="images/loading.gif" >
+            <span class="form-actions col-xs-2">
+                <button type="submit" ng-disabled="form.$invalid || settingsUpdatePending" class="btn btn-success">Change</button>
+                <img ng-if="settingsUpdatePending" src="images/loading.gif" >
+            </span>
         </div>
-
     </form>
 
     <p></p>

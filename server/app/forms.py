@@ -24,6 +24,11 @@ class ModelForm(BaseModelForm):
 class UserDeleteForm(Form):
     email = StringField('email', validators=[Optional()])
 
+class SettingPatchForm(Form):
+    name = StringField('name', validators=[DataRequired()])
+    value = StringField('value', validators=[DataRequired()])
+    type = IntegerField('type', validators=[DataRequired()])
+
 class UserPatchForm(Form):
     email = StringField('email', validators=[Optional()])
     firstName = StringField('firstName', validators=[Optional()])

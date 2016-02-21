@@ -16,6 +16,14 @@
   white-space: pre;
 }
 
+.setting-col {
+  line-height: 35px;
+}
+
+.setting-span {
+  vertical-align: middle;
+}
+
 .alert-info {
   white-space: pre;
 }

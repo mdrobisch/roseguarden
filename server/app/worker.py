@@ -15,6 +15,7 @@ import base64
 import json
 import datetime
 import helpers
+import security
 from dateutil.relativedelta import relativedelta
 import os
 from models import RfidTagInfo
@@ -389,12 +390,12 @@ class BackgroundWorker():
 
                     if readSecretString == user.cardSecret:
                         print "correct secret"
-                        if user.checkUserAccessPrivleges() == "Access granted.":
+                        if security.checkUserAccessPrivleges(user) == "Access granted.":
                             if datetime.datetime.now() > g.user.lastAccessDateTime + datetime.timedelta(minutes=config.NODE_LOG_MERGE):
                                 g.user.lastAccessDateTime = datetime.datetime.now()
 
                                 logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, user.firstName + ' ' + user.lastName,
-                                               user.email, 'Opening request for ' + config.NODE_DOOR_NAME + ' (' + str(1) + ' attempts)', 'Opening request',
+                                               user.email, 'Opening request (' + str(1) + ' attempts)', 'Opening request',
                                                'L2', 1, 'Card based', Action.ACTION_OPENING_REQUEST, 1)
                                 print "Log-entry created"
                                 try:
@@ -411,12 +412,12 @@ class BackgroundWorker():
                                     if lastlogEntry.synced is 0:
                                         lastlogEntry.date = datetime.datetime.utcnow()
                                         lastlogEntry.actionParameter += 1
-                                        lastlogEntry.logText = 'Opening request for ' + config.NODE_DOOR_NAME + ' (' + str(lastlogEntry.actionParameter) + ' attempts)'
+                                        lastlogEntry.logText = 'Opening request (' + str(lastlogEntry.actionParameter) + ' attempts)'
                                     else:
                                         lastlogEntry.synced = 0
                                         lastlogEntry.date = datetime.datetime.utcnow()
                                         lastlogEntry.actionParameter = 1
-                                        lastlogEntry.logText = 'Opening request for ' + config.NODE_DOOR_NAME + ' (' + str(lastlogEntry.actionParameter) + ' attempts)'
+                                        lastlogEntry.logText = 'Opening request (' + str(lastlogEntry.actionParameter) + ' attempts)'
                                 print "Log-entry is in merge-range ts = " + str(datetime.datetime.now()) + " last = " + str(g.user.lastAccessDateTime) + " merge = " + str(config.NODE_LOG_MERGE) + " minutes"
                                 try:
                                     db.session.commit()

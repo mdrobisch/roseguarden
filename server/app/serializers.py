@@ -27,6 +27,11 @@ class StatisticListSerializer(Schema):
     class Meta:
         fields = ("id", "statId", "name", "statType", "binningCount", "seriesCount", "seriesName1", "seriesName2", "seriesName3", "seriesName4", "seriesName5", "seriesName6", "seriesName7", "seriesName8")
 
+class SettingsListSerializer(Schema):
+    class Meta:
+        fields = ("id", "name", "value", "type")
+
+
 class StatisticEntryListSerializer(Schema):
     class Meta:
         fields = ("id", "statId", "statId", "month", "year", "binningId", "series", "label", "value")

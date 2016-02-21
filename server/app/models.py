@@ -72,29 +72,6 @@ class User(db.Model):
         else:
             self.cardIDAssigned = 1
 
-    def checkUserAccessPrivleges(self):
-        # check for invalid accessType == no access
-        if self.accessType == self.ACCESSTYPE_NO_ACCESS or self.accessType > self.ACCESSTYPE_MAX:
-            return 'Denied access because of unauthorized access type.'
-        # check start-date and end-date for accessType == period
-        if self.accessType == self.ACCESSTYPE_ACCESS_PERIOD:
-            if self.accessDateStart > datetime.datetime.now():
-                return 'Denied access because of invalid start of period.'
-            if self.accessDateEnd < datetime.datetime.now():
-                return 'Denied access because of invalid end of period.'
-        # check day counter for accessType == day-budget
-        if self.accessType == self.ACCESSTYPE_ACCESS_DAYS:
-            if self.accessDayCounter <= 0:
-                return 'Denied access because of insufficient day-budget.'
-        if (int(1 << datetime.datetime.now().weekday()) & self.accessDaysMask) == 0:
-            return 'Denied access because of invalid access weekday.'
-        if self.accessTimeStart.time() > datetime.datetime.now().time():
-            return 'Denied access because of invalid day-time start.'
-        if self.accessTimeEnd.time() < datetime.datetime.now().time():
-            return 'Denied access because of invalid day-time end.'
-        return "Access granted."
-
-
     def updateUserFromSyncDict(self, data):
         self.syncMaster = data['syncMaster']
         self.active = data['active']
@@ -181,11 +158,11 @@ class User(db.Model):
         self.lastBudgetUpdateDate = (datetime.datetime.today()).replace(hour=0, minute=0, second=0, microsecond=0)
 
 class Setting(db.Model):
-    WRITEONLY = 0x80
-    WRITEONLY = 0x40
-    VALUETYPE_STRING = 1
-    VALUETYPE_INT = 1
-    VALUETYPE_FLOAT = 1
+    WRITEABLE = 0x100
+    SETTINGTYPE_STRING  = 1
+    SETTINGTYPE_INT     = 2
+    SETTINGTYPE_FLOAT   = 3
+    SETTINGTYPE_BOOL    = 4
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text)

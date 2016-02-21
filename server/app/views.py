@@ -3,19 +3,20 @@ from email import send_email
 from flask import g, render_template, make_response, jsonify, request
 from flask_restful import Resource, fields, marshal_with
 from server import api, db, flask_bcrypt, auth, mail
-from models import User, Action, Door, RfidTagInfo, Statistic, StatisticEntry
+from models import User, Action, Door, RfidTagInfo, Statistic, StatisticEntry, Setting
 from serializers import LogSerializer, UserSyncSerializer, AdminsListSerializer, UserListForSupervisorsSerializer, UserListSerializer, \
-    UserSerializer, SessionInfoSerializer, DoorSerializer, RfidTagInfoSerializer, StatisticListSerializer, StatisticEntryListSerializer
+    UserSerializer, SessionInfoSerializer, DoorSerializer, RfidTagInfoSerializer, StatisticListSerializer, SettingsListSerializer, StatisticEntryListSerializer
 from forms import UserPatchForm, DoorRegistrationForm, SessionCreateForm, LostPasswordForm, RegisterUserForm, \
-    UserDeleteForm, RFIDTagAssignForm, RFIDTagWithdrawForm
+    UserDeleteForm, RFIDTagAssignForm, RFIDTagWithdrawForm, SettingPatchForm
 from worker import backgroundWorker
 from sqlalchemy.exc import IntegrityError
+import settings
 import config
 import json
 import random
 import requests
 import base64
-import controller
+import security
 import datetime
 
 
@@ -361,7 +362,7 @@ class LostPasswordView(Resource):
         user = User.query.filter_by(email=form.email.data).first()
         if user is None:
             return '', 401
-        new_password = controller.id_generator(12)
+        new_password = security.generator_password(12)
         user.password = flask_bcrypt.generate_password_hash(new_password)
         db.session.commit()
         send_email("%s: A new password has been generated" % 'RoseGuarden',
@@ -395,13 +396,13 @@ class OpeningRequestView(Resource):
     @auth.login_required
     def post(self):
         print 'Opening request received'
-        checkAccessResult = g.user.checkUserAccessPrivleges()
+        checkAccessResult = security.checkUserAccessPrivleges(g.user)
         print "Check user privileges for opening request: " + checkAccessResult
         if (checkAccessResult == "Access granted."):
             if datetime.datetime.now() > g.user.lastAccessDateTime + datetime.timedelta(minutes=config.NODE_LOG_MERGE):
                 g.user.lastAccessDateTime = datetime.datetime.now()
                 logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
-                               g.user.email, 'Opening request for ' + config.NODE_DOOR_NAME + ' ( ' + str(1) + ' attempts)', 'Opening request', 'L2', 0, 'Web based', Action.ACTION_OPENING_REQUEST, 1)
+                               g.user.email, 'Opening request ( ' + str(1) + ' attempts)', 'Opening request', 'L2', 0, 'Web based', Action.ACTION_OPENING_REQUEST, 1)
                 print "Log-entry created"
 
                 try:
@@ -419,13 +420,13 @@ class OpeningRequestView(Resource):
                         print "is not None / False"
                         lastlogEntry.date = datetime.datetime.utcnow()
                         lastlogEntry.actionParameter += 1
-                        lastlogEntry.logText = 'Opening request for ' + config.NODE_DOOR_NAME + ' ( ' + str(lastlogEntry.actionParameter) + ' attempts)';
+                        lastlogEntry.logText = 'Opening request ( ' + str(lastlogEntry.actionParameter) + ' attempts)';
                     else:
                         print "is not None / True"
                         lastlogEntry.synced = 0
                         lastlogEntry.date = datetime.datetime.utcnow()
                         lastlogEntry.actionParameter = 1
-                        lastlogEntry.logText = 'Opening request for ' + config.NODE_DOOR_NAME + ' ( ' + str(lastlogEntry.actionParameter) + ' attempts)';
+                        lastlogEntry.logText = 'Opening request ( ' + str(lastlogEntry.actionParameter) + ' attempts)';
                     print str(lastlogEntry.synced)
 
                 else:
@@ -689,18 +690,54 @@ class RfidTagWitdrawView(Resource):
         else:
             return make_response(jsonify({'error': 'bad request data'}), 400)
 
+class SettingView(Resource):
+    @auth.login_required
+    def post(self, id):
+        if g.user.role != 1:
+            return make_response(jsonify({'error': 'Not authorized'}), 403)
+        form = SettingPatchForm()
+        if not form.validate_on_submit():
+            print form.errors
+            return form.errors, 422
+
+        setting = Setting.query.filter_by(id=id, name=form.name.data).first()
+        if setting is None:
+            return '', 405
+
+        logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
+                       g.user.email, "Changed setting " + str(setting.name) + " from " + str(setting.value) + " to " + str(form.value.data), 'Changed setting',
+                       'L2', 0, 'Web based')
+        db.session.add(logentry)
+        db.session.commit()
+
+
+        settings.setOrUpdateSettingValue(form.name.data, int(form.type.data), form.value.data)
+        return '', 201
+
+class SettingsListView(Resource):
+    @auth.login_required
+    def get(self):
+        if g.user.role != 1:
+            return '', 401
+
+        settings = Setting.query.all()
+        if settings is None:
+            return '', 405
+
+        return SettingsListSerializer().dump(settings, many=True).data
+
 
 class StatisticsListView(Resource):
     @auth.login_required
     def get(self):
 
-        if g.user.id != id:
-            if g.user.role != 1:
+        if g.user.role != 1:
+            if g.user.role != 2:
                 return '', 401
 
         stats = Statistic.query.all()
         if stats is None:
-            return '', 401
+            return '', 405
 
         return StatisticListSerializer().dump(stats, many=True).data
 
@@ -708,8 +745,8 @@ class StatisticEntriesListView(Resource):
     @auth.login_required
     def get(self, id):
 
-        if g.user.id != id:
-            if g.user.role != 1:
+        if g.user.role != 1:
+            if g.user.role != 2:
                 return '', 401
 
         stats = Statistic.query.filter(Statistic.id == id).first();
@@ -741,6 +778,8 @@ api.add_resource(DoorListView, '/doors')
 api.add_resource(StatisticsListView, '/statistics')
 api.add_resource(StatisticEntriesListView, '/statistic/<int:id>')
 
+api.add_resource(SettingsListView, '/settings')
+api.add_resource(SettingView, '/setting/<int:id>')
 
 api.add_resource(OpeningRequestView, '/request/opening')
 api.add_resource(LostPasswordView, '/request/password')
