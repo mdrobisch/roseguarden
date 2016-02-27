@@ -126,6 +126,11 @@ In addition a upgrade of the migration from the database is required, use roseGu
 
 - `sudo python roseGuarden.py db upgrade`
 
+For migrations or upgrades of the database, new data have to been seeded (storing default values). So please run,
+
+- `sudo python roseGuarden.py seed`
+
+
 To update the client switch to your client directory e.g the `client`-directory:
 
 Here we have to install/uninstall all new/old packages of bower.

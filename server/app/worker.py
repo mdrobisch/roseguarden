@@ -391,8 +391,8 @@ class BackgroundWorker():
                     if readSecretString == user.cardSecret:
                         print "correct secret"
                         if security.checkUserAccessPrivleges(user) == "Access granted.":
-                            if datetime.datetime.now() > g.user.lastAccessDateTime + datetime.timedelta(minutes=config.NODE_LOG_MERGE):
-                                g.user.lastAccessDateTime = datetime.datetime.now()
+                            if datetime.datetime.now() > user.lastAccessDateTime + datetime.timedelta(minutes=config.NODE_LOG_MERGE):
+                                user.lastAccessDateTime = datetime.datetime.now()
 
                                 logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, user.firstName + ' ' + user.lastName,
                                                user.email, 'Opening request (' + str(1) + ' attempts)', 'Opening request',
@@ -418,7 +418,7 @@ class BackgroundWorker():
                                         lastlogEntry.date = datetime.datetime.utcnow()
                                         lastlogEntry.actionParameter = 1
                                         lastlogEntry.logText = 'Opening request (' + str(lastlogEntry.actionParameter) + ' attempts)'
-                                print "Log-entry is in merge-range ts = " + str(datetime.datetime.now()) + " last = " + str(g.user.lastAccessDateTime) + " merge = " + str(config.NODE_LOG_MERGE) + " minutes"
+                                print "Log-entry is in merge-range ts = " + str(datetime.datetime.now()) + " last = " + str(user.lastAccessDateTime) + " merge = " + str(config.NODE_LOG_MERGE) + " minutes"
                                 try:
                                     db.session.commit()
                                 except:
@@ -530,6 +530,20 @@ class BackgroundWorker():
             for user in users:
                 # create dictionary with indices
                 userDict[str(user.email)] = users.index(user)
+
+                # checking for invalid type in stored user-data
+                if user.monthlyAccessCount is None:
+                    user.monthlyAccessCount = 0
+                if user.monthlyAccessAverage is None:
+                    user.monthlyAccessAverage = 0
+                if user.monthlyAccessMonthNumber is None:
+                    user.monthlyAccessAverage = datetime.datetime.now().month
+
+                # reset monthly access count for new month
+                if user.monthlyAccessMonthNumber != datetime.datetime.now().month:
+                    user.monthlyAccessCount = 0
+                    user.monthlyAccessMonthNumber = datetime.datetime.now().month
+
                 # update sync-date
                 user.lastSyncDateTime = datetime.datetime.now()
                 # check for
@@ -582,6 +596,7 @@ class BackgroundWorker():
                 action.synced = 1
                 if action.action == Action.ACTION_OPENING_REQUEST:
                     userIndex = userDict[str(action.userMail)]
+                    users[userIndex].monthlyAccessCount += 1
                     delta = action.date - users[userIndex].lastAccessDateTime
                     if users[userIndex].accessType == User.ACCESSTYPE_ACCESS_DAYS or \
                         users[userIndex].accessType == User.ACCESSTYPE_MONTHLY_BUDGET or \
@@ -613,11 +628,22 @@ class BackgroundWorker():
 
                     statDict_Weekdays[action.date.weekday()] += action.actionParameter
 
+            statDict_monthlyAccessUserClasses = []
+            for user in users:
+                if user.syncMaster == 0:
+                    statDict_monthlyAccessUserClasses.append(user.monthlyAccessCount)
+
             db.session.commit()
-            StatisticsManager.updateAccessesStat(statDict_Accesses)
-            StatisticsManager.updateUserCountStat(statDict_UserCount)
-            StatisticsManager.updateNodeAccessStat(statDict_NodeAccess)
-            StatisticsManager.updateWeekdaysStat(statDict_Weekdays)
+
+            if config.STATISTICS_ENABLE == True:
+                StatisticsManager.updateAccessesStat(statDict_Accesses)
+                StatisticsManager.updateUserCountStat(statDict_UserCount)
+                StatisticsManager.updateNodeAccessStat(statDict_NodeAccess)
+                StatisticsManager.updateWeekdaysStat(statDict_Weekdays)
+                StatisticsManager.updateUserActivityGroups(statDict_monthlyAccessUserClasses)
+                StatisticsManager.updateUserActivityGroupAccesses(statDict_monthlyAccessUserClasses)
+                StatisticsManager.updateUserActivityGroupAverages(statDict_monthlyAccessUserClasses)
+
         except:
             db.session.rollback()
             raise
@@ -721,6 +747,7 @@ class BackgroundWorker():
         db.session.add(logentry)
         db.session.commit()
 
+        # sync user of all doors
         for doorSync in doorList:
             if doorSync.local == 1:
                 print 'Sync user of ' + doorSync.name + ' (local)'

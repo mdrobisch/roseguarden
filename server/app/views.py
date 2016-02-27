@@ -749,7 +749,7 @@ class StatisticEntriesListView(Resource):
             if g.user.role != 2:
                 return '', 401
 
-        stats = Statistic.query.filter(Statistic.id == id).first();
+        stats = Statistic.query.filter(Statistic.id == id).first()
         if stats is None:
             return '', 405
 

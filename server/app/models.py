@@ -235,11 +235,15 @@ class Statistic(db.Model):
     STATTYPE_RADAR_SERIES = 3
     STATTYPE_DOUGHNUT_CLASSES = 5
     STATTYPE_RADAR_CLASSES = 6
+    STATTYPE_YEARLY_BAR_SERIES = 8
 
-    STATTYPE_YEARLY_LINE_SERIES = 11
+    STATDISPLAY_CONFIG_SHOW_DESCRIPTION = 1
+    STATDISPLAY_CONFIG_NO_TOTAL = 2
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text)
+    displayConfig = db.Column(db.Integer)
+    description = db.Column(db.Text)
     statId = db.Column(db.Integer)
     statType = db.Column(db.Integer)
     binningCount = db.Column(db.Integer)
@@ -253,8 +257,10 @@ class Statistic(db.Model):
     seriesName7 = db.Column(db.Text)
     seriesName8 = db.Column(db.Text)
 
-    def __init__(self, name, statId, statType, binningCount = 0, seriesCount = 0, seriesName1 = '', seriesName2 = '', seriesName3 = '', seriesName4 = '', seriesName5 = '', seriesName6 = '', seriesName7 = '', seriesName8 = ''):
+    def __init__(self, name, statId, statType, binningCount = 0, seriesCount = 0, description = '', displayConfig = 0, seriesName1 = '', seriesName2 = '', seriesName3 = '', seriesName4 = '', seriesName5 = '', seriesName6 = '', seriesName7 = '', seriesName8 = ''):
         self.name = name
+        self.displayConfig = displayConfig
+        self.description = description
         self.statId = statId
         self.statType = statType
         self.binningCount = binningCount

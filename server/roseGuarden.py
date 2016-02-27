@@ -8,6 +8,7 @@ from flask_alchemydumps import AlchemyDumpsCommand
 from app.models import User, Action, Door, Setting, Statistic, StatisticEntry
 from app.config import SYNC_MASTER_DEFAULT_PASSWORD
 import app.config as config
+import app.seed as seeder
 import datetime
 import random
 
@@ -35,20 +36,31 @@ def open_the_door():
     backgroundWorker.open_the_door()
 
 @manager.command
+def seed():
+    "Seed RoseGuarden database filled default data after an migration/upgrade"
+    seeder.seed()
+
+@manager.command
 def seed_statistic():
     "Create RoseGuarden database filled with testdata for the statistics"
     Statistic.query.delete()
     StatisticEntry.query.delete()
 
-    userCountStat = Statistic("User total", StatisticsManager.STATISTICS_STATID_USERCOUNT, Statistic.STATTYPE_LINE_SERIES, 0, 3, "Users", "Admins", "Supervisors")
-    accessesStat = Statistic("Accesses total", StatisticsManager.STATISTICS_STATID_ACCESSES, Statistic.STATTYPE_LINE_SERIES, 0, 2, "Card auth.", "Web auth.")
-    weekdayStat = Statistic("Accesses per weekday", StatisticsManager.STATISTICS_STATID_WEEKDAYS, Statistic.STATTYPE_RADAR_SERIES, 7, 1, "Weekdays")
-    doorStat = Statistic("Accesses per node", StatisticsManager.STATISTICS_STATID_NODE_ACCESSES, Statistic.STATTYPE_DOUGHNUT_CLASSES, 2, 0)
-    loginsCountStat = Statistic("Logins", StatisticsManager.STATISTICS_STATID_LOGINS, Statistic.STATTYPE_LINE_SERIES, 0, 2, "Logins", "Failed attempts")
-    secuirityStat = Statistic("Security warnings", StatisticsManager.STATISTICS_STATID_SECURITY, Statistic.STATTYPE_LINE_SERIES, 0, 3, "Failed login", "Failed API auth.", "Worker errors")
+    userCountStat = Statistic("User total", StatisticsManager.STATISTICS_STATID_USERCOUNT, Statistic.STATTYPE_LINE_SERIES, 0, 3, "", 0, "Users", "Admins", "Supervisors")
+    accessesStat = Statistic("Accesses total", StatisticsManager.STATISTICS_STATID_ACCESSES, Statistic.STATTYPE_LINE_SERIES, 0, 2, "", 0, "Card auth.", "Web auth.")
+    weekdayStat = Statistic("Accesses per weekday", StatisticsManager.STATISTICS_STATID_WEEKDAYS, Statistic.STATTYPE_RADAR_SERIES, 7, 1, "", 0, "Weekdays")
+    doorStat = Statistic("Accesses per node", StatisticsManager.STATISTICS_STATID_NODE_ACCESSES, Statistic.STATTYPE_DOUGHNUT_CLASSES, 2, 0, "", 0)
+    loginsCountStat = Statistic("Logins", StatisticsManager.STATISTICS_STATID_LOGINS, Statistic.STATTYPE_LINE_SERIES, 0, 2, "", 0, "Logins", "Failed attempts")
+    secuirityStat = Statistic("Security warnings", StatisticsManager.STATISTICS_STATID_SECURITY, Statistic.STATTYPE_LINE_SERIES, 0, 3, "", 0, "Failed login", "Failed API auth.", "Worker errors")
+    activityGroupsStat = Statistic("User activity groups", StatisticsManager.STATISTICS_STATID_ACTIVITY_USER_GROUPS, Statistic.STATTYPE_YEARLY_BAR_SERIES, 0, 4, "", Statistic.STATDISPLAY_CONFIG_NO_TOTAL, "Zero activity users", "Low activity users", "Medium activity users", "High activity users")
+    activityAccessesStat = Statistic("Average accesses of user groups", StatisticsManager.STATISTICS_STATID_USER_GROUPS_ACCESSES, Statistic.STATTYPE_LINE_SERIES, 0, 3, "",  Statistic.STATDISPLAY_CONFIG_NO_TOTAL, "Low activity users", "Medium activity users", "High activity users")
+    activityAverageStat = Statistic("Total accesses of user groups", StatisticsManager.STATISTICS_STATID_USER_GROUPS_AVERAGE, Statistic.STATTYPE_YEARLY_BAR_SERIES, 0, 3, "", Statistic.STATDISPLAY_CONFIG_NO_TOTAL, "Low activity users", "Medium activity users", "High activity users")
 
     db.session.add(userCountStat)
     db.session.add(accessesStat)
+    db.session.add(activityGroupsStat)
+    db.session.add(activityAccessesStat)
+    db.session.add(activityAverageStat)
     db.session.add(doorStat)
     db.session.add(loginsCountStat)
     db.session.add(weekdayStat)
@@ -60,6 +72,24 @@ def seed_statistic():
             if year >= datetime.datetime.now().year:
                 if month > datetime.datetime.now().month:
                     break
+
+            # STATISTICS_STATID_ACTIVITY_USER_GROUPS entries
+            db.session.add(StatisticEntry(StatisticsManager.STATISTICS_STATID_ACTIVITY_USER_GROUPS, str(month) + "/" + str(year % 1000), random.randrange(20, 120), StatisticsManager.SERIES_GROUPS_NO_ACTIVITY, month, year, StatisticsManager.BINNING_NONE))
+            db.session.add(StatisticEntry(StatisticsManager.STATISTICS_STATID_ACTIVITY_USER_GROUPS, str(month) + "/" + str(year % 1000), random.randrange(5, 15), StatisticsManager.SERIES_GROUPS_LOW_ACTIVITY, month, year, StatisticsManager.BINNING_NONE))
+            db.session.add(StatisticEntry(StatisticsManager.STATISTICS_STATID_ACTIVITY_USER_GROUPS, str(month) + "/" + str(year % 1000), random.randrange(2, 6), StatisticsManager.SERIES_GROUPS_MEDIUM_ACTIVITY, month, year, StatisticsManager.BINNING_NONE))
+            db.session.add(StatisticEntry(StatisticsManager.STATISTICS_STATID_ACTIVITY_USER_GROUPS, str(month) + "/" + str(year % 1000), random.randrange(2, 6), StatisticsManager.SERIES_GROUPS_HIGH_ACTIVITY, month, year, StatisticsManager.BINNING_NONE))
+
+            # STATISTICS_STATID_USER_GROUPS_ACCESSES entries
+            db.session.add(StatisticEntry(StatisticsManager.STATISTICS_STATID_USER_GROUPS_ACCESSES, str(month) + "/" + str(year % 1000), random.randrange(20, 120), StatisticsManager.SERIES_GROUP_BY_LOW_ACTIVITY, month, year, StatisticsManager.BINNING_NONE))
+            db.session.add(StatisticEntry(StatisticsManager.STATISTICS_STATID_USER_GROUPS_ACCESSES, str(month) + "/" + str(year % 1000), random.randrange(5, 15), StatisticsManager.SERIES_GROUP_BY_MEDIUM_ACTIVITY, month, year, StatisticsManager.BINNING_NONE))
+            db.session.add(StatisticEntry(StatisticsManager.STATISTICS_STATID_USER_GROUPS_ACCESSES, str(month) + "/" + str(year % 1000), random.randrange(2, 6), StatisticsManager.SERIES_GROUP_BY_HIGH_ACTIVITY, month, year, StatisticsManager.BINNING_NONE))
+
+            # STATISTICS_STATID_USER_GROUPS_ACCESSES entries
+            db.session.add(StatisticEntry(StatisticsManager.STATISTICS_STATID_USER_GROUPS_AVERAGE, str(month) + "/" + str(year % 1000), random.randrange(20, 120), StatisticsManager.SERIES_GROUP_BY_LOW_ACTIVITY, month, year, StatisticsManager.BINNING_NONE))
+            db.session.add(StatisticEntry(StatisticsManager.STATISTICS_STATID_USER_GROUPS_AVERAGE, str(month) + "/" + str(year % 1000), random.randrange(5, 15), StatisticsManager.SERIES_GROUP_BY_MEDIUM_ACTIVITY, month, year, StatisticsManager.BINNING_NONE))
+            db.session.add(StatisticEntry(StatisticsManager.STATISTICS_STATID_USER_GROUPS_AVERAGE, str(month) + "/" + str(year % 1000), random.randrange(2, 6), StatisticsManager.SERIES_GROUP_BY_HIGH_ACTIVITY, month, year, StatisticsManager.BINNING_NONE))
+
+
             # STATISTICS_STATID_USERCOUNT entries
             db.session.add(StatisticEntry(StatisticsManager.STATISTICS_STATID_USERCOUNT, str(month) + "/" + str(year % 1000), random.randrange(20, 120), StatisticsManager.SERIES_GENERALUSER, month, year, StatisticsManager.BINNING_NONE))
             db.session.add(StatisticEntry(StatisticsManager.STATISTICS_STATID_USERCOUNT, str(month) + "/" + str(year % 1000), random.randrange(5, 15), StatisticsManager.SERIES_SUPERUSER, month, year, StatisticsManager.BINNING_NONE))

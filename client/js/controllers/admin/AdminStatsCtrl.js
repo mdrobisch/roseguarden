@@ -141,8 +141,22 @@ RoseGuardenApp.controller('AdminStatsCtrl', function($scope, $log, $q, Statistic
     $scope.updateChart = function(statIndex, data) {
         var selectedStat = $scope.statCollection[statIndex];
 
+        var STATDISPLAY_CONFIG_SHOW_DESCRIPTION = 1
+        var STATDISPLAY_CONFIG_NO_TOTAL = 2
+
         switch (selectedStat.statType) {
             case 1: /* STATTYPE_LINE_SERIES */
+            case 8:
+
+                switch (selectedStat.statType) {
+                    case 8:
+                        $scope.statType = 'Bar';
+                        break;
+                    default:
+                        $scope.statType = 'Line';
+                        break;
+                }
+
                 console.log("Line " + selectedStat.statType + " " + $scope.dt.getYear());
                 console.log(selectedStat);
                 console.log(data[0]);
@@ -156,18 +170,20 @@ RoseGuardenApp.controller('AdminStatsCtrl', function($scope, $log, $q, Statistic
                     $scope.statLabels.push( i + "/" + ($scope.dt.getFullYear() % 1000));
 
                 displayedSeries = selectedStat.seriesCount;
-                if (selectedStat.seriesCount > 1)
+                if (selectedStat.seriesCount > 1  && (selectedStat.displayConfig & STATDISPLAY_CONFIG_NO_TOTAL) == 0)
                     displayedSeries ++;
 
                 for(var i=0;i<displayedSeries;i++){
                     var seriesName = "";
                     var seriesIndex = i;
 
-                    if (selectedStat.seriesCount > 1)
+                    if (selectedStat.seriesCount > 1 && (selectedStat.displayConfig & STATDISPLAY_CONFIG_NO_TOTAL) == 0)
                         seriesIndex--;
 
+                    console.log( (selectedStat.displayConfig & STATDISPLAY_CONFIG_NO_TOTAL))
+
                     if(i == 0) {
-                        if (selectedStat.seriesCount > 1)
+                        if (selectedStat.seriesCount > 1 && (selectedStat.displayConfig & STATDISPLAY_CONFIG_NO_TOTAL) == 0)
                             seriesName = "Total";
                         else
                             seriesName = getSeriesNameByIndex(0,selectedStat);
@@ -184,7 +200,7 @@ RoseGuardenApp.controller('AdminStatsCtrl', function($scope, $log, $q, Statistic
 
                 for (var i = 0;i < data.length;i++) {
                     if(data[i].year == $scope.dt.getFullYear()) {
-                        if (selectedStat.seriesCount > 1) {
+                        if (selectedStat.seriesCount > 1  && (selectedStat.displayConfig & STATDISPLAY_CONFIG_NO_TOTAL) == 0) {
                             $scope.statData[data[i].series+1][data[i].month - 1] = data[i].value;
                             if($scope.statData[0][data[i].month - 1] == null)
                                 $scope.statData[0][data[i].month - 1] = data[i].value;
@@ -196,9 +212,6 @@ RoseGuardenApp.controller('AdminStatsCtrl', function($scope, $log, $q, Statistic
                         }
                     }
                 }
-
-
-                $scope.statType = 'Line';
                 break;
             case 2: /* STATTYPE_BAR_SERIES */
                 console.log("Bar " + selectedStat.statType);
