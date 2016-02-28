@@ -201,14 +201,14 @@ RoseGuardenApp.controller('AdminStatsCtrl', function($scope, $log, $q, Statistic
                 for (var i = 0;i < data.length;i++) {
                     if(data[i].year == $scope.dt.getFullYear()) {
                         if (selectedStat.seriesCount > 1  && (selectedStat.displayConfig & STATDISPLAY_CONFIG_NO_TOTAL) == 0) {
-                            $scope.statData[data[i].series+1][data[i].month - 1] = data[i].value;
+                            $scope.statData[data[i].series+1][data[i].month - 1] = parseFloat(data[i].value);
                             if($scope.statData[0][data[i].month - 1] == null)
-                                $scope.statData[0][data[i].month - 1] = data[i].value;
+                                $scope.statData[0][data[i].month - 1] = parseFloat(data[i].value);
                             else
-                                $scope.statData[0][data[i].month - 1] += data[i].value;
+                                $scope.statData[0][data[i].month - 1] += parseFloat(data[i].value);
                         }
                         else {
-                            $scope.statData[data[i].series][data[i].month - 1] = data[i].value;
+                            $scope.statData[data[i].series][data[i].month - 1] = parseFloat(data[i].value);
                         }
                     }
                 }
