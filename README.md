@@ -135,7 +135,7 @@ To update the client switch to your client directory e.g the `client`-directory:
 
 Here we have to install/uninstall all new/old packages of bower.
 
-- `sudo bower install`
+- `bower install` (no `sudo` required)
 
 After updating please restart your roseGuarden-application again.
 It should be work after this with the newest version for server and client.

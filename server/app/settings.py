@@ -13,9 +13,10 @@ def setting_value_to_float(v):
     return float(v)
 
 
-def getSettingValue(name, default):
+def getSettingValue(name, type, default):
     setting = Setting.query.filter(Setting.name == name).first()
     if setting == None:
+        setOrUpdateSettingValue(name,type,default)
         return default
     else:
         if setting.type == Setting.SETTINGTYPE_STRING:
@@ -46,5 +47,5 @@ def updateSettingFromDatabase():
     global SETTING_NODE_VALID_KEYS_MASK
     SETTING_NODE_VALID_KEYS_MASK = getSettingValue("NODE_VALID_KEYS_MASK", 0)
 
-SETTING_NODE_VALID_KEYS_MASK = getSettingValue("NODE_VALID_KEYS_MASK", 0)
+SETTING_NODE_VALID_KEYS_MASK = getSettingValue("NODE_VALID_KEYS_MASK",Setting.SETTINGTYPE_INT, 0)
 #setOrUpdateSettingValue("NODE_VALID_KEYS_MASK", Setting.SETTINGTYPE_INT, 0x00)

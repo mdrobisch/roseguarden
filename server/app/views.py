@@ -710,7 +710,6 @@ class SettingView(Resource):
         db.session.add(logentry)
         db.session.commit()
 
-
         settings.setOrUpdateSettingValue(form.name.data, int(form.type.data), form.value.data)
         return '', 201
 
@@ -721,6 +720,7 @@ class SettingsListView(Resource):
             return '', 401
 
         settings = Setting.query.all()
+
         if settings is None:
             return '', 405
 
