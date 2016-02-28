@@ -58,7 +58,7 @@ class StatisticsManager(object):
             db.session.commit()
         else:
             if statEntry.value != value:
-                statEntry.value = value
+                statEntry.value = float(value)
                 db.session.commit()
 
     @staticmethod
@@ -68,7 +68,7 @@ class StatisticsManager(object):
             newEntry = StatisticEntry(statId, label, value, series, month, year, binningId)
             db.session.add(newEntry)
         else:
-            statEntry.value += value
+            statEntry.value += float(value)
         db.session.commit()
 
 
