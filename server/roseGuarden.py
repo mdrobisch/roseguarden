@@ -148,7 +148,7 @@ def create_db():
     #db.session.add(Door(id = 0, name = 'front door', address = 'http://192.168.2.137', keyMask = 0x01, local = 0x00 ))
     #db.session.add(Door(id = 0, name = 'front door', address = 'http://192.168.2.138', keyMask = 0x01, local = 0x00 ))
     #db.session.add(Door(id = 0, name = 'front door', address = 'http://192.168.2.139', keyMask = 0x01, local = 0x00 ))
-    db.session.add(Door(name = config.NODE_NAME, displayName = config.NODE_LOCAL_DOOR_NAME, address = 'http://localhost', keyMask = 0x03, local = 0x01, password= config.SYNC_MASTER_DEFAULT_PASSWORD))
+    db.session.add(Door(name = config.NODE_NAME, displayName = 'Local', address = 'http://localhost', keyMask = 0x03, local = 0x01, password= config.SYNC_MASTER_DEFAULT_PASSWORD))
 
     Setting.query.delete()
     db.session.add(Setting('NODE_VALID_KEYS_MASK', '3', Setting.SETTINGTYPE_INT))

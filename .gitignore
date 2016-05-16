@@ -8,3 +8,4 @@ server/config.ini
 server/alchemydumps
 *.lyx~
 *.lyx#
+*.pyc

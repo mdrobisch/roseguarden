@@ -257,6 +257,11 @@ To fix this the following steps could enable the reconnection.
 Alternativly you can tools like wicd-curses.
 Instructions for wicd-curses can be found in the internet.
 
+*I have problems to develop under windows*
+
+- Install the python Visual C++-Compiler from  http://aka.ms/vcpython27 before installing the requirements
+- user requirements_win_dev.txt instead of requirements.txt (SPI-Py is for linux only)
+
 *The rfid don't read any tag*
 
 With Kernel 3.18 and above Rasbian switch to device tree support on default.
