@@ -123,40 +123,43 @@ def seed_statistic():
 def create_db():
     "Create RoseGuarden database"
 
+    print "Create database (this will remove old data)"
     db.create_all()
     User.query.delete()
 
     # add syncmaster-user for synchronisation
+    print "Add syncmaster user"
     syncMasterUser = User('syncmaster@roseguarden.org', SYNC_MASTER_DEFAULT_PASSWORD, 'Sync','Master',1)
     syncMasterUser.syncMaster = 1
-
     db.session.add(syncMasterUser)
 
     # you can add some default user here
-    defaultUser1 = User('kommando@konglomerat.org','pleasechangethepassword','Konglomerat','Kommando', 0)
+    print "Add admin user"
+    defaultUser1 = User('Administrator','pleasechangethepassword','RoseGuarden','Admin', 1)
     defaultUser1.accessType = 1
-    defaultUser2 = User('m.drobisch@googlemail.com','1234','Marcus','Drobisch',1,'01754404298',0x00,0x03)
-    defaultUser2.accessType = 1
-
     db.session.add(defaultUser1)
-    db.session.add(defaultUser2)
 
-    #db.session.add(User(id = 0, password = flask_bcrypt.generate_password_hash('1234'), token = base64.encodestring('m.drobisch@googlemail.com:1234'), tokenExpirationDate= datetime.datetime.utcnow(), firstName = 'Marcus', lastName = 'Drobisch', phone = '0175 4404298', email='m.drobisch@googlemail.com', card_id = '1.1.1.1' , doorLicense = 0x01, deviceLicense = 0x01))
-    #db.session.add(User(id = 1, password = flask_bcrypt.generate_password_hash('1234'), token = base64.encodestring('m.mustermann@googlemail.com:1234'), tokenExpirationDate= datetime.datetime.utcnow(), firstName = 'Max', lastName = 'Mustermann', phone = '0175 4404298', email='m.mustermann@googlemail.com', card_id = '2.1.1.1'  , doorLicense = 0x00, deviceLicense = 0x00))
-
-    Door.query.delete()
     #db.session.add(Door(id = 0, name = 'front door', address = 'http://192.168.2.137', keyMask = 0x01, local = 0x00 ))
     #db.session.add(Door(id = 0, name = 'front door', address = 'http://192.168.2.138', keyMask = 0x01, local = 0x00 ))
     #db.session.add(Door(id = 0, name = 'front door', address = 'http://192.168.2.139', keyMask = 0x01, local = 0x00 ))
+
+    print "Add local door"
+    Door.query.delete()
     db.session.add(Door(name = config.NODE_NAME, displayName = 'Local', address = 'http://localhost', keyMask = 0x03, local = 0x01, password= config.SYNC_MASTER_DEFAULT_PASSWORD))
 
+    print "Add default settings"
     Setting.query.delete()
     db.session.add(Setting('NODE_VALID_KEYS_MASK', '3', Setting.SETTINGTYPE_INT))
 
+
+    print "Add log-entry"
     Action.query.delete()
     db.session.add(Action(datetime.datetime.utcnow(), config.NODE_NAME, syncMasterUser.firstName + ' ' + syncMasterUser.lastName, syncMasterUser.email, 'Remove all data & regenerate database', 'Init systen', 'L1', 1, 'Internal'))
 
+    print "Save  new database"
     db.session.commit()
+
+    print "Successfully create new database"
 
 if __name__ == '__main__':
     manager.run()
