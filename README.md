@@ -72,21 +72,25 @@ In the same `client`-directory prompt
 Now the frontend is ready.
 
 For the backend (python) we have to install dependecies, too.
-The python package manager `pip` will handle this for us. So we need to install `pip` like this.
 
-8. `sudo apt-get install python-pip`
+First we install `python-dev` and `gcc` on the raspberry to establish interfaces between c++-libs and python.
+
+8. `sudo apt-get install python-dev` needed to compile c++-bindings with python
+9. `sudo apt-get install gcc` needed to compile c++
+
+The python package manager `pip` will handle needed python modules for us. So we need to install `pip` like this.
+
+10. `sudo apt-get install python-pip`
 
 At this point we will get the python packages list in the `requirement.txt` file.
 Switch to the `server`-directory and prompt.
 
-9. `sudo pip install -r requirements.txt` (in the `server`-directory)
+11. `sudo pip install -r requirements.txt` (in the `server`-directory)
 
 To use the rfid-reader (rc522) we have to install SPI-Py. Switch to the `server/app/SPI-Py`-directory and
 install the dependencies and the module.
 
-10. `sudo apt-get install python-dev` needed to compile c++-bindings with python
-11. `sudo apt-get install gcc` needed to compile c++
-12. `sudo python setup.py install` install the module
+10. `sudo python setup.py install` install the module
 
 Note: depending on your raspberry pi and kernel you have to re/enable the spi-module and the device tree support
 with `sudo raspi-config` -> 'Advanded Options'
@@ -104,6 +108,25 @@ Running RoseGuarden
 
 - start the http-server in the `client` - directory with  `http-server -p 8000`
 - start the RoseGuarden-app in the `server` - directory with `sudo python roseGuarden.py start`
+
+Problems durring installation and running RoseGuarden
+-----------------------------------------------------
+
+*Problem:* Modules (e.g. Flask) could not found while running `sudo python roseGuarden.py create_db` or `sudo python roseGuarden.py start`
+
+*Solution:*
+
+- Go to `/your-roseguarden-directory/server/`
+- repeat the installation of the python modules with `sudo pip install -r requirements.txt`
+- sometime there are problems with a bad internet connection, check this twice before running the installation (e.g. ping to a known web-site)
+
+
+Some other known issues regarding the WLan and the RFID-Reader can be found at the end of the page.
+
+Have a look at the known issues on Github ( https://github.com/blinzelaffe/roseguarden/issues?utf8=%E2%9C%93&q=is%3Aissue+ ) and see problems already known.
+
+Sometimes a update will help to get the latest version of RoseGuarden and some fixed bugs. See the section below for this.
+
 
 Update RoseGuarden
 ------------------
