@@ -595,7 +595,13 @@ class BackgroundWorker():
             for action in actions:
                 action.synced = 1
                 if action.action == Action.ACTION_OPENING_REQUEST:
-                    userIndex = userDict[str(action.userMail)]
+
+                    try:
+                        userIndex = userDict[str(action.userMail)]
+                    except:
+                        print "Skip User [" + str(userIndex) + "] for statistics, because the user got removed."
+                        continue
+
                     users[userIndex].monthlyAccessCount += 1
                     delta = action.date - users[userIndex].lastAccessDateTime
                     if users[userIndex].accessType == User.ACCESSTYPE_ACCESS_DAYS or \
