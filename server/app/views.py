@@ -633,9 +633,9 @@ class RfidTagAssignView(Resource):
             user.cardAuthKeyA = config.RFID_GLOBAL_PASSWORD
             user.cardAuthKeyB = "FF-FF-FF-FF-FF-FF"
 
-            print "User-secret: >" + user.cardSecret + "<"
-            print "User-keyA: >" + user.cardAuthKeyA + "<"
-            print "User-keyB: >" + user.cardAuthKeyB + "<"
+            print "User-secret: >" + str(user.cardSecret) + "<"
+            print "User-keyA: >" + str(user.cardAuthKeyA) + "<"
+            print "User-keyB: >" + str(user.cardAuthKeyB) + "<"
 
             if (backgroundWorker.assignRFIDTag(user) == False):
                 print 'Error while assigning cardID ' + form.rfidTagId.data + ' to ' + user.firstName + ' ' + user.lastName

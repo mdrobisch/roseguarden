@@ -50,7 +50,7 @@ while continue_reading:
 
 
         newkey = []
-        newkeystring = '55-39-68-A7-F1-B5'
+        newkeystring = '00-00-00-00-00-00'
         for x in newkeystring.split('-'):
             newkey.append(int(x, 16))
 

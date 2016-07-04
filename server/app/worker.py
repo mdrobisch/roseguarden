@@ -238,6 +238,9 @@ class BackgroundWorker():
                 userkey = []
                 usersecret = []
 
+                print "Card auth key A:" + str(user.cardAuthKeyA)
+                print "Card auth key B:" + str(user.cardAuthKeyB)
+
                 userkeyString = user.cardAuthKeyA
                 for x in userkeyString.split('-'):
                     userkey.append(int(x, 16))
