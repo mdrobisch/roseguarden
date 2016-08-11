@@ -11,7 +11,11 @@ import app.config as config
 import app.seed as seeder
 import datetime
 import random
+import codecs
+import sys
 
+UTF8Writer = codecs.getwriter('utf8')
+sys.stdout = UTF8Writer(sys.stdout)
 
 manager = Manager(app, False)
 manager.add_command('db', MigrateCommand)
