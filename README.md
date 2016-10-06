@@ -109,9 +109,15 @@ Running RoseGuarden
 - start the http-server in the `client` - directory with  `http-server -p 8000`
 - start the RoseGuarden-app in the `server` - directory with `sudo python roseGuarden.py start`
 
+Use RoseGuarden
+----------------
+
+- after complete installation and setup you can reach the admin panel on the ip of your raspberry pi (port 8000)
+- e.g. enter "192.168.1.100:8000" in your browser (Chrome or Mozilla are suggested)
+
 - The initial administrator-account is: Administrator
 - The initial administrator-password is: pleasechangethepassword
-- please change it after your first login
+- please change the password after your first login
 
 Problems durring installation and running RoseGuarden
 -----------------------------------------------------
