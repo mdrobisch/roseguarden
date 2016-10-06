@@ -109,6 +109,10 @@ Running RoseGuarden
 - start the http-server in the `client` - directory with  `http-server -p 8000`
 - start the RoseGuarden-app in the `server` - directory with `sudo python roseGuarden.py start`
 
+- The initial administrator-account is: Administrator
+- The initial administrator-password is: pleasechangethepassword
+- please change it after your first login
+
 Problems durring installation and running RoseGuarden
 -----------------------------------------------------
 
