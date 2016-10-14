@@ -7,6 +7,7 @@ from flask_migrate import MigrateCommand
 from flask_alchemydumps import AlchemyDumpsCommand
 from app.models import User, Action, Door, Setting, Statistic, StatisticEntry
 from app.config import SYNC_MASTER_DEFAULT_PASSWORD
+from app.security import checkUserAccessPrivleges
 import app.config as config
 import app.seed as seeder
 import datetime
@@ -30,15 +31,15 @@ def start():
     backgroundWorker.cancel()
 
 @manager.command
-def open_the_door():
-    "Force the local door openend"
-    backgroundWorker.run()
-    backgroundWorker.open_the_door()
-
-@manager.command
 def seed():
     "Seed RoseGuarden database filled default data after an migration/upgrade"
     seeder.seed()
+
+@manager.command
+def unittests():
+    "Test the server-functionality"
+    from app.security import securityTests
+    securityTests()
 
 @manager.command
 def seed_statistic():
@@ -150,7 +151,6 @@ def create_db():
     print "Add default settings"
     Setting.query.delete()
     db.session.add(Setting('NODE_VALID_KEYS_MASK', '3', Setting.SETTINGTYPE_INT))
-
 
     print "Add log-entry"
     Action.query.delete()

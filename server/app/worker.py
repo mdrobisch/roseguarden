@@ -393,7 +393,7 @@ class BackgroundWorker():
 
                     if readSecretString == user.cardSecret:
                         print "correct secret"
-                        if security.checkUserAccessPrivleges(user) == "Access granted.":
+                        if security.checkUserAccessPrivleges(datetime.datetime.now(),user) == "Access granted.":
                             if datetime.datetime.now() > user.lastAccessDateTime + datetime.timedelta(minutes=config.NODE_LOG_MERGE):
                                 user.lastAccessDateTime = datetime.datetime.now()
 

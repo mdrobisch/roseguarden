@@ -9,12 +9,13 @@ import marshmallow
 
 class User(db.Model):
     ACCESSTYPE_NO_ACCESS = 0
-    ACCESSTYPE_ACCESS_PERIOD = 1
+    ACCESSTYPE_DAILY_ACCESS_PERIOD = 1
     ACCESSTYPE_ACCESS_DAYS = 2
     ACCESSTYPE_LIFETIME_ACCESS = 3
     ACCESSTYPE_MONTHLY_BUDGET = 4
     ACCESSTYPE_QUARTERLY_BUDGET = 5
-    ACCESSTYPE_MAX = 6
+    ACCESSTYPE_ABSOLUT_ACCESS_PERIOD = 6
+    ACCESSTYPE_MAX = 7
 
     AUTHTYPE_WEB    = 0
     AUTHTYPE_RFID   = 1
@@ -22,6 +23,14 @@ class User(db.Model):
     ROLE_USER           = 0
     ROLE_ADMIN          = 1
     ROLE_SUPERVISOR     = 2
+
+    MONDAY          = 1
+    TUESDAY         = 2
+    WEDNESDAY       = 4
+    THURSDAY        = 8
+    FRIDAY          = 16
+    SATURDAY        = 32
+    SUNDAY          = 64
 
     id = db.Column(db.Integer, primary_key=True)
     syncMaster = db.Column(db.Integer)
