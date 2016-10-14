@@ -112,14 +112,17 @@ Running RoseGuarden
 Problems durring installation and running RoseGuarden
 -----------------------------------------------------
 
-*Problem:* Modules (e.g. Flask) could not found while running `sudo python roseGuarden.py create_db` or `sudo python roseGuarden.py start`
+** _Problem:_ **
 
-*Solution:*
+Modules (e.g. Flask) could not found while running `sudo python roseGuarden.py create_db` or `sudo python roseGuarden.py start`
+
+** _Solution:_ **
 
 - Go to `/your-roseguarden-directory/server/`
 - repeat the installation of the python modules with `sudo pip install -r requirements.txt`
 - sometime there are problems with a bad internet connection, check this twice before running the installation (e.g. ping to a known web-site)
 
+** _Other Hints:_ **
 
 Some other known issues regarding the WLan and the RFID-Reader can be found at the end of the page.
 
@@ -328,6 +331,36 @@ SDA  ——————————> pin 24 e.g. GPIO 8
 RST  ——————————> pin 22 e.g. GPIO 25
 
 IRQ  ——————————> NONE
+
+In addition you have to change your SPI-Py library. There is a bug, which isn't fixed and break the communication to the Mifare-Module.
+
+change the following code in the `/server/app/SPI-Py/spi.c`-file.
+
+```c
+	struct spi_ioc_transfer tr = {
+		.tx_buf = (unsigned long)tx,
+		.rx_buf = (unsigned long)rx,
+		.len = tupleSize,
+		.delay_usecs = delay,
+		.speed_hz = speed,
+		.bits_per_word = bits,
+        .cs_change = 1,
+    };
+```
+
+to
+
+```c
+	struct spi_ioc_transfer tr = {
+		.tx_buf = (unsigned long)tx,
+		.rx_buf = (unsigned long)rx,
+		.len = tupleSize,
+		.delay_usecs = delay,
+		.speed_hz = speed,
+		.bits_per_word = bits,
+        .cs_change = 0,
+	};
+```
 
 License
 =======
