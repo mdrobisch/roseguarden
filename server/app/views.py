@@ -396,7 +396,7 @@ class OpeningRequestView(Resource):
     @auth.login_required
     def post(self):
         print 'Opening request received'
-        checkAccessResult = security.checkUserAccessPrivleges(g.user)
+        checkAccessResult = security.checkUserAccessPrivleges(datetime.datetime.now(),g.user)
         print "Check user privileges for opening request: " + checkAccessResult
         if (checkAccessResult == "Access granted."):
             if datetime.datetime.now() > g.user.lastAccessDateTime + datetime.timedelta(minutes=config.NODE_LOG_MERGE):
@@ -523,7 +523,7 @@ class DoorInfoView(Resource):
 class DoorListView(Resource):
     @auth.login_required
     def get(self):
-        if config.NODE_DOOR_AVAILABLE == True:
+        if config.NODE_DOOR_AVAILABLE == False:
             posts = Door.query.filter_by(local=0).all()
         else:
             posts = Door.query.all()
