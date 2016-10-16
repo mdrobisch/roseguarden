@@ -75,7 +75,7 @@ class GPIOWrapper:
         logging.log("GPIO_LOG", "GPIO: Setup GPIO " + str(channel) + " to " + str(type))
 
 
-if platform.platform_getType() == platform.RASPBERRY_PI:
+if platform.platform_getType() == platform.RASPBERRY_PI or platform.platform_getType() == platform.RASPBERRY_PI_2 :
     try:
         import RPi.GPIO as GPIO
 
