@@ -1,12 +1,18 @@
+import codecs
 import time
 
 import datetime
+
+import sys
 from flask import Flask
 from flask_script import Manager, Option
 from sys import version_info
 from app.server import app, db
 from app.worker import backgroundWorker
 from app.models import User
+
+UTF8Writer = codecs.getwriter('utf8')
+sys.stdout = UTF8Writer(sys.stdout)
 
 app = Flask(__name__)
 
@@ -65,7 +71,7 @@ def updateAssociation():
             print "\tNo members in the assocation."
         else:
             for user in users:
-                print "\t" + str(user.firstName) + " " + str(user.lastName) + " - " + str(user.email)
+                print "\t", (user.firstName), " ", (user.lastName), " - ", (user.email)
 
             print ""
 
@@ -120,38 +126,58 @@ def updateAssociation():
                 print ""
 
                 if change == 'y':
+                    print users
                     for user in users:
                         if 'accessType' in locals():
+                            print "change accessType of ", user.firstName, " ", user.lastName, " to ", accessType
                             user.accessType = accessType
-                            del accessType
                         if 'keyMask' in locals():
+                            print "change keyMask of ", user.firstName, " ", user.lastName, " to ", keyMask
                             user.keyMask = keyMask
-                            del keyMask
                         if 'dayMask' in locals():
+                            print "change dayMask of ", user.firstName, " ", user.lastName, " to ", dayMask
                             user.accessDaysMask = dayMask
-                            del dayMask
                         if 'startDate' in locals():
+                            print "change startDate of ", user.firstName, " ", user.lastName, " to ", startDate.replace(hour=0,minute=0,second=0)
                             user.accessDateStart = startDate.replace(hour=0,minute=0,second=0)
-                            del startDate
                         if 'endDate' in locals():
+                            print "change endDate of ", user.firstName, " ", user.lastName, " to ", endDate.replace(hour=23,minute=59,second=0)
                             user.accessDateEnd = endDate.replace(hour=23,minute=59,second=0)
-                            del endDate
                         if 'startTime' in locals():
+                            print "change startTime of ", user.firstName, " ", user.lastName, " to ", startTime.time()
                             user.accessTimeStart = startTime
-                            del startTime
                         if 'endTime' in locals():
+                            print "change endTime of ", user.firstName, " ", user.lastName, " to ", endTime.time()
                             user.accessTimeEnd = endTime
-                            del endTime
                         if 'dayCounter' in locals():
+                            print "change dayCounter of ", user.firstName, " ", user.lastName, " to ", dayCounter
                             user.accessDayCounter = dayCounter
-                            del dayCounter
                         if 'dayCounterBudget' in locals():
+                            print "change dayCounterBudget of ", user.firstName, " ", user.lastName, " to ", dayCounterBudget
                             user.accessDayCyclicBudget = dayCounterBudget
-                            del dayCounterBudget
+
+                        print ""
+
+                    if 'accessType' in locals():
+                        del accessType
+                    if 'keyMask' in locals():
+                        del keyMask
+                    if 'dayMask' in locals():
+                        del dayMask
+                    if 'startDate' in locals():
+                        del startDate
+                    if 'endDate' in locals():
+                        del endDate
+                    if 'startTime' in locals():
+                        del startTime
+                    if 'endTime' in locals():
+                        del endTime
+                    if 'dayCounter' in locals():
+                        del dayCounter
+                    if 'dayCounterBudget' in locals():
+                        del dayCounterBudget
 
                     db.session.commit()
-
-
 
         print ""
 

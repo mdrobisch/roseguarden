@@ -1,3 +1,6 @@
+import codecs
+
+import sys
 from flask import Flask
 from flask_script import Manager, Option
 from sys import version_info
@@ -8,6 +11,9 @@ from app.RFID import RFIDReader
 import signal
 
 stopTest = False
+
+UTF8Writer = codecs.getwriter('utf8')
+sys.stdout = UTF8Writer(sys.stdout)
 
 # Capture SIGINT for cleanup when the script is aborted
 def endTest(signal,frame):
