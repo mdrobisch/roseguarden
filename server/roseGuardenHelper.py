@@ -126,7 +126,6 @@ def updateAssociation():
                 print ""
 
                 if change == 'y':
-                    print users
                     for user in users:
                         if 'accessType' in locals():
                             print "change accessType of ", user.firstName, " ", user.lastName, " to ", accessType

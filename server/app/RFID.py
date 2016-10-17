@@ -153,7 +153,7 @@ class RFIDWrapper:
         logging.log("RFID_LOG",  "RFID StopCrypto")
 
 
-if platform.platform_getType() == platform.RASPBERRY_PI:
+if platform.platform_getType() == platform.RASPBERRY_PI or platform.platform_getType() == platform.RASPBERRY_PI_2:
     try:
         import MFRC522.MFRC522 as RFID
         logging.log("RFID_LOG", "RFID: Using MFRC522 as RFID")
