@@ -3,7 +3,7 @@ __author__ = 'drobisch'
 import platform
 import logging
 
-class GPIOStateMockup:
+class GPIOStubState:
     # pin configuration
     OUT = 0
     IN = 1
@@ -29,7 +29,7 @@ class GPIOStateMockup:
         self.outputstate = state
 
 
-class GPIOWrapper:
+class GPIOStub:
     # suppported modes
     UNKNOWN = 0
     BOARD = 1
@@ -79,16 +79,16 @@ if platform.platform_getType() == platform.RASPBERRY_PI or platform.platform_get
     try:
         import RPi.GPIO as GPIO
 
-        logging.log("GPIO_LOG", "GPIO: Using RPi.GPIO as GPIO")
+        print "INFO: Using RPi.GPIO as GPIO"
         GPIOMockup = None
         GPIO.setmode(GPIO.BOARD)
     except RuntimeError:
         print(
             "Error importing RPi.GPIO!  This is probably because you need superuser privileges.  You can achieve this by using 'sudo' to run your script")
 else:
-    logging.log("GPIO_LOG", "GPIO: Using GPIOWrapper as GPIO")
-    GPIOMockup = GPIOStateMockup()
-    GPIO = GPIOWrapper(GPIOMockup)
+    print "WARNING: Using GPIOWrapper as GPIO"
+    GPIOState = GPIOStubState()
+    GPIO = GPIOStub(GPIOStubState)
     GPIO.setmode(GPIO.BOARD)
 
 

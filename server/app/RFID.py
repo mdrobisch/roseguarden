@@ -156,12 +156,12 @@ class RFIDWrapper:
 if platform.platform_getType() == platform.RASPBERRY_PI or platform.platform_getType() == platform.RASPBERRY_PI_2:
     try:
         import MFRC522.MFRC522 as RFID
-        logging.log("RFID_LOG", "RFID: Using MFRC522 as RFID")
+        print "INFO: Using MFRC522 (with SPI) as RFID"
         RFIDReader = RFID.MFRC522()
         RFIDMockup = None
     except RuntimeError:
         logging.log("RFID_LOG", "Error importing RPi.GPIO!  This is probably because you need superuser privileges.  You can achieve this by using 'sudo' to run your script")
 else:
-    logging.log("RFID_LOG",  "RFID: Using RFIDWrapper as RFID")
+    print "RFID: Using RFIDWrapper as RFID"
     RFIDReader = RFIDWrapper()
     RFIDMockup = RFIDStateMockup()
