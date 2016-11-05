@@ -18,7 +18,7 @@ import requests
 import base64
 import security
 import datetime
-
+import dateutil.parser
 
 @auth.verify_password
 def verify_password(email, password):
@@ -65,6 +65,7 @@ class UserView(Resource):
             return form.errors, 422
         user = User.query.filter_by(id=id).first()
         log_text = ''
+        
         if form.newpassword.data != None and form.newpassword.data != '':
             oldpwd = base64.decodestring(form.oldpassword.data)
             if not flask_bcrypt.check_password_hash(user.password, oldpwd):
@@ -76,24 +77,28 @@ class UserView(Resource):
             log_text += 'Changed password'
             user.password = flask_bcrypt.generate_password_hash(base64.decodestring(form.newpassword.data))
             db.session.commit()
+
         if form.lastName.data != None and form.lastName.data != '':
             if user.lastName != form.lastName.data:
                 if log_text != '':
                     log_text += '; '
                 log_text += 'Change last name from ' + user.lastName + ' to ' + form.lastName.data
             user.lastName = form.lastName.data
+
         if form.firstName.data != None and form.firstName.data != '':
             if user.firstName != form.firstName.data:
                 if log_text != '':
                     log_text += '; '
                 log_text += 'Change first name from ' + user.firstName + ' to ' + form.firstName.data
             user.firstName = form.firstName.data
+
         if form.phone.data != None and form.phone.data != '':
             if user.phone != form.phone.data:
                 if log_text != '':
                     log_text += '; '
                 log_text +=  'Change phone number from ' + user.phone + ' to ' + form.phone.data
             user.phone = form.phone.data
+
         if form.association.data != None and form.association.data != '':
             if user.association != form.association.data:
                 if log_text != '':
@@ -120,6 +125,7 @@ class UserView(Resource):
                     log_text += '; '
                 log_text += 'Change accessDaysMask from ' + str(user.accessDaysMask) + ' to ' + str(form.accessDaysMask.data)
             user.accessDaysMask = form.accessDaysMask.data
+
         if form.accessDayCounter.data != None and form.accessDayCounter.data != '':
             if g.user.role != 1 and g.user.role != 2:
                 return make_response(jsonify({'error': 'Not authorized'}), 403)
@@ -129,6 +135,7 @@ class UserView(Resource):
                 log_text += 'Change accessDayCounter from ' + str(user.accessDayCounter) + ' to ' + str(form.accessDayCounter.data)
                 user.lastAccessDaysUpdateDate = datetime.datetime.today()
             user.accessDayCounter = form.accessDayCounter.data
+
         if form.accessDayCyclicBudget.data != None and form.accessDayCyclicBudget.data != '':
             if g.user.role != 1 and g.user.role != 2:
                 return make_response(jsonify({'error': 'Not authorized'}), 403)
@@ -138,6 +145,7 @@ class UserView(Resource):
                 log_text += 'Change accessDayCyclicBudget from ' + str(user.accessDayCyclicBudget) + ' to ' + str(form.accessDayCyclicBudget.data)
                 user.lastAccessDaysUpdateDate = datetime.datetime.today()
             user.accessDayCyclicBudget = form.accessDayCyclicBudget.data
+
         if form.accessType.data != None and form.accessType.data != '':
             if g.user.role != 1 and g.user.role != 2:
                 return make_response(jsonify({'error': 'Not authorized'}), 403)
@@ -147,6 +155,7 @@ class UserView(Resource):
                 log_text += 'Change accessType from ' + str(user.accessType) + ' to ' + str(form.accessType.data)
                 user.lastAccessDaysUpdateDate = datetime.datetime.today()
             user.accessType = form.accessType.data
+
         if form.keyMask.data != None and form.keyMask.data != '':
             if g.user.role != 1 and g.user.role != 2:
                 return make_response(jsonify({'error': 'Not authorized'}), 403)
@@ -155,38 +164,42 @@ class UserView(Resource):
                     log_text += '; '
                 log_text += 'Change keyMask from ' + str(user.keyMask) + ' to ' + str(form.keyMask.data)
             user.keyMask = form.keyMask.data
+
         if form.accessDateStart.data != None and form.accessDateStart.data != '':
             if g.user.role != 1 and g.user.role != 2:
                 return make_response(jsonify({'error': 'Not authorized'}), 403)
-            if user.accessDateStart != datetime.datetime.strptime(form.accessDateStart.data, '%Y-%m-%dT%H:%M:%S.%fZ'):
+            if user.accessDateStart != dateutil.parser.parse(form.accessDateStart.data).replace(tzinfo=None):
                 if log_text != '':
                     log_text += '; '
-                log_text += 'Change accessDateStart from ' + str(user.accessDateStart) + ' to ' + str(form.accessDateStart.data)
-            user.accessDateStart = datetime.datetime.strptime(form.accessDateStart.data, '%Y-%m-%dT%H:%M:%S.%fZ')
+                log_text += 'Change accessDateStart from ', (user.accessDateStart), ' to ', (form.accessDateStart.data)
+            user.accessDateStart = dateutil.parser.parse(form.accessDateStart.data).replace(tzinfo=None)
+
         if form.accessDateEnd.data != None and form.accessDateEnd.data != '':
             if g.user.role != 1 and g.user.role != 2:
                 return make_response(jsonify({'error': 'Not authorized'}), 403)
-            if user.accessDateEnd != datetime.datetime.strptime(form.accessDateEnd.data, '%Y-%m-%dT%H:%M:%S.%fZ'):
+            if user.accessDateEnd != dateutil.parser.parse(form.accessDateEnd.data).replace(tzinfo=None):
                 if log_text != '':
                     log_text += '; '
                 log_text += 'Change accessDateEnd from ' + str(user.accessDateEnd ) + ' to ' + str(form.accessDateEnd.data)
-            user.accessDateEnd = datetime.datetime.strptime(form.accessDateEnd.data, '%Y-%m-%dT%H:%M:%S.%fZ')
+            user.accessDateEnd = dateutil.parser.parse(form.accessDateEnd.data).replace(tzinfo=None)
+
         if form.accessTimeStart.data != None and form.accessTimeStart.data != '':
             if g.user.role != 1 and g.user.role != 2:
                 return make_response(jsonify({'error': 'Not authorized'}), 403)
-            if user.accessTimeStart != datetime.datetime.strptime(form.accessTimeStart.data, '%Y-%m-%dT%H:%M:%S.%fZ'):
+            if user.accessTimeStart != dateutil.parser.parse(form.accessTimeStart.data).replace(tzinfo=None):
                 if log_text != '':
                     log_text += '; '
                 log_text += 'Change accessTimeStart from ' + str(user.accessTimeStart) + ' to ' + str(form.accessTimeStart.data)
-            user.accessTimeStart = datetime.datetime.strptime(form.accessTimeStart.data, '%Y-%m-%dT%H:%M:%S.%fZ')
+            user.accessTimeStart = dateutil.parser.parse(form.accessTimeStart.data).replace(tzinfo=None)
+
         if form.accessTimeEnd.data != None and form.accessTimeEnd.data != '':
             if g.user.role != 1 and g.user.role != 2:
                 return make_response(jsonify({'error': 'Not authorized'}), 403)
-            if user.accessTimeEnd != datetime.datetime.strptime(form.accessTimeEnd.data, '%Y-%m-%dT%H:%M:%S.%fZ'):
+            if user.accessTimeEnd != dateutil.parser.parse(form.accessTimeEnd.data).replace(tzinfo=None):
                 if log_text != '':
                     log_text += '; '
                 log_text += 'Change accessTimeEnd from ' + str(user.accessTimeEnd) + ' to ' + str(form.accessTimeEnd.data)
-            user.accessTimeEnd = datetime.datetime.strptime(form.accessTimeEnd.data, '%Y-%m-%dT%H:%M:%S.%fZ')
+            user.accessTimeEnd = dateutil.parser.parse(form.accessTimeEnd.data).replace(tzinfo=None)
 
         log_text = 'Update of ' + user.firstName + ' ' + user.lastName + ' (' + user.email + ')' + ' with the following changes: ' + log_text
         logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
