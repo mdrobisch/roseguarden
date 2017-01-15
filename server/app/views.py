@@ -65,7 +65,7 @@ class UserView(Resource):
             return form.errors, 422
         user = User.query.filter_by(id=id).first()
         log_text = ''
-        
+
         if form.newpassword.data != None and form.newpassword.data != '':
             oldpwd = base64.decodestring(form.oldpassword.data)
             if not flask_bcrypt.check_password_hash(user.password, oldpwd):
@@ -536,7 +536,7 @@ class DoorInfoView(Resource):
 class DoorListView(Resource):
     @auth.login_required
     def get(self):
-        if config.NODE_DOOR_AVAILABLE == False:
+        if config.NODE_DOOR_AVAILABLE == True:
             posts = Door.query.filter_by(local=0).all()
         else:
             posts = Door.query.all()
