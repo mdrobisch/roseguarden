@@ -24,6 +24,7 @@ Roseguarden is in development. Till now there exist only a prerelease version. T
 * Integrate the http-server into flask [In development].
 * Implement a web-gui setup to replace the config.ini. [planned]
 * Package Roseguarden into images (ISO) for Raspberry Pi 2, 3 and Zero. [planned]
+* Provide a user manual for important task and usage of Roseguarden [planned]
 * __**Release version 1.0.0 images**__ [planned]
 * Integrate a tool to repair broken rfid-tags [planned]
 * Build a web-gui export and import feature for user-backup [planned]
