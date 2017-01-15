@@ -4,7 +4,7 @@ RoseGuarden
 A remote door api and web application for Raspberry Pi, Odroid, Orange Pi or BeagleBoard (based on python).
 
 Features
-==========
+========
 
 * affordable access-control system
 * authentication by rfid-tags or webserver-application (smarthone, tablet)
@@ -13,6 +13,44 @@ Features
 * different types of accesses (period, days-budget)
 * additional options to adjust accesses (by given time, weekdays, differenet door-licences)
 * basic statistics (total users, total accesses, accesses per weekday, accesses per door/node)
+
+
+Roadmap
+=======
+
+Roseguarden is in development. Till now there exist only a prerelease version. The following steps are planed till release and further. While there is only one contributor to the project by now, don't expect any release dates. It's done when it's done.
+
+* Build up and run a community forum [Finished 2017-01-17 [Community forum](http://http://www.community.fabba.space/)].
+* Integrate the http-server into flask [In development].
+* Implement a web-gui setup to replace the config.ini. [planned]
+* Package Roseguarden into images (ISO) for Raspberry Pi 2, 3 and Zero. [planned]
+* __**Release version 1.0.0 images**__ [planned]
+* Integrate a tool to repair broken rfid-tags [planned]
+* Build a web-gui export and import feature for user-backup [planned]
+* Build in user groups for easy handling of multiple users [planned]
+* __**Release Version 1.1.0**__ [planned]
+
+Backlog for further release:
+---------------------------
+
+* OLED display support
+* Replace SPI-Py package with a more stable module
+* Rework RFID-module
+* support for machine-control (enable/license machines)
+* support a cashless payment system
+
+
+News & Community
+================
+
+The project has a community forum. News will be posted there. In addition its purpose is to find help, discuss features or report bugs. You are welcome to contribute to the project there.
+
+[To the community forum](http://http://www.community.fabba.space/)
+
+
+Overview
+========
+
 
 Quickstart
 ==========
@@ -76,7 +114,7 @@ For the backend (python) we have to install dependecies, too.
 First we install `python-dev` and `gcc` on the raspberry to establish interfaces between c++-libs and python.
 
 8. `sudo apt-get install python-dev` needed to compile c++-bindings with python
-9. `sudo apt-get install gcc` needed to compile c++
+9. `sudo apt-get install gcc libjpeg-dev zlib1g-dev` needed to compile c++, jpge and zlib
 
 The python package manager `pip` will handle needed python modules for us. So we need to install `pip` like this.
 
