@@ -18,7 +18,7 @@ Features
 Roadmap
 =======
 
-Roseguarden is in development. Till now there exist only a prerelease version. The following steps are planed till release and further. While there is only one contributor to the project by now, don't expect any release dates. It's done when it's done.
+Roseguarden is in development. Till now there exist only a prerelease version. It's already working fine and can be installed/ setup using the instruction below. So far it is not a released version. The following steps are planed till release and further. While there is only one contributor to the project by now, don't expect a release soon. It's done when it's done. Find news about the progress in the community-forum.
 
 * Build up and run a community forum [Finished 2017-01-17 [Community forum](http://www.community.fabba.space/)].
 * Integrate the http-server into flask [In development].
@@ -51,6 +51,9 @@ The project has a community forum. News will be posted there. In addition its pu
 
 Overview
 ========
+
+![overview](documentation/manual&guides/images/Roseguarden_Overview.png)
+
 
 
 Quickstart
