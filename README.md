@@ -59,26 +59,36 @@ Overview
 Quickstart
 ==========
 
-
-Install RoseGuarden
--------------------
-
-Clone the repository to your installation path with `git clone https://github.com/blinzelaffe/roseguarden.git`
-
-Install dependencies
---------------------
+Update your system
+------------------
 
 First of all update and upgrade your raspberry pi os
 
 1. `sudo apt-get update`
 2. `sudo apt-get upgrade`
 
+
+Install basic dependecies
+-------------------------
+
+3. `sudo apt-get install git`
+
+
+Install RoseGuarden
+-------------------
+
+Clone the repository to your installation path with `git clone https://github.com/blinzelaffe/roseguarden.git`
+
+
+Install dependencies
+--------------------
+
 For the frontend we need nodejs to get a module called bower and a fast nodejs http-server.
 The http-server serve the http-request. Bower will handle all the frontend dependencies.
 You can install the most actual nodejs package like this.
 
-3. `wget http://node-arm.herokuapp.com/node_0.10.36_armhf.deb`
-4. `sudo dpkg -i node_0.10.36_armhf.deb`
+4. `wget http://node-arm.herokuapp.com/node_0.10.36_armhf.deb`
+5. `sudo dpkg -i node_0.10.36_armhf.deb`
 
 NOTE: for the old raspberry pi the nodejs 0.10.36 is used. Some newer versions have problems with the c++ libaries.
 Have a look at http://weworkweplay.com/play/raspberry-pi-nodejs/ for further informations and instructions.
@@ -103,13 +113,13 @@ sudo cp -R {bin,include,lib,share} /usr/local/
 First we install the nodejs-http-server
 For this step you have to switch to the `client`-directory and prompt
 
-5. `sudo npm install -g http-server`
+6. `sudo npm install -g http-server`
 
 Now we could install bower and let bower get us the packages for the frontend (css, angularjs, smarttable, etc.).
 In the same `client`-directory prompt
 
-6. `sudo npm install -g bower`
-7. install the bower packages with `bower install` (in the `client`-directory install)
+7. `sudo npm install -g bower`
+8. install the bower packages with `bower install` (in the `client`-directory install)
 
 Now the frontend is ready.
 
@@ -117,22 +127,22 @@ For the backend (python) we have to install dependecies, too.
 
 First we install `python-dev` and `gcc` on the raspberry to establish interfaces between c++-libs and python.
 
-8. `sudo apt-get install python-dev` needed to compile c++-bindings with python
-9. `sudo apt-get install gcc libjpeg-dev zlib1g-dev` needed to compile c++, jpge and zlib
+9. `sudo apt-get install python-dev` needed to compile c++-bindings with python
+10. `sudo apt-get install gcc libjpeg-dev zlib1g-dev` needed to compile c++, jpge and zlib
 
 The python package manager `pip` will handle needed python modules for us. So we need to install `pip` like this.
 
-10. `sudo apt-get install python-pip`
+11. `sudo apt-get install python-pip`
 
 At this point we will get the python packages list in the `requirement.txt` file.
 Switch to the `server`-directory and prompt.
 
-11. `sudo pip install -r requirements.txt` (in the `server`-directory)
+12. `sudo pip install -r requirements.txt` (in the `server`-directory)
 
 To use the rfid-reader (rc522) we have to install SPI-Py. Switch to the `server/app/SPI-Py`-directory and
 install the dependencies and the module.
 
-10. `sudo python setup.py install` install the module
+13. `sudo python setup.py install` install the module
 
 Note: depending on your raspberry pi and kernel you have to re/enable the spi-module and the device tree support
 with `sudo raspi-config` -> 'Advanded Options'
