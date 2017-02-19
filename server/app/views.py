@@ -773,34 +773,34 @@ class StatisticEntriesListView(Resource):
         return StatisticEntryListSerializer().dump(statsEntries, many=True).data
 
 
-api.add_resource(SessionView, '/sessions')
+api.add_resource(SessionView, '/api/v1/sessions')
 
-api.add_resource(UserView, '/user/<int:id>')
-api.add_resource(UserListView, '/users')
-api.add_resource(AdminsListView, '/admins')
+api.add_resource(UserView, '/api/v1/user/<int:id>')
+api.add_resource(UserListView, '/api/v1/users')
+api.add_resource(AdminsListView, '/api/v1/admins')
 
-api.add_resource(LogUserView, '/actions/user')
-api.add_resource(LogAdminView, '/actions/admin')
-api.add_resource(LogDebugView, '/actions/debug')
+api.add_resource(LogUserView, '/api/v1/actions/user')
+api.add_resource(LogAdminView, '/api/v1/actions/admin')
+api.add_resource(LogDebugView, '/api/v1/actions/debug')
 
-api.add_resource(DoorView, '/door/<int:id>')
-api.add_resource(DoorSyncView, '/door/<int:id>/sync')
-api.add_resource(DoorRegistrationView, '/door')
-api.add_resource(DoorListView, '/doors')
+api.add_resource(DoorView, '/api/v1/door/<int:id>')
+api.add_resource(DoorSyncView, '/api/v1/door/<int:id>/sync')
+api.add_resource(DoorRegistrationView, '/api/v1/door')
+api.add_resource(DoorListView, '/api/v1/doors')
 
-api.add_resource(StatisticsListView, '/statistics')
-api.add_resource(StatisticEntriesListView, '/statistic/<int:id>')
+api.add_resource(StatisticsListView, '/api/v1/statistics')
+api.add_resource(StatisticEntriesListView, '/api/v1/statistic/<int:id>')
 
-api.add_resource(SettingsListView, '/settings')
-api.add_resource(SettingView, '/setting/<int:id>')
+api.add_resource(SettingsListView, '/api/v1/settings')
+api.add_resource(SettingView, '/api/v1/setting/<int:id>')
 
-api.add_resource(OpeningRequestView, '/request/opening')
-api.add_resource(LostPasswordView, '/request/password')
-api.add_resource(DoorInfoView, '/request/doorinfo')
-api.add_resource(InvalidateAuthCardView, '/request/invalidateAuthCard/<int:id>')
-api.add_resource(SyncRequestView, '/request/sync')
+api.add_resource(OpeningRequestView, '/api/v1/request/opening')
+api.add_resource(LostPasswordView, '/api/v1/request/password')
+api.add_resource(DoorInfoView, '/api/v1/request/doorinfo')
+api.add_resource(InvalidateAuthCardView, '/api/v1/request/invalidateAuthCard/<int:id>')
+api.add_resource(SyncRequestView, '/api/v1/request/sync')
 
-api.add_resource(RfidTagInfoView, '/tag/info')
-api.add_resource(RfidTagAssignView, '/tag/assign')
-api.add_resource(RfidTagWitdrawView, '/tag/withdraw')
-api.add_resource(RegisterUserView, '/register')
+api.add_resource(RfidTagInfoView, '/api/v1/tag/info')
+api.add_resource(RfidTagAssignView, '/api/v1/tag/assign')
+api.add_resource(RfidTagWitdrawView, '/api/v1/tag/withdraw')
+api.add_resource(RegisterUserView, '/api/v1/register')
