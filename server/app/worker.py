@@ -22,7 +22,7 @@ from models import RfidTagInfo
 from RFID import RFIDReader
 from RFID import RFIDMockup
 from GPIO import GPIO
-from GPIO import GPIOMockup
+from GPIO import GPIOStub
 
 
 GPIO_RELAY = 12
