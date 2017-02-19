@@ -29,7 +29,7 @@ def start():
     backgroundWorker.run()
 
     # running the flask app
-    app.run('0.0.0.0', threaded=True)
+    app.run('0.0.0.0', port=80, threaded=True)
 
     # after exiting the app, cancel the backgroundowrker
     backgroundWorker.cancel()
