@@ -38,7 +38,8 @@ RoseGuardenApp.config(function($routeProvider, RestangularProvider) {
     //RestangularProvider.setBaseUrl('http://localhost:5000');
 
     console.log(window.location.hostname);
-    RestangularProvider.setBaseUrl('http://' + window.location.hostname + ':5000');
+    //RestangularProvider.setBaseUrl('http://' + window.location.hostname + ':5000');
+    RestangularProvider.setBaseUrl('http://' + window.location.hostname + '/api/v1/');
     //RestangularProvider.setBaseUrl('http://localhost:5000');
 
 
