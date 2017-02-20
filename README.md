@@ -20,9 +20,9 @@ Roadmap
 
 Roseguarden is in development. Till now there exist only a prerelease version. It's already working fine and can be installed/ setup using the instruction below. So far it is not a released version. The following steps are planed till release and further. While there is only one contributor to the project by now, don't expect a release soon. It's done when it's done. Find news about the progress in the community-forum.
 
-* Build up and run a community forum [Finished 2017-01-17 [Community forum](http://www.community.fabba.space/)].
-* Integrate the http-server into flask [In development].
-* Implement a web-gui setup to replace the config.ini. [planned]
+* ~~Build up and run a community forum~~ [Finished 2017-01-17 [Community forum](http://www.community.fabba.space/)].
+* ~~Integrate the http-server into flask~~ [Finished 2017-02-19].
+* Implement a web-gui setup to make setup easier. [In development]
 * Package Roseguarden into images (ISO) for Raspberry Pi 2, 3 and Zero. [planned]
 * Provide a user manual for important task and usage of Roseguarden [planned]
 * __**Release version 1.0.0 images**__ [planned]
