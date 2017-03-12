@@ -1,0 +1,75 @@
+
+<div class="text-center">
+    <h3>Welcome to RoseGuarden</h3>
+
+    <p>This user interface will guide you through the setup of your RoseGuarden-node.
+        It will be assumed, that you have already setup your host system carefully. If you are not sure
+        whether all preparations are made correctly, please double-check. You will find informations and
+        a helping hand on the projects github-page.
+    </p>
+    <div class="alert alert-danger" role="alert">
+       Please recheck, that your host system have a static IP-address. <br> A DHCP-IP could lead to malfunction or data-loss.
+    </div>
+
+    <h3>
+        Let's start with some hardware-tests:
+    </h3>
+
+    <form class="form-horizontal">
+      <div class="form-group">
+        <label for="inputEmail3" class="col-xs-offset-2 col-xs-3 control-label">Relay</label>
+        <div class="col-xs-3 text-right">
+          <button type="button" class="btn btn-success btn-100px">Open door</button>
+          <button type="button" class="btn btn-default btn-circle text-left" popover-placement="top" uib-popover="Turn on the relay-pin for 5 seconds. The default pin is 12 (GPIO.BOARD)">
+              <i class="glyphicon glyphicon-info-sign"></i>
+          </button>
+        </div>
+      </div>
+    </form>
+
+    <form class="form-horizontal">
+      <div class="form-group">
+        <label for="inputEmail3" class="col-xs-offset-2 col-xs-3 control-label">RFID</label>
+        <div class="col-xs-3 text-right">
+          <button type="button" class="btn btn-success btn-100px">Read</button>
+          <button type="button" class="btn btn-default btn-circle text-left" popover-placement="top" uib-popover="Will read out the UUID, of a rfid tag on the reader.">
+              <i class="glyphicon glyphicon-info-sign"></i>
+          </button>
+        </div>
+
+      </div>
+    </form>
+
+    <form class="form-horizontal">
+      <div class="form-group">
+        <label for="inputEmail3" class="col-xs-offset-2 col-xs-3 control-label">LED</label>
+        <div class="col-xs-3 text-right">
+          <button type="button" class="btn btn-success btn-100px">Blink!</button>
+          <button type="button" class="btn btn-default btn-circle text-left"  popover-placement="top" uib-popover="Let the 3 status led blink. The default pins are 11, 13, 15 (GPIO.BOARD).">
+              <i class="glyphicon glyphicon-info-sign"></i>
+          </button>
+        </div>
+      </div>
+    </form>
+
+    <form class="form-horizontal">
+      <div class="form-group">
+        <label for="inputEmail3" class="col-xs-offset-2 col-xs-3 control-label">Display</label>
+        <div class="col-xs-3 text-right">
+          <button type="button" class="btn btn-success btn-100px">Test</button>
+          <button type="button" class="btn btn-default btn-circle text-left" popover-placement="top" uib-popover="The test will write a greeting on the display.">
+              <i class="glyphicon glyphicon-info-sign"></i>
+          </button>
+        </div>
+      </div>
+    </form>
+
+    <h3>
+        If everything is working fine, continue with the setup.
+    </h3>
+
+    <p>
+        <a href="#!/start" class="btn btn-primary btn-lg btn-start text-center" role="button">Start setup</a>
+    </p>
+
+</div>
