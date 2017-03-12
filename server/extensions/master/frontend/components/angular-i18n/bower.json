@@ -1,0 +1,11 @@
+{
+  "name": "angular-i18n",
+  "version": "1.4.11",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "components",
+    "precommit.sh"
+  ]
+}
