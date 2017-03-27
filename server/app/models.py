@@ -136,7 +136,7 @@ class User(db.Model):
         self.cardAuthKeyA = ''
         self.cardAuthKeyB = ''
         self.role = role;
-        self.email = email
+        self.email = email.lower()
         self.password = flask_bcrypt.generate_password_hash(password)
         self.firstName = firstName
         self.lastName = lastName

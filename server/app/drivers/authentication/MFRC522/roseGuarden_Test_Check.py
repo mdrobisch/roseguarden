@@ -2,9 +2,11 @@ __author__ = 'drobisch'
 #!/usr/bin/env python
 # -*- coding: utf8 -*-
 
-import RPi.GPIO as GPIO
-import MFRC522
 import signal
+
+import RPi.GPIO as GPIO
+
+import MFRC522
 
 continue_reading = True
 auth_failed = False
@@ -48,6 +50,7 @@ while continue_reading:
         # Select the scanned tag
         MIFAREReader.MFRC522_SelectTag(uid)
 
+
         newkey = []
         newkeystring = '55-39-68-A7-F1-B5'
         for x in newkeystring.split('-'):
@@ -68,7 +71,7 @@ while continue_reading:
         SecretBlockAddr = cardAuthSector * 4 + cardAuthBlock
         TrailerBlockAddr = cardAuthSector * 4 + 3
 
-        status = MIFAREReader.MFRC522_Auth(MIFAREReader.PICC_AUTHENT1A, SecretBlockAddr, key, uid)
+        status = MIFAREReader.MFRC522_Auth(MIFAREReader.PICC_AUTHENT1A, SecretBlockAddr, newkey, uid)
         # Check if authenticated
         if status == MIFAREReader.MI_OK:
 
@@ -110,41 +113,10 @@ while continue_reading:
             result = MIFAREReader.MFRC522_Read(SecretBlockAddr)
             print result
             print "\n"
-
-        else:
-            print "Authentication error"
-
-        # Authenticate
-        status = MIFAREReader.MFRC522_Auth(MIFAREReader.PICC_AUTHENT1A, TrailerBlockAddr, key, uid)
-
-        # Check if authenticated
-        if status == MIFAREReader.MI_OK :
-            print "Read TrailerBlock :"
-            # Read block 8
-            result = MIFAREReader.MFRC522_Read(TrailerBlockAddr)
-            print result
-
-            for x in range(0,6):
-                result[x] = newkey[x]
-            print result
-
-            print "Write new treiler:"
-            # Write the data
-            MIFAREReader.MFRC522_Write(TrailerBlockAddr, result)
-            print "\n"
-
-            print "Read back trailer:"
-            # Check to see if it was written
-            result = MIFAREReader.MFRC522_Read(TrailerBlockAddr)
-            print result
-            print "\n"
-
             # Stop
             MIFAREReader.MFRC522_StopCrypto1()
 
             # Make sure to stop reading for cards
             continue_reading = False
-
-            print "\n"
         else:
             print "Authentication error"

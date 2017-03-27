@@ -2,9 +2,11 @@ __author__ = 'drobisch'
 #!/usr/bin/env python
 # -*- coding: utf8 -*-
 
-import RPi.GPIO as GPIO
-import MFRC522
 import signal
+
+import RPi.GPIO as GPIO
+
+import MFRC522
 
 continue_reading = True
 auth_failed = False
@@ -50,7 +52,7 @@ while continue_reading:
 
 
         newkey = []
-        newkeystring = '55-39-68-A7-F1-B5'
+        newkeystring = '00-00-00-00-00-00'
         for x in newkeystring.split('-'):
             newkey.append(int(x, 16))
 
@@ -68,43 +70,6 @@ while continue_reading:
 
         SecretBlockAddr = cardAuthSector * 4 + cardAuthBlock
         TrailerBlockAddr = cardAuthSector * 4 + 3
-
-
-        # Authenticate
-        if auth_failed == False:
-            status = MIFAREReader.MFRC522_Auth(MIFAREReader.PICC_AUTHENT1A, TrailerBlockAddr, key, uid)
-        else:
-            status = 10
-
-        # Check if authenticated
-        if status == MIFAREReader.MI_OK :
-            print "Read TrailerBlock :"
-            # Read block 8
-            result = MIFAREReader.MFRC522_Read(TrailerBlockAddr)
-            print result
-
-            for x in range(0,6):
-                result[x] = newkey[x]
-            print result
-
-
-            print "Write new treiler:"
-            # Write the data
-            MIFAREReader.MFRC522_Write(TrailerBlockAddr, result)
-            print "\n"
-
-            print "Read back trailer:"
-            # Check to see if it was written
-            result = MIFAREReader.MFRC522_Read(TrailerBlockAddr)
-            print result
-            print "\n"
-
-            print "\n"
-        else:
-            if auth_failed == False:
-                print "Authentication error"
-                auth_failed = True
-                continue
 
         status = MIFAREReader.MFRC522_Auth(MIFAREReader.PICC_AUTHENT1A, SecretBlockAddr, newkey, uid)
         # Check if authenticated
@@ -147,6 +112,35 @@ while continue_reading:
             # Check to see if it was written
             result = MIFAREReader.MFRC522_Read(SecretBlockAddr)
             print result
+            print "\n"
+
+        else:
+            print "Authentication error"
+
+        status = MIFAREReader.MFRC522_Auth(MIFAREReader.PICC_AUTHENT1A, TrailerBlockAddr, newkey, uid)
+
+        # Check if authenticated
+        if status == MIFAREReader.MI_OK :
+            print "Read TrailerBlock :"
+            # Read block 8
+            result = MIFAREReader.MFRC522_Read(TrailerBlockAddr)
+            print result
+
+            for x in range(0,6):
+                result[x] = 0xFF
+            print result
+
+            print "Write new treiler:"
+            # Write the data
+            MIFAREReader.MFRC522_Write(TrailerBlockAddr, result)
+            print "\n"
+
+            print "Read back trailer:"
+            # Check to see if it was written
+            result = MIFAREReader.MFRC522_Read(TrailerBlockAddr)
+            print result
+            print "\n"
+
             print "\n"
 
             # Stop

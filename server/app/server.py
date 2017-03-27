@@ -7,9 +7,9 @@ from flask_alchemydumps import AlchemyDumps
 
 from flask_httpauth import HTTPBasicAuth
 from flask_mail import Mail
+from extension import extension_name
 
-
-app = Flask(__name__, static_url_path='', static_folder='../extensions/master/frontend')
+app = Flask(__name__, static_url_path='', static_folder='../extensions/' + extension_name + '/frontend')
 # have a look at
 # http://stackoverflow.com/questions/26722279/how-to-set-static-url-path-in-flask-application
 # http://flask.pocoo.org/snippets/102/

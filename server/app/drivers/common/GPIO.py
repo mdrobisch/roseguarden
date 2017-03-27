@@ -1,7 +1,7 @@
 __author__ = 'drobisch'
 
-import platform
-import logging
+import server.app.platform
+import server.app.logging
 
 class GPIOStubState:
     # pin configuration
@@ -50,32 +50,32 @@ class GPIOStub:
     def setmode(self, mode):
         self.mode = mode
         if mode == self.BOARD:
-            logging.log("GPIO_LOG", "GPIO: Using BOARD pin numbering")
+            server.app.logging.log("GPIO_LOG", "GPIO: Using BOARD pin numbering")
         else:
             if mode == self.BCM:
-                logging.log("GPIO_LOG", "GPIO: Using BCM pin numbering")
+                server.app.logging.log("GPIO_LOG", "GPIO: Using BCM pin numbering")
             else:
-                logging.log("GPIO_LOG", "GPIO: Uknown mode")
+                server.app.logging.log("GPIO_LOG", "GPIO: Uknown mode")
         return None
 
     def input(self, channel):
-        logging.log("GPIO_LOG", "GPIO: Get " + channel + " input")
+        server.app.logging.log("GPIO_LOG", "GPIO: Get " + channel + " input")
         return self.statemockup.getinput
 
     def output(self, channel, state):
         if (state == self.HIGH):
-            logging.log("GPIO_LOG", "GPIO: Set " + str(channel) + " (HIGH)")
+            server.app.logging.log("GPIO_LOG", "GPIO: Set " + str(channel) + " (HIGH)")
         else:
-            logging.log("GPIO_LOG", "GPIO: Reset " + str(channel) + " (LOW)")
+            server.app.logging.log("GPIO_LOG", "GPIO: Reset " + str(channel) + " (LOW)")
 
     def cleanup(self, channel):
-        logging.log("GPIO_LOG", "GPIO: Cleanup channel " + channel)
+        server.app.logging.log("GPIO_LOG", "GPIO: Cleanup channel " + channel)
 
     def setup(self, channel, type, initial):
-        logging.log("GPIO_LOG", "GPIO: Setup GPIO " + str(channel) + " to " + str(type))
+        server.app.logging.log("GPIO_LOG", "GPIO: Setup GPIO " + str(channel) + " to " + str(type))
 
 
-if platform.platform_getType() == platform.RASPBERRY_PI or platform.platform_getType() == platform.RASPBERRY_PI_2:
+if server.app.platform.platform_getType() == server.app.platform.RASPBERRY_PI or server.app.platform.platform_getType() == server.app.platform.RASPBERRY_PI_2:
     try:
         import RPi.GPIO as GPIO
 
