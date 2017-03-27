@@ -3,11 +3,6 @@ import requests
 __author__ = 'drobisch'
 
 import flask_alchemydumps
-from models import User, Door, Action
-from server import app, db
-from serializers import LogSerializer, UserSyncSerializer, SessionInfoSerializer, DoorSerializer, RfidTagInfoSerializer
-from statistics import StatisticsManager
-from werkzeug.datastructures import MultiDict
 import threading
 import time
 import config
@@ -16,21 +11,22 @@ import json
 import datetime
 import helpers
 import security
-from dateutil.relativedelta import relativedelta
 import os
-from models import RfidTagInfo
-from RFID import RFIDReader
-from RFID import RFIDMockup
-from GPIO import GPIO
-from GPIO import GPIOStub
 
+from extension import extension
+from models import User, Door, Action
+from server import app, db
+from serializers import LogSerializer, UserSyncSerializer
+from statistics import StatisticsManager
+from dateutil.relativedelta import relativedelta
+from models import RfidTagInfo
+from drivers.authentication.RFID import RFIDReader
+from drivers.common.GPIO import GPIO
 
 GPIO_RELAY = 12
 GPIO_LED_GREEN = 11
 GPIO_LED_YELLOW = 13
 GPIO_LED_RED = 15
-
-
 
 class BackgroundWorker():
 
@@ -87,7 +83,8 @@ class BackgroundWorker():
         # if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
         self.thr = threading.Timer(1, self.timer_cycle)
 
-        self.update_users_and_actions()
+        if(extension.CONFIG_DISABLE_UPDATE_USER is False):
+            self.update_users_and_actions()
 
         self.thr.start()
         print 'started background-server ' + '(' + str(datetime.datetime.now()) + ')'
@@ -860,7 +857,8 @@ class BackgroundWorker():
             if self.forceSync == True:
                 time.sleep(1.0)
             try:
-                self.sync_cycle()
+                if(extension.CONFIG_DISABLE_SYNC_CYCLES == False):
+                    self.sync_cycle()
             except Exception, e:
                 import traceback
                 print traceback.format_exc()
@@ -875,7 +873,8 @@ class BackgroundWorker():
             self.cleanupTimer = 0
             if config.CLEANUP_EANBLE == True:
                 try:
-                    self.cleanup_cycle()
+                    if (extension.CONFIG_DISABLE_CLEANUP_CYLCES == False):
+                        self.cleanup_cycle()
                 except Exception, e:
                     import traceback
                     print traceback.format_exc()
@@ -898,7 +897,7 @@ class BackgroundWorker():
             GPIO.output(GPIO_RELAY, GPIO.LOW)
 
             self.openingTimer += 1
-            if self.openingTimer >= 16:
+            if self.openingTimer >= config.DOOR_OPENING_TIME:
                 self.openingTimer = -1
                 print "Closing door"
                 GPIO.output(GPIO_RELAY, GPIO.HIGH)
