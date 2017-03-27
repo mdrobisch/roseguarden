@@ -2,7 +2,6 @@
 .idea
 *.gcode
 *.stl
-bower_components
 server/database/roseGuarden.db
 server/config.ini
 server/alchemydumps
