@@ -1,13 +1,13 @@
 import codecs
-
 import sys
-from flask import Flask
-from flask_script import Manager, Option
 from sys import version_info
+
+from flask import Flask
+from flask_script import Manager
 #!/usr/bin/env python
 # -*- coding: utf8 -*-
 
-from app.RFID import RFIDReader
+from app.drivers.authentication.RFID import RFIDReader
 import signal
 
 stopTest = False

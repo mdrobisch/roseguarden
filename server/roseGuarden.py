@@ -1,4 +1,6 @@
 __author__ = 'drobisch'
+from app.extension import extension
+import app.config as config
 from app.server import app, db
 from app.worker import backgroundWorker
 from app.statistics import StatisticsManager
@@ -6,9 +8,8 @@ from flask_script import Manager, Option
 from flask_migrate import MigrateCommand
 from flask_alchemydumps import AlchemyDumpsCommand
 from app.models import User, Action, Door, Setting, Statistic, StatisticEntry
-from app.config import SYNC_MASTER_DEFAULT_PASSWORD
+from app.config import NODE_PASSWORD
 from app.security import checkUserAccessPrivleges
-import app.config as config
 import app.seed as seeder
 import datetime
 import random
@@ -132,17 +133,17 @@ def create_db():
     db.create_all()
     User.query.delete()
 
-    # add syncmaster-user for synchronisation
     print "Add syncmaster user"
-    syncMasterUser = User('syncmaster@roseguarden.org', SYNC_MASTER_DEFAULT_PASSWORD, 'Sync','Master',1)
+    syncMasterUser = User('syncmaster@roseguarden.org', NODE_PASSWORD, 'Sync','Master',1)
     syncMasterUser.syncMaster = 1
     db.session.add(syncMasterUser)
 
-    # you can add some default user here
     print "Add admin user"
-    defaultUser1 = User('Administrator','pleasechangethepassword','RoseGuarden','Admin', 1)
+    defaultUser1 = User('Administrator', NODE_PASSWORD,'RoseGuarden','Admin', 1)
     defaultUser1.accessType = 1
     db.session.add(defaultUser1)
+
+    # you can add some default user here
 
     #db.session.add(Door(id = 0, name = 'front door', address = 'http://192.168.2.137', keyMask = 0x01, local = 0x00 ))
     #db.session.add(Door(id = 0, name = 'front door', address = 'http://192.168.2.138', keyMask = 0x01, local = 0x00 ))
