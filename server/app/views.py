@@ -22,7 +22,7 @@ import dateutil.parser
 
 @auth.verify_password
 def verify_password(email, password):
-    user = User.query.filter_by(email=email).first()
+    user = User.query.filter_by(email=email.lower()).first()
     if not user:
         return False
     g.user = user
@@ -604,6 +604,14 @@ class InvalidateAuthCardView(Resource):
             return '', 401
         return '', 201
 
+class HardwareTestView(Resource):
+    def post(self):
+        print 'Hardwaretest request received'
+
+        #form = DoorRegistrationForm()
+        #print 'Door registration request received'
+        #if not form.validate_on_submit():
+        #    return form.errors, 422
 
 
 class RfidTagInfoView(Resource):
@@ -726,6 +734,10 @@ class SettingView(Resource):
         settings.setOrUpdateSettingValue(form.name.data, int(form.type.data), form.value.data)
         return '', 201
 
+class ConfigView(Resource):
+    def get(self):
+        return jsonify(json.dumps(config.getConfigJSON(), indent=2))
+
 class SettingsListView(Resource):
     @auth.login_required
     def get(self):
@@ -800,7 +812,11 @@ api.add_resource(DoorInfoView, '/api/v1/request/doorinfo')
 api.add_resource(InvalidateAuthCardView, '/api/v1/request/invalidateAuthCard/<int:id>')
 api.add_resource(SyncRequestView, '/api/v1/request/sync')
 
-api.add_resource(RfidTagInfoView, '/api/v1/tag/info')
-api.add_resource(RfidTagAssignView, '/api/v1/tag/assign')
-api.add_resource(RfidTagWitdrawView, '/api/v1/tag/withdraw')
+api.add_resource(HardwareTestView, '/api/v1/hardwaretest')
+
+api.add_resource(RfidTagInfoView, '/api/v1/auth/info')
+api.add_resource(RfidTagAssignView, '/api/v1/auth/assign')
+api.add_resource(RfidTagWitdrawView, '/api/v1/auth/withdraw')
 api.add_resource(RegisterUserView, '/api/v1/register')
+
+api.add_resource(ConfigView, '/api/v1/config')
