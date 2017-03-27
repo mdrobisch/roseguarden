@@ -20,22 +20,9 @@ RoseGuardenApp.config(function($routeProvider, RestangularProvider) {
       when('/start', {
         templateUrl: 'partials/start.html'
       }).
-      when('/master/global', {
-        templateUrl: 'partials/master/global.html',
-        controller: 'MasterConfigCtrl'
-      }).
-      when('/master/node', {
-        templateUrl: 'partials/master/node.html',
-        controller: 'MasterConfigCtrl'
-      }).
-      when('/master/interfaces', {
-        templateUrl: 'partials/master/interfaces.html',
-        controller: 'MasterConfigCtrl'
-      }).
-      when('/master/advanced', {
-        templateUrl: 'partials/master/advanced.html',
-        controller: 'MasterConfigCtrl'
-
+      when('/master/setup', {
+      templateUrl: 'partials/master/setup.html',
+      controller: 'MasterConfigCtrl'
       }).
       otherwise({
         redirectTo: '/'

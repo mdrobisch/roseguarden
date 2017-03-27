@@ -1,0 +1,97 @@
+
+<div class="text-center">
+
+    <h3>Master config</h3>
+
+    <form class="form-horizontal row">
+        <label class="col-xs-offset-1 col-xs-4 control-label">{{ nodeName.displayName }}</label>
+        <div class="col-xs-3 text-right">
+          <input  type="text" ng-model="nodeName.value" class="inp-150px" />
+        </div>
+        <div class="col-xs-1 text-right">
+          <button type="button" class="btn btn-default btn-circle text-left"  popover-placement="top" uib-popover="{{ nodeName.descryption }}">
+              <i class="glyphicon glyphicon-info-sign"></i>
+          </button>
+        </div>
+    </form>
+
+    <br>
+
+    <h3>Node config</h3>
+
+    <form class="form-horizontal row">
+        <label class="col-xs-offset-1 col-xs-4 control-label">{{ nodeName.displayName }}</label>
+        <div class="col-xs-3 text-right">
+          <input  type="text" ng-model="nodeName.value" class="inp-150px" />
+        </div>
+        <div class="col-xs-1 text-right">
+          <button type="button" class="btn btn-default btn-circle text-left"  popover-placement="top" uib-popover="{{ nodeName.descryption }}">
+              <i class="glyphicon glyphicon-info-sign"></i>
+          </button>
+        </div>
+    </form>
+
+
+    <form class="form-horizontal row">
+        <label class="col-xs-offset-1 col-xs-4 control-label">Node password</label>
+        <div class="col-xs-3 text-right">
+            <input type="password" name="password" id="password" class="inp-150px" ng-model="password" required />
+        </div>
+        <div class="col-xs-1 text-right">
+        </div>
+        <div class="col-xs-1 text-right">
+          <button type="button" class="btn btn-default btn-circle text-left"  popover-placement="top" uib-popover="{{ nodeName.descryption }}">
+              <i class="glyphicon glyphicon-info-sign"></i>
+          </button>
+        </div>
+    </form>
+
+    <form class="form-horizontal row">
+        <label class="col-xs-offset-1 col-xs-4 control-label"> Repeat password</label>
+        <div class="col-xs-3 text-right">
+            <input type="password" name="password2" id="password2" class="inp-150px" ng-model="password2"  value-match="pwd.password" required />
+        </div>
+        <span class="msg-error " ng-show="password != password2">Passwords don't match.</span>
+    </form>
+
+    <h3>Interface config</h3>
+
+    <form class="form-horizontal row">
+        <label class="col-xs-offset-1 col-xs-4 control-label">{{ nodeName.displayName }}</label>
+        <div class="col-xs-3 text-right">
+          <input  type="text" ng-model="nodeName.value" class="inp-150px" />
+        </div>
+        <div class="col-xs-1 text-right">
+          <button type="button" class="btn btn-default btn-circle text-left"  popover-placement="top" uib-popover="{{ nodeName.descryption }}">
+              <i class="glyphicon glyphicon-info-sign"></i>
+          </button>
+        </div>
+    </form>
+
+    <br>
+
+    <h3>Advanced config</h3>
+
+    <form class="form-horizontal row">
+        <label class="col-xs-offset-1 col-xs-4 control-label">{{ nodeName.displayName }}</label>
+        <div class="col-xs-3 text-right">
+          <input  type="text" ng-model="nodeName.value" class="inp-150px" />
+        </div>
+        <div class="col-xs-1 text-right">
+          <button type="button" class="btn btn-default btn-circle text-left"  popover-placement="top" uib-popover="{{ nodeName.descryption }}">
+              <i class="glyphicon glyphicon-info-sign"></i>
+          </button>
+        </div>
+    </form>
+
+    <br>
+
+    <p>
+        <a href="#!/start" class="btn btn-warning btn-sm" role="button">Go back</a>
+        <a class="btn btn-success btn-lg btn-start text-center" ng-click="log()" role="button">Setup</a>
+    </p>
+
+
+
+
+</div>

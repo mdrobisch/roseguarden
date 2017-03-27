@@ -100,7 +100,6 @@ RoseGuardenApp.config(function($routeProvider, RestangularProvider) {
         templateUrl: 'partials/session/register.html',
         controller: 'RegisterCtrl'
       }).
-
       when('/logout', {
         templateUrl: 'partials/session/logout.html',
         controller: 'LogoutCtrl'

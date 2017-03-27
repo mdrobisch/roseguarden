@@ -191,6 +191,12 @@ a.width170px {
     width : 100px;
 }
 
+.inp-150px {
+    width : 170px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
 .btn-100px {
     width: 100px;
 }

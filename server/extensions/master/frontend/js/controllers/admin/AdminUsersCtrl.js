@@ -86,10 +86,10 @@ RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log, $q, Us
         $scope.isLoading = true;
         deferred = $q.defer();
         User.getList(true).then(function(data) {
-              console.log(data.length)
-              for(i=0;i < data.length;i++) {
-                  $scope.rowCollection.push(data[i]);
-              }
+            console.log(data.length)
+            for(var i=0;i < data.length;i++) {
+              $scope.rowCollection.push(data[i]);
+            }
             $scope.displayedCollection = [].concat($scope.rowCollection);
             $scope.isLoading = false;
             return deferred.resolve();
