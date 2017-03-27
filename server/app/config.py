@@ -1,7 +1,8 @@
 from configobj import ConfigObj
 import os
-print os.path.dirname(os.path.abspath(__file__))
+import json
 
+print os.path.dirname(os.path.abspath(__file__))
 
 def conf_entry_to_bool(v):
     return v.lower() in ("yes", "true", "t", "1")
@@ -9,19 +10,42 @@ def conf_entry_to_bool(v):
 def conf_entry_to_int(v):
     return int(v)
 
+def gather_subsection(section, key):
+    #if section.depth > 1:
+    print "Subsection " + section.name , " ", section.depth
+
+def config_lock():
+    print "lock config"
+    open("config.lock", 'a').close()
+
+def config_is_locked():
+    if os.path.isfile("config.lock"):
+        return True
+    else:
+        return False
+
 # global settings
 WTF_CSRF_ENABLED = False
+SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 # user defined settings from 'config.ini'
 config = ConfigObj("config.ini")
 
+NODE_LOCKED = config_is_locked()
+
 # node settings
 node_section = config['NODE']
-NODE_NAME = node_section['NODE_NAME']
-NODE_MASTER = conf_entry_to_bool(node_section['NODE_MASTER'])
-NODE_DOOR_AVAILABLE = conf_entry_to_bool(node_section['NODE_DOOR_AVAILABLE'])
 
-if NODE_MASTER == True:
+NODE_NAME = node_section['NODE_NAME']
+NODE_DOOR_AVAILABLE = conf_entry_to_bool(node_section['NODE_DOOR_AVAILABLE'])
+if 'NODE_IS_MASTER' in node_section:
+    NODE_IS_MASTER = conf_entry_to_bool(node_section['NODE_IS_MASTER'])
+else:
+    if 'NODE_MASTER' in  node_section:
+        NODE_IS_MASTER = conf_entry_to_bool(node_section['NODE_MASTER'])
+
+
+if NODE_IS_MASTER == True:
     NODE_SYNC_CYCLIC = conf_entry_to_bool(node_section['NODE_SYNC_CYCLIC'])
     NODE_SYNC_CYCLE = conf_entry_to_int(node_section['NODE_SYNC_CYCLE'])
     NODE_SYNC_ON_STARTUP = conf_entry_to_bool(node_section['NODE_SYNC_ON_STARTUP'])
@@ -56,7 +80,36 @@ DEBUG = conf_entry_to_bool(flask_section['DEBUG'])
 # security settings
 security_section = config['SECURITY']
 RFID_GLOBAL_PASSWORD = security_section['RFID_GLOBAL_PASSWORD']
-SYNC_MASTER_DEFAULT_PASSWORD = security_section['SYNC_MASTER_DEFAULT_PASSWORD']
+
+if 'SYNC_MASTER_DEFAULT_PASSWORD' in security_section:
+    NODE_PASSWORD = security_section['SYNC_MASTER_DEFAULT_PASSWORD']
+else:
+    if 'NODE_PASSWORD' in security_section:
+        NODE_PASSWORD = security_section['NODE_PASSWORD']
+
+
+if 'DOOR' in config:
+    door_section = config['DOOR']
+    DOOR_OPENING_TIME = conf_entry_to_int(door_section['DOOR_OPENING_TIME'])
+else:
+    DOOR_OPENING_TIME = 16
+
+# extension settings
+if 'EXTENSION' in config:
+    extension_section = config['EXTENSION']
+    EXTENSION_NAME = extension_section['EXTENSION_NAME']
+    EXTENSION_FRONTEND_DISABLE = conf_entry_to_bool(extension_section['EXTENSION_FRONTEND_DISABLE'])
+else:
+    if NODE_LOCKED is True:
+        if NODE_IS_MASTER is True:
+            EXTENSION_NAME = 'master'
+            EXTENSION_FRONTEND_DISABLE = False
+        else:
+            EXTENSION_NAME = 'setup'
+            EXTENSION_FRONTEND_DISABLE = False
+    else:
+        EXTENSION_NAME = 'setup'
+        EXTENSION_FRONTEND_DISABLE = False
 
 # backup settings
 
@@ -84,7 +137,7 @@ else:
     CLEANUP_THRESHOLD = 1000
 
 # settings for flask-mail, if available
-if NODE_MASTER == True:
+if NODE_IS_MASTER == True:
     mail_section = config['MAIL']
     MAIL_SERVER = mail_section['MAIL_SERVER']
     MAIL_PORT = conf_entry_to_int(mail_section['MAIL_PORT'])
@@ -99,3 +152,57 @@ else:
     MAIL_USE_SSL = True
     MAIL_USERNAME = ''
     MAIL_PASSWORD = ''
+
+def getConfigJSON():
+    config_json_root = {}
+
+    config_json_master = {}
+
+    config_json_master["entries"] = []
+    config_json_master["entries"].append({"name": "RFID_GLOBAL_PASSWORD", "displayName": "Global RFID password", "descryption" : "The systemwide used RFID-password.", "value": RFID_GLOBAL_PASSWORD})
+    config_json_master["entries"].append({"name": "NODE_IS_MASTER", "displayName": "Is master-node", "descryption" : "Is the node the master-node.", "value": NODE_IS_MASTER})
+    config_json_master["entries"].append({"name": "STATISTICS_ENABLE", "displayName": "Enable statistics", "descryption" : "Is the node the master-node.", "value": STATISTICS_ENABLE})
+    config_json_master["entries"].append({"name": "CLEANUP_EANBLE", "displayName": "Enable log-cleanup", "descryption" : "Enable cleanup of the log (and free database-size).", "value": CLEANUP_EANBLE})
+    config_json_master["entries"].append({"name": "CLEANUP_THRESHOLD", "displayName": "Logging threshold", "descryption" : "If cleanup is enabled specify how many days the log should be stored.", "value": CLEANUP_THRESHOLD})
+    config_json_master["entries"].append({"name": "NODE_SYNC_CYCLIC", "displayName": "Cyclic synchronisation", "descryption" : "Enable cyclic synchronisation. If enabled, synch. start every X minutes (based on synch. cycle). If disabled synchronisation starts every day.", "value": NODE_SYNC_CYCLIC})
+    config_json_master["entries"].append({"name": "NODE_SYNC_CYCLE", "displayName": "Synchronisation cycle", "descryption" : "Time in minutes after new synchronisation starts (if cyclic synhronisation is enabled).", "value": NODE_SYNC_CYCLE})
+    config_json_master["entries"].append({"name": "NODE_SYNC_ON_STARTUP", "displayName": "Synch. on startup", "descryption" : "Force synchronisation on startup of the system.", "value": NODE_SYNC_ON_STARTUP})
+
+    config_json_node = {}
+    config_json_node["entries"] = []
+    config_json_node["entries"].append({"name": "NODE_NAME", "displayName": "Name", "descryption" : "The name of the node", "value": NODE_NAME})
+    config_json_node["entries"].append({"name": "NODE_PASSWORD", "displayName": "Password", "descryption" : "Password used for the admin-account (master) or synchronisation (slave).", "value": NODE_PASSWORD})
+    config_json_node["entries"].append({"name": "NODE_DOOR_AVAILABLE", "displayName": "Has a door", "descryption" : "The node interface a door connected?", "value": NODE_DOOR_AVAILABLE})
+    config_json_node["entries"].append({"name": "EXTENSION_NAME", "displayName": "Extension", "descryption" : "The extension describe the functionality (logic) and user-interface (frontend).", "value": EXTENSION_NAME})
+    config_json_node["entries"].append({"name": "EXTENSION_FRONTEND_DISABLE", "displayName": "Extension UI disable", "descryption" : "Disable the user-interface (frontend) of the extension.", "value": EXTENSION_FRONTEND_DISABLE})
+    config_json_node["entries"].append({"name": "DEBUG", "displayName": "Enable debug info.", "descryption" : "Enable flask debug informations.", "value": DEBUG})
+
+    config_json_interfaces = {}
+    config_json_interfaces["entries"] = []
+    config_json_interfaces["entries"].append({"doorOpeningTime": "DOOR_OPENING_TIME", "displayName": "Name", "descryption" : "The duration the door keep open after request.", "value": DOOR_OPENING_TIME })
+
+    config_json_advanced = {}
+    config_json_advanced["entries"] = []
+    config_json_advanced["entries"].append({"name": "MAIL_SERVER", "displayName": "Mail server", "descryption" : "Mail-server address.", "value": MAIL_SERVER})
+    config_json_advanced["entries"].append({"name": "MAIL_PORT", "displayName": "Mail server port", "descryption" : "Mail-server port.", "value": MAIL_PORT})
+    config_json_advanced["entries"].append({"name": "MAIL_USE_TLS", "displayName": "Mail use TLS", "descryption" : "Do the mail server use TLS.", "value": MAIL_USE_TLS})
+    config_json_advanced["entries"].append({"name": "MAIL_USE_SSL", "displayName": "Mail use SSL", "descryption" : "Do the mail server use SSL.", "value": MAIL_USE_SSL})
+    config_json_advanced["entries"].append({"name": "MAIL_USERNAME", "displayName": "Mail userneame", "descryption" : "The username to login to the mail-server.", "value": MAIL_USERNAME})
+    config_json_advanced["entries"].append({"name": "MAIL_PASSWORD", "displayName": "Mail password", "descryption" : "The password to login to the mail-server.", "value": MAIL_PASSWORD})
+
+
+    config_json_root["lock"] = config_is_locked()
+    config_json_root["master_config"] = config_json_master
+    config_json_root["node_config"] = config_json_node
+    config_json_root["interface_config"] = config_json_interfaces
+    config_json_root["advanced_config"] = config_json_advanced
+    return config_json_root
+
+
+#config_lock()
+#config.walk(gather_subsection)
+
+#for section in config.sections:
+#    print section
+
+print json.dumps(getConfigJSON(), indent=2)
