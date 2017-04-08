@@ -161,7 +161,7 @@ def getConfigJSON():
     config_json_master["entries"] = []
     config_json_master["entries"].append({"name": "RFID_GLOBAL_PASSWORD", "displayName": "Global RFID password", "descryption" : "The systemwide used RFID-password.", "value": RFID_GLOBAL_PASSWORD})
     config_json_master["entries"].append({"name": "NODE_IS_MASTER", "displayName": "Is master-node", "descryption" : "Is the node the master-node.", "value": NODE_IS_MASTER})
-    config_json_master["entries"].append({"name": "STATISTICS_ENABLE", "displayName": "Enable statistics", "descryption" : "Is the node the master-node.", "value": STATISTICS_ENABLE})
+    config_json_master["entries"].append({"name": "STATISTICS_ENABLE", "displayName": "Enable statistics", "descryption" : "Enable the statistic module.", "value": STATISTICS_ENABLE})
     config_json_master["entries"].append({"name": "CLEANUP_EANBLE", "displayName": "Enable log-cleanup", "descryption" : "Enable cleanup of the log (and free database-size).", "value": CLEANUP_EANBLE})
     config_json_master["entries"].append({"name": "CLEANUP_THRESHOLD", "displayName": "Logging threshold", "descryption" : "If cleanup is enabled specify how many days the log should be stored.", "value": CLEANUP_THRESHOLD})
     config_json_master["entries"].append({"name": "NODE_SYNC_CYCLIC", "displayName": "Cyclic synchronisation", "descryption" : "Enable cyclic synchronisation. If enabled, synch. start every X minutes (based on synch. cycle). If disabled synchronisation starts every day.", "value": NODE_SYNC_CYCLIC})
@@ -172,14 +172,14 @@ def getConfigJSON():
     config_json_node["entries"] = []
     config_json_node["entries"].append({"name": "NODE_NAME", "displayName": "Name", "descryption" : "The name of the node", "value": NODE_NAME})
     config_json_node["entries"].append({"name": "NODE_PASSWORD", "displayName": "Password", "descryption" : "Password used for the admin-account (master) or synchronisation (slave).", "value": NODE_PASSWORD})
-    config_json_node["entries"].append({"name": "NODE_DOOR_AVAILABLE", "displayName": "Has a door", "descryption" : "The node interface a door connected?", "value": NODE_DOOR_AVAILABLE})
     config_json_node["entries"].append({"name": "EXTENSION_NAME", "displayName": "Extension", "descryption" : "The extension describe the functionality (logic) and user-interface (frontend).", "value": EXTENSION_NAME})
     config_json_node["entries"].append({"name": "EXTENSION_FRONTEND_DISABLE", "displayName": "Extension UI disable", "descryption" : "Disable the user-interface (frontend) of the extension.", "value": EXTENSION_FRONTEND_DISABLE})
     config_json_node["entries"].append({"name": "DEBUG", "displayName": "Enable debug info.", "descryption" : "Enable flask debug informations.", "value": DEBUG})
 
     config_json_interfaces = {}
     config_json_interfaces["entries"] = []
-    config_json_interfaces["entries"].append({"doorOpeningTime": "DOOR_OPENING_TIME", "displayName": "Name", "descryption" : "The duration the door keep open after request.", "value": DOOR_OPENING_TIME })
+    config_json_interfaces["entries"].append({"name": "NODE_DOOR_AVAILABLE", "displayName": "Door connected", "descryption" : "The node interface a door?", "value": NODE_DOOR_AVAILABLE})
+    config_json_interfaces["entries"].append({"name": "DOOR_OPENING_TIME", "displayName": "Door opening duration", "descryption" : "The duration the door keep open after request.", "value": DOOR_OPENING_TIME })
 
     config_json_advanced = {}
     config_json_advanced["entries"] = []
