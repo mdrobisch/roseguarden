@@ -1,0 +1,293 @@
+
+<div class="text-center">
+
+    <div class="alert alert-info" ng-show="isLoading">
+        Loading data ...
+        <img src="images/loading.gif" >
+    </div>
+
+
+    <div ng-show="!isLoading">
+
+
+        <h3>Node config</h3>
+
+        <form class="form-horizontal row">
+            <label class="col-xs-offset-1 col-xs-4 control-label">{{ nodeName.displayName }}</label>
+            <div class="col-xs-3 text-center  small-padding">
+              <input  type="text" ng-model="nodeName.value" class="inp-150px" />
+            </div>
+            <div class="col-xs-1 text-right">
+              <button type="button" class="btn btn-default btn-circle text-left"  popover-placement="top" uib-popover="{{ nodeName.descryption }}">
+                  <i class="glyphicon glyphicon-info-sign"></i>
+              </button>
+            </div>
+        </form>
+
+        <form class="form-horizontal row">
+            <label class="col-xs-offset-1 col-xs-4 control-label">Node password</label>
+            <div class="col-xs-3 text-center  small-padding">
+                <input type="password" name="password" id="password" class="inp-150px" ng-model="password" required />
+            </div>
+            <div class="col-xs-1 text-right">
+              <button type="button" class="btn btn-default btn-circle text-left"  popover-placement="top" uib-popover="{{ nodeName.descryption }}">
+                  <i class="glyphicon glyphicon-info-sign"></i>
+              </button>
+            </div>
+        </form>
+
+        <form class="form-horizontal row">
+            <label class="col-xs-offset-1 col-xs-4 control-label"> Repeat password</label>
+            <div class="col-xs-3 text-center  small-padding">
+                <input type="password" name="password2" id="password2" class="inp-150px" ng-model="password2"  value-match="pwd.password" required />
+            </div>
+            <div class="row">
+                <div class="col-xs-offset-5 col-xs-3">
+                    <span class="msg-error text-center" ng-show="password != password2">Passwords don't match.</span>
+                </div>
+            </div>
+        </form>
+
+        <form class="form-horizontal row">
+            <label class="col-xs-offset-1 col-xs-4 control-label">{{ nodeExtensionName.displayName }}</label>
+            <div class="col-xs-3 text-center  small-padding">
+              <input  type="text" ng-model="nodeExtensionName.value" class="inp-150px" />
+            </div>
+            <div class="col-xs-1 text-right">
+              <button type="button" class="btn btn-default btn-circle text-left"  popover-placement="top" uib-popover="{{ nodeExtensionName.descryption }}">
+                  <i class="glyphicon glyphicon-info-sign"></i>
+              </button>
+            </div>
+        </form>
+
+        <form class="form-horizontal row">
+            <label class="col-xs-offset-1 col-xs-4 control-label">{{ nodeExtensionFrontendDisable.displayName }}</label>
+            <div class="col-xs-3 text-center  small-padding">
+              <input  type="checkbox" ng-model="nodeExtensionFrontendDisable.value" class="chk-100px" />
+            </div>
+            <div class="col-xs-1 text-right">
+              <button type="button" class="btn btn-default btn-circle text-left"  popover-placement="top" uib-popover="{{ nodeExtensionFrontendDisable.descryption }}">
+                  <i class="glyphicon glyphicon-info-sign"></i>
+              </button>
+            </div>
+        </form>
+
+
+        <form class="form-horizontal row">
+            <label class="col-xs-offset-1 col-xs-4 control-label">{{ nodeDebug.displayName }}</label>
+            <div class="col-xs-3 text-center  small-padding">
+              <input  type="checkbox" ng-model="nodeDebug.value" class="chk-100px" />
+            </div>
+            <div class="col-xs-1 text-right">
+              <button type="button" class="btn btn-default btn-circle text-left"  popover-placement="top" uib-popover="{{ nodeDebug.descryption }}">
+                  <i class="glyphicon glyphicon-info-sign"></i>
+              </button>
+            </div>
+        </form>
+
+        <h3>Master config</h3>
+
+        <form class="form-horizontal row">
+            <label class="col-xs-offset-1 col-xs-4 control-label">{{ masterGlobalRfidKey.displayName }}</label>
+            <div class="col-xs-3 text-center small-padding">
+              <input  type="text" ng-model="masterGlobalRfidKey.value" class="inp-150px" />
+            </div>
+            <div class="col-xs-2 text-left">
+              <button type="button" class="btn btn-default btn-circle text-left"  popover-placement="top" uib-popover="{{ masterGlobalRfidKey.descryption }}">
+                  <i class="glyphicon glyphicon-info-sign"></i>
+              </button>
+              <button type="button" class="btn btn-default btn-circle text-left"  popover-placement="top" uib-popover="{{ masterGlobalRfidKey.descryption }}">
+                  <i class="glyphicon glyphicon-info-sign"></i>
+              </button>
+            </div>
+        </form>
+
+        <br>
+
+        <form class="form-horizontal row">
+            <label class="col-xs-offset-1 col-xs-4 control-label">{{ masterStatisticEnable.displayName }}</label>
+            <div class="col-xs-3 text-center  small-padding">
+              <input  type="checkbox" ng-model="masterStatisticEnable.value" class="chk-100px" />
+            </div>
+            <div class="col-xs-1 text-right">
+              <button type="button" class="btn btn-default btn-circle text-left"  popover-placement="top" uib-popover="{{ masterStatisticEnable.descryption }}">
+                  <i class="glyphicon glyphicon-info-sign"></i>
+              </button>
+            </div>
+        </form>
+
+        <form class="form-horizontal row">
+            <label class="col-xs-offset-1 col-xs-4 control-label">{{ masterCleanupEnable.displayName }}</label>
+            <div class="col-xs-3 text-center small-padding">
+              <input  type="checkbox" ng-model="masterCleanupEnable.value" class="chk-100px" />
+            </div>
+            <div class="col-xs-1 text-right">
+              <button type="button" class="btn btn-default btn-circle text-left"  popover-placement="top" uib-popover="{{ masterCleanupEnable.descryption }}">
+                  <i class="glyphicon glyphicon-info-sign"></i>
+              </button>
+            </div>
+        </form>
+
+        <form class="form-horizontal row">
+            <label class="col-xs-offset-1 col-xs-4 control-label">{{ masterCleanupThreshold.displayName }}</label>
+            <div class="col-xs-3 text-right small-padding">
+              <input  type="text" ng-model="masterCleanupThreshold.value" class="inp-150px" />
+            </div>
+            <div class="col-xs-1 text-right">
+              <button type="button" class="btn btn-default btn-circle text-left"  popover-placement="top" uib-popover="{{ masterCleanupThreshold.descryption }}">
+                  <i class="glyphicon glyphicon-info-sign"></i>
+              </button>
+            </div>
+        </form>
+
+        <form class="form-horizontal row">
+            <label class="col-xs-offset-1 col-xs-4 control-label">{{ masterSyncCyclic.displayName }}</label>
+            <div class="col-xs-3 text-center small-padding">
+              <input  type="checkbox" ng-model="masterSyncCyclic.value" class="chk-100px" />
+            </div>
+            <div class="col-xs-1 text-right">
+              <button type="button" class="btn btn-default btn-circle text-left"  popover-placement="top" uib-popover="{{ masterSyncCyclic.descryption }}">
+                  <i class="glyphicon glyphicon-info-sign"></i>
+              </button>
+            </div>
+        </form>
+
+        <form class="form-horizontal row">
+            <label class="col-xs-offset-1 col-xs-4 control-label">{{ masterSyncCycle.displayName }}</label>
+            <div class="col-xs-3 text-right small-padding">
+              <input  type="text" ng-model="masterSyncCycle.value" class="inp-150px" />
+            </div>
+            <div class="col-xs-1 text-right">
+              <button type="button" class="btn btn-default btn-circle text-left"  popover-placement="top" uib-popover="{{ masterSyncCycle.descryption }}">
+                  <i class="glyphicon glyphicon-info-sign"></i>
+              </button>
+            </div>
+        </form>
+
+        <form class="form-horizontal row">
+            <label class="col-xs-offset-1 col-xs-4 control-label">{{ masterSyncOnStartup.displayName }}</label>
+            <div class="col-xs-3 text-center small-padding">
+              <input  type="checkbox" ng-model="masterSyncOnStartup.value" class="chk-100px" />
+            </div>
+            <div class="col-xs-1 text-right">
+              <button type="button" class="btn btn-default btn-circle text-left"  popover-placement="top" uib-popover="{{ masterSyncOnStartup.descryption }}">
+                  <i class="glyphicon glyphicon-info-sign"></i>
+              </button>
+            </div>
+        </form>
+
+        <br>
+
+        <h3>Interface config</h3>
+
+        <form class="form-horizontal row">
+            <label class="col-xs-offset-1 col-xs-4 control-label">{{ interfaceDoor.displayName }}</label>
+            <div class="col-xs-3 text-center small-padding">
+              <input  type="checkbox" ng-model="interfaceDoor.value" class="chk-100px" />
+            </div>
+            <div class="col-xs-1 text-right">
+              <button type="button" class="btn btn-default btn-circle text-left"  popover-placement="top" uib-popover="{{ interfaceDoor.descryption }}">
+                  <i class="glyphicon glyphicon-info-sign"></i>
+              </button>
+            </div>
+        </form>
+
+        <form class="form-horizontal row">
+            <label class="col-xs-offset-1 col-xs-4 control-label">{{ interfaceDoorOpeningTime.displayName }}</label>
+            <div class="col-xs-3 text-right small-padding">
+              <input  type="text" ng-model="interfaceDoorOpeningTime.value" class="inp-150px" />
+            </div>
+            <div class="col-xs-1 text-right">
+              <button type="button" class="btn btn-default btn-circle text-left"  popover-placement="top" uib-popover="{{ interfaceDoorOpeningTime.descryption }}">
+                  <i class="glyphicon glyphicon-info-sign"></i>
+              </button>
+            </div>
+        </form>
+
+        <br>
+
+        <h3>Advanced config</h3>
+
+        <form class="form-horizontal row">
+            <label class="col-xs-offset-1 col-xs-4 control-label">{{ advancedMailServer.displayName }}</label>
+            <div class="col-xs-3 text-right small-padding">
+              <input  type="text" ng-model="advancedMailServer.value" class="inp-150px" />
+            </div>
+            <div class="col-xs-1 text-right">
+              <button type="button" class="btn btn-default btn-circle text-left"  popover-placement="top" uib-popover="{{ advancedMailServer.descryption }}">
+                  <i class="glyphicon glyphicon-info-sign"></i>
+              </button>
+            </div>
+        </form>
+
+       <form class="form-horizontal row">
+            <label class="col-xs-offset-1 col-xs-4 control-label">{{ advancedMailPort.displayName }}</label>
+            <div class="col-xs-3 text-right small-padding">
+              <input  type="text" ng-model="advancedMailPort.value" class="inp-150px" />
+            </div>
+            <div class="col-xs-1 text-right">
+              <button type="button" class="btn btn-default btn-circle text-left"  popover-placement="top" uib-popover="{{ advancedMailPort.descryption }}">
+                  <i class="glyphicon glyphicon-info-sign"></i>
+              </button>
+            </div>
+        </form>
+
+        <form class="form-horizontal row">
+            <label class="col-xs-offset-1 col-xs-4 control-label">{{ advancedMailUseTLS.displayName }}</label>
+            <div class="col-xs-3 text-center small-padding">
+              <input  type="checkbox" ng-model="advancedMailUseTLS.value" class="chk-100px" />
+            </div>
+            <div class="col-xs-1 text-right">
+              <button type="button" class="btn btn-default btn-circle text-left"  popover-placement="top" uib-popover="{{ advancedMailUseTLS.descryption }}">
+                  <i class="glyphicon glyphicon-info-sign"></i>
+              </button>
+            </div>
+        </form>
+
+        <form class="form-horizontal row">
+            <label class="col-xs-offset-1 col-xs-4 control-label">{{ advancedMailUseSSL.displayName }}</label>
+            <div class="col-xs-3 text-center small-padding">
+              <input  type="checkbox" ng-model="advancedMailUseSSL.value" class="chk-100px" />
+            </div>
+            <div class="col-xs-1 text-right">
+              <button type="button" class="btn btn-default btn-circle text-left"  popover-placement="top" uib-popover="{{ advancedMailUseSSL.descryption }}">
+                  <i class="glyphicon glyphicon-info-sign"></i>
+              </button>
+            </div>
+        </form>
+
+        <form class="form-horizontal row">
+            <label class="col-xs-offset-1 col-xs-4 control-label">{{ advancedMailUsername.displayName }}</label>
+            <div class="col-xs-3 text-center small-padding">
+              <input  type="text" ng-model="advancedMailUsername.value" class="inp-150px" />
+            </div>
+            <div class="col-xs-1 text-right">
+              <button type="button" class="btn btn-default btn-circle text-left"  popover-placement="top" uib-popover="{{ advancedMailUsername.descryption }}">
+                  <i class="glyphicon glyphicon-info-sign"></i>
+              </button>
+            </div>
+        </form>
+
+        <form class="form-horizontal row">
+            <label class="col-xs-offset-1 col-xs-4 control-label">{{ advancedMailPassword.displayName }}</label>
+            <div class="col-xs-3 text-center small-padding">
+                <input type="password" name="password" id="password" class="inp-150px" ng-model="advancedMailPassword.value" required />
+            </div>
+            <div class="col-xs-1 text-right">
+              <button type="button" class="btn btn-default btn-circle text-left"  popover-placement="top" uib-popover="{{ advancedMailPassword.descryption }}">
+                  <i class="glyphicon glyphicon-info-sign"></i>
+              </button>
+            </div>
+        </form>
+
+        <br>
+
+        <p>
+            <a href="#!/start" class="btn btn-warning btn-sm" role="button">Go back</a>
+            <a class="btn btn-success btn-lg btn-start text-center" ng-click="log()" role="button">Setup</a>
+        </p>
+
+    </div>
+
+
+</div>

@@ -189,10 +189,17 @@ a.width170px {
 
 .inp-100px {
     width : 100px;
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
 
+.small-padding {
+    padding-left: 2px;
+    padding-right: 2px;
+
+}
 .inp-150px {
-    width : 170px;
+    width : 100%;
     margin-top: 5px;
     margin-bottom: 5px;
 }
