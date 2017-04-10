@@ -10,6 +10,13 @@
     <div ng-show="!isLoading">
 
 
+        <div class="text-left">
+            <p>Log:</p>
+            <div class="well text-left">
+                Test
+            </div>
+        </div>
+
         <h3>Node config</h3>
 
         <form class="form-horizontal row">
@@ -45,6 +52,18 @@
                 <div class="col-xs-offset-5 col-xs-3">
                     <span class="msg-error text-center" ng-show="password != password2">Passwords don't match.</span>
                 </div>
+            </div>
+        </form>
+
+        <form class="form-horizontal row">
+            <label class="col-xs-offset-1 col-xs-4 control-label">{{ masterGlobalRfidKey.displayName }}</label>
+            <div class="col-xs-3 text-center small-padding">
+              <input  type="text" ng-model="masterGlobalRfidKey.value" class="inp-150px" />
+            </div>
+            <div class="col-xs-1 text-left">
+              <button type="button" class="btn btn-default btn-circle text-left"  popover-placement="top" uib-popover="{{ masterGlobalRfidKey.descryption }}">
+                  <i class="glyphicon glyphicon-info-sign"></i>
+              </button>
             </div>
         </form>
 
@@ -85,35 +104,6 @@
             </div>
         </form>
 
-        <h3>Master config</h3>
-
-        <form class="form-horizontal row">
-            <label class="col-xs-offset-1 col-xs-4 control-label">{{ masterGlobalRfidKey.displayName }}</label>
-            <div class="col-xs-3 text-center small-padding">
-              <input  type="text" ng-model="masterGlobalRfidKey.value" class="inp-150px" />
-            </div>
-            <div class="col-xs-2 text-left">
-              <button type="button" class="btn btn-success btn-circle text-left"  ng-click="randmoizeGlobalKey()">
-                  <i class="glyphicon glyphicon-refresh"></i>
-              </button>
-              <button type="button" class="btn btn-default btn-circle text-left"  popover-placement="top" uib-popover="{{ masterGlobalRfidKey.descryption }}">
-                  <i class="glyphicon glyphicon-info-sign"></i>
-              </button>
-            </div>
-        </form>
-
-        <form class="form-horizontal row">
-            <label class="col-xs-offset-1 col-xs-4 control-label">{{ masterStatisticEnable.displayName }}</label>
-            <div class="col-xs-3 text-center  small-padding">
-              <input  type="checkbox" ng-model="masterStatisticEnable.value" class="chk-100px" />
-            </div>
-            <div class="col-xs-1 text-right">
-              <button type="button" class="btn btn-default btn-circle text-left"  popover-placement="top" uib-popover="{{ masterStatisticEnable.descryption }}">
-                  <i class="glyphicon glyphicon-info-sign"></i>
-              </button>
-            </div>
-        </form>
-
         <form class="form-horizontal row">
             <label class="col-xs-offset-1 col-xs-4 control-label">{{ masterCleanupEnable.displayName }}</label>
             <div class="col-xs-3 text-center small-padding">
@@ -133,42 +123,6 @@
             </div>
             <div class="col-xs-1 text-right">
               <button type="button" class="btn btn-default btn-circle text-left"  popover-placement="top" uib-popover="{{ masterCleanupThreshold.descryption }}">
-                  <i class="glyphicon glyphicon-info-sign"></i>
-              </button>
-            </div>
-        </form>
-
-        <form class="form-horizontal row">
-            <label class="col-xs-offset-1 col-xs-4 control-label">{{ masterSyncCyclic.displayName }}</label>
-            <div class="col-xs-3 text-center small-padding">
-              <input  type="checkbox" ng-model="masterSyncCyclic.value" class="chk-100px" />
-            </div>
-            <div class="col-xs-1 text-right">
-              <button type="button" class="btn btn-default btn-circle text-left"  popover-placement="top" uib-popover="{{ masterSyncCyclic.descryption }}">
-                  <i class="glyphicon glyphicon-info-sign"></i>
-              </button>
-            </div>
-        </form>
-
-        <form class="form-horizontal row">
-            <label class="col-xs-offset-1 col-xs-4 control-label">{{ masterSyncCycle.displayName }}</label>
-            <div class="col-xs-3 text-right small-padding">
-              <input  type="text" ng-model="masterSyncCycle.value" class="inp-150px" />
-            </div>
-            <div class="col-xs-1 text-right">
-              <button type="button" class="btn btn-default btn-circle text-left"  popover-placement="top" uib-popover="{{ masterSyncCycle.descryption }}">
-                  <i class="glyphicon glyphicon-info-sign"></i>
-              </button>
-            </div>
-        </form>
-
-        <form class="form-horizontal row">
-            <label class="col-xs-offset-1 col-xs-4 control-label">{{ masterSyncOnStartup.displayName }}</label>
-            <div class="col-xs-3 text-center small-padding">
-              <input  type="checkbox" ng-model="masterSyncOnStartup.value" class="chk-100px" />
-            </div>
-            <div class="col-xs-1 text-right">
-              <button type="button" class="btn btn-default btn-circle text-left"  popover-placement="top" uib-popover="{{ masterSyncOnStartup.descryption }}">
                   <i class="glyphicon glyphicon-info-sign"></i>
               </button>
             </div>

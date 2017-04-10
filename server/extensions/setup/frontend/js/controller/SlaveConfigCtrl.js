@@ -1,4 +1,4 @@
-RoseGuardenApp.controller('MasterConfigCtrl', function($scope, $q, Config, $location) {
+RoseGuardenApp.controller('SlaveConfigCtrl', function($scope, $q, Config, $location) {
 
     var i=0;
     i++;
@@ -40,11 +40,12 @@ RoseGuardenApp.controller('MasterConfigCtrl', function($scope, $q, Config, $loca
         $scope.nodeName = findConfigEntryByName(config, "NODE_NAME");
         $scope.nodePassword = findConfigEntryByName(config, "NODE_NAME");
         $scope.nodeExtensionName = findConfigEntryByName(config, "EXTENSION_NAME");
+        $scope.nodeExtensionName.value = "slave";
         $scope.nodeExtensionFrontendDisable = findConfigEntryByName(config, "EXTENSION_FRONTEND_DISABLE");
         $scope.nodeDebug = findConfigEntryByName(config, "DEBUG");
 
         $scope.nodeIsMaster = findConfigEntryByName(config, "NODE_IS_MASTER");
-        $scope.nodeIsMaster.value = true;
+        $scope.nodeIsMaster.value = false;
 
         $scope.masterGlobalRfidKey = findConfigEntryByName(config, "RFID_GLOBAL_PASSWORD");
         $scope.masterStatisticEnable = findConfigEntryByName(config, "STATISTICS_ENABLE");
@@ -87,7 +88,6 @@ RoseGuardenApp.controller('MasterConfigCtrl', function($scope, $q, Config, $loca
 
     $scope.log = function () {
         console.log(config.node_config.entries[0]);
-        $location.path("/" );
     };
 
 });

@@ -159,7 +159,7 @@ def getConfigJSON():
     config_json_master = {}
 
     config_json_master["entries"] = []
-    config_json_master["entries"].append({"name": "RFID_GLOBAL_PASSWORD", "displayName": "Global RFID password", "descryption" : "The systemwide used RFID-password.", "value": RFID_GLOBAL_PASSWORD})
+    config_json_master["entries"].append({"name": "RFID_GLOBAL_PASSWORD", "displayName": "Global RFID password", "descryption" : "The system-wide RFID-password. IMPROTANT: Please remember this key. Use the key for all slaves in the same system!", "value": RFID_GLOBAL_PASSWORD})
     config_json_master["entries"].append({"name": "NODE_IS_MASTER", "displayName": "Is master-node", "descryption" : "Is the node the master-node.", "value": NODE_IS_MASTER})
     config_json_master["entries"].append({"name": "STATISTICS_ENABLE", "displayName": "Enable statistics", "descryption" : "Enable the statistic module.", "value": STATISTICS_ENABLE})
     config_json_master["entries"].append({"name": "CLEANUP_EANBLE", "displayName": "Enable log-cleanup", "descryption" : "Enable cleanup of the log (and free database-size).", "value": CLEANUP_EANBLE})

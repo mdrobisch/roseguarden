@@ -24,6 +24,10 @@ RoseGuardenApp.config(function($routeProvider, RestangularProvider) {
       templateUrl: 'partials/master/config.html',
       controller: 'MasterConfigCtrl'
       }).
+      when('/slave/config', {
+      templateUrl: 'partials/slave/config.html',
+      controller: 'SlaveConfigCtrl'
+      }).
       otherwise({
         redirectTo: '/'
       });
