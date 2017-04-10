@@ -28,7 +28,7 @@ RoseGuardenApp.controller('MasterConfigCtrl', function($scope, $q, Config, $loca
             }
         }
       }
-};
+    }
 
     //console.log(ConfigService.getConfig());
 
@@ -85,9 +85,8 @@ RoseGuardenApp.controller('MasterConfigCtrl', function($scope, $q, Config, $loca
         $scope.masterGlobalRfidKey.value = token;
     };
 
-    $scope.log = function () {
-        console.log(config.node_config.entries[0]);
-        $location.path("/" );
+    $scope.startSetup = function () {
+        $location.path("/master/setup" );
     };
 
 });

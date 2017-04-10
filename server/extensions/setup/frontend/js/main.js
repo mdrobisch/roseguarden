@@ -1,5 +1,5 @@
 //Define an angular module for our app
-var RoseGuardenApp = angular.module('RoseGuardenApp', ['ngRoute','ui.bootstrap', 'ngSanitize', 'restangular']);
+var RoseGuardenApp = angular.module('RoseGuardenApp', ['ngRoute','ui.bootstrap', 'ngSanitize', 'restangular','ngScrollbar']);
 
 
 
@@ -23,6 +23,10 @@ RoseGuardenApp.config(function($routeProvider, RestangularProvider) {
       when('/master/config', {
       templateUrl: 'partials/master/config.html',
       controller: 'MasterConfigCtrl'
+      }).
+      when('/master/setup', {
+      templateUrl: 'partials/master/setup.html',
+      controller: 'MasterSetupCtrl'
       }).
       when('/slave/config', {
       templateUrl: 'partials/slave/config.html',
