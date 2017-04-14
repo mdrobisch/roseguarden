@@ -91,8 +91,14 @@ else:
 if 'DOOR' in config:
     door_section = config['DOOR']
     DOOR_OPENING_TIME = conf_entry_to_int(door_section['DOOR_OPENING_TIME'])
+    if('DOOR_KEYMASK' in door_section):
+        DOOR_KEYMASK = conf_entry_to_int(door_section['DOOR_KEYMASK'])
+    else:
+        DOOR_KEYMASK = 0
+
 else:
     DOOR_OPENING_TIME = 16
+    DOOR_KEYMASK = 0
 
 # extension settings
 if 'EXTENSION' in config:
@@ -179,6 +185,7 @@ def getConfigJSON():
     config_json_interfaces = {}
     config_json_interfaces["entries"] = []
     config_json_interfaces["entries"].append({"name": "NODE_DOOR_AVAILABLE", "displayName": "Door connected", "descryption" : "The node interface a door?", "value": NODE_DOOR_AVAILABLE})
+    config_json_interfaces["entries"].append({"name": "DOOR_KEYMASK", "displayName": "Door key mask", "descryption" : "The duration the door keep open after request.", "value": DOOR_OPENING_TIME })
     config_json_interfaces["entries"].append({"name": "DOOR_OPENING_TIME", "displayName": "Door opening duration", "descryption" : "The duration the door keep open after request.", "value": DOOR_OPENING_TIME })
 
     config_json_advanced = {}
