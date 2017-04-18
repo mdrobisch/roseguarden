@@ -44,7 +44,7 @@ Backlog for further release:
 News & Community
 ================
 
-*Want to see Roseguarden in action: Visit Roseguarden on the Maker-Faire-Saxony in Chemnitz Germany (22./23. April 2017)*
+**Want to see Roseguarden in action: Visit Roseguarden on the Maker-Faire-Saxony in Chemnitz Germany (22./23. April 2017)**
 
 The project has a community forum. News will be posted there. In addition its purpose is to find help, discuss features or report bugs. You are welcome to contribute to the project there.
 
