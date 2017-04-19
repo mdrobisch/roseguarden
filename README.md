@@ -3,7 +3,7 @@ RoseGuarden
 
 A remote door api and web application for Raspberry Pi, Odroid, Orange Pi or BeagleBoard (based on python).
 
-IMPORTANT NEWS
+Important news
 ==============
 
 **I strongly recommend to wait for the new release of RoseGuarden.**
@@ -11,7 +11,7 @@ IMPORTANT NEWS
 **The release date is set to 30th of June 2017.** 
 **Please be patient till then.**
 
-**The progress can be followed on https://github.com/mdrobisch/roseguarden/tree/0.9.0 **
+**The progress can be followed on:** https://github.com/mdrobisch/roseguarden/tree/0.9.0 
 
 Features
 ========
