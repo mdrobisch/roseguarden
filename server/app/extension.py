@@ -1,7 +1,12 @@
 import imp
 import os
+from config import NODE_LOCKED, EXTENSION_NAME
 
-extension_name = "setup"
+if NODE_LOCKED is False:
+    extension_name = "setup"
+else:
+    extension_name = EXTENSION_NAME
+
 extension = imp.load_source('module', 'extensions/' + extension_name + '/extension.py')
 
 extension.extension_event_loading()
