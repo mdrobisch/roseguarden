@@ -12,6 +12,19 @@
     max-width: 768px;
 }
 
+.vcenter {
+    display: inline-block;
+    vertical-align: middle;
+    float: none;
+}
+
+.vbottom {
+    display: inline-block;
+    vertical-align: bottom;
+    float: none;
+}
+
+
 .popover-content {
   white-space: pre;
 }
@@ -195,6 +208,12 @@ a.width170px {
 
 .log-scroll-height {
     max-height: 200px;
+    height: 200px;
+}
+
+
+.display-block-20px {
+    display: block ;
 }
 
 .small-padding {

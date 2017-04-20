@@ -7,7 +7,7 @@ RoseGuardenApp.controller('SlaveConfigCtrl', function($scope, $q, Config, $locat
     this.loadConfig = function(credentials) {
         var me = this;
         deferred = $q.defer();
-        Config.create(credentials, true).then(function(config) {
+        Config.get(credentials, true).then(function(config) {
             currentConfig = JSON.parse(config);
             console.log("got it");
             return deferred.resolve(config);

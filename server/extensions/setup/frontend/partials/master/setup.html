@@ -1,28 +1,45 @@
 
 <div class="text-center">
 
+    <div>
+        <h3>Setup node:</h3>
+        <a class="btn btn-success btn-lg btn-start text-center" ng-click="startSetup()" role="button">Start</a>
+    </div>
+
     <div class="text-left">
-        <p>Log:</p>
+
+        <div class="row">
+            <div class="col-xs-2 vcenter">
+                <h3>Log:</h3>
+            </div>
+
+            <div class="col-xs-offset-6 col-xs-4 vbottom" style="width: 32%">
+                <uib-progressbar class="progress-striped" style="margin-bottom: 10px; margin-left: 10px" value="setupProgress" type="{{ setupBarColor }}">{{ setupStatus }}</uib-progressbar>
+            </div>
+
+        </div>
+
         <div class="well text-left">
-          <div class="log-scroll-height" ng-scrollbar is-bar-shown="barShown">
-            <h1>Scroll me down!</h1>
-            <p>...</p>
-            <p>...</p>
-            <p>...</p>
-            <p>...</p>
-            <p>...</p>
-            <p>...</p>
-            <p>
-                <a class="btn btn-primary btn-lg" role="button" href="https://github.com/asafdav/ng-scrollbar">Learn more</a>
+          <div class="log-scroll-height" ng-scrollbar is-bar-shown="barShown" rebuild-on="rebuild:statusbar">
+            <p ng-repeat="log in logs">
+              <b>{{log.date}}:</b>  {{log.log}}
             </p>
           </div>
         </div>
+
+        <div class="row">
+
+        </div>
+
     </div>
 
     <div class=""text-center>
         <p>
             <a href="#!/master/config" class="btn btn-warning btn-sm" role="button">Go back</a>
-            <a class="btn btn-success btn-lg btn-start text-center" ng-click="finishSetup()" role="button">Finish</a>
+            <a class="btn btn-success btn-lg btn-start text-center" ng-disabled="!isFinished" ng-click="finishSetup()" role="button">
+                Finish
+                <img ng-show="isLockPending" src="images/loading.gif" >
+            </a>
         </p>
 
     </div>

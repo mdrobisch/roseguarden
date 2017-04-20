@@ -190,6 +190,51 @@
             </div>
         </form>
 
+
+        <form class="form-horizontal row">
+            <label class="col-xs-offset-1 col-xs-4 control-label">{{ interfaceDoorKeymask.displayName }}</label>
+
+            <div class="col-xs-3 text-center small-padding ">
+                <span class="col-xs-3 text-center">
+                    <i class="glyphicon glyphicon-thumbs-up gliphicon-red" tooltip="red key"></i>
+                    <input type="checkbox" ng-model="interfaceDoorKeymaskForm[0]">
+                </span>
+                <span class="col-xs-3">
+                    <i class="glyphicon glyphicon-thumbs-up gliphicon-green" tooltip="green key"></i>
+                    <input type="checkbox" ng-model="interfaceDoorKeymaskForm[1]">
+                </span>
+                <span class="col-xs-3">
+                    <i class="glyphicon glyphicon-thumbs-up gliphicon-black" tooltip="black key"></i>
+                    <input type="checkbox" ng-model="interfaceDoorKeymaskForm[2]">
+                </span>
+                <span class="col-xs-3">
+                    <i class="glyphicon glyphicon-thumbs-up gliphicon-pink" tooltip="pink key"></i>
+                    <input type="checkbox" ng-model="interfaceDoorKeymaskForm[3]">
+                </span>
+                <span class="col-xs-3">
+                    <i class="glyphicon glyphicon-thumbs-up gliphicon-marine" tooltip="marine key"></i>
+                    <input type="checkbox" ng-model="interfaceDoorKeymaskForm[4]">
+                </span>
+                <span class="col-xs-3">
+                    <i class="glyphicon glyphicon-thumbs-up gliphicon-orange" tooltip="orange key"></i>
+                    <input type="checkbox" ng-model="interfaceDoorKeymaskForm[5]">
+                </span>
+                <span class="col-xs-3">
+                    <i class="glyphicon glyphicon-thumbs-up gliphicon-olive" tooltip="olive key"></i>
+                    <input type="checkbox" ng-model="interfaceDoorKeymaskForm[6]">
+                </span>
+                <span class="col-xs-3">
+                    <i class="glyphicon glyphicon-thumbs-up gliphicon-purple" tooltip="purple key"></i>
+                    <input type="checkbox" ng-model="interfaceDoorKeymaskForm[7]" tooltip="purple key">
+                </span>
+            </div>
+            <div class="col-xs-1 text-right">
+              <button type="button" class="btn btn-default btn-circle text-left"  popover-placement="top" uib-popover="{{ interfaceDoorKeymask.descryption }}">
+                  <i class="glyphicon glyphicon-info-sign"></i>
+              </button>
+            </div>
+        </form>
+
         <form class="form-horizontal row">
             <label class="col-xs-offset-1 col-xs-4 control-label">{{ interfaceDoorOpeningTime.displayName }}</label>
             <div class="col-xs-3 text-right small-padding">
@@ -282,7 +327,7 @@
 
         <p>
             <a href="#!/start" class="btn btn-warning btn-sm" role="button">Go back</a>
-            <a class="btn btn-success btn-lg btn-start text-center" ng-click="startSetup()" role="button">Setup</a>
+            <a class="btn btn-success btn-lg btn-start text-center" ng-click="saveConfig()" role="button">Save</a>
         </p>
 
     </div>
