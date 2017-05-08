@@ -49,7 +49,7 @@ RoseGuardenApp.config(function($routeProvider, RestangularProvider) {
             var deferred = $q.defer();
 
             if (AuthService.isAuthenticated()) {
-                deferred.reject()
+                deferred.reject();
                 $location.path(route);
             } else {
                 deferred.resolve()
@@ -57,15 +57,17 @@ RoseGuardenApp.config(function($routeProvider, RestangularProvider) {
 
             return deferred.promise;
         }
-    }
+    };
 
     var redirectIfNotAuthenticated = function(route) {
         return function($location, $q, AuthService) {
 
+            console.log("redirectIfNotAuthenticated");
+
             var deferred = $q.defer();
 
             if (! AuthService.isAuthenticated()) {
-                deferred.reject()
+                deferred.reject();
                 $location.path(route);
             } else {
                 deferred.resolve()
@@ -73,7 +75,7 @@ RoseGuardenApp.config(function($routeProvider, RestangularProvider) {
 
             return deferred.promise;
         }
-    }
+    };
 
     $routeProvider.
       when('/', {

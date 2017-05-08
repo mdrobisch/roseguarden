@@ -7,10 +7,16 @@ RoseGuardenApp.factory('Setup', function(Restangular) {
                 .withHttpConfig({bypassErrorInterceptor: bypassErrorInterceptor})
                 .customGET(data);
         },
-        lock: function(id,data) {
+        start: function(data, bypassErrorInterceptor) {
             return Restangular
-                .one('/setup/lock', id)
-                .withHttpConfig({bypassErrorInterceptor: true})
+                .one('setup/start')
+                .withHttpConfig({bypassErrorInterceptor: bypassErrorInterceptor})
+                .customPOST(data);
+        },
+        lock: function(data,bypassErrorInterceptor) {
+            return Restangular
+                .one('setup/lock')
+                .withHttpConfig({bypassErrorInterceptor: bypassErrorInterceptor})
                 .customPOST(data);
         }
     };

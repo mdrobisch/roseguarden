@@ -48,12 +48,9 @@ RoseGuardenApp.controller('MasterConfigCtrl', function($scope, $q, Config, $loca
     //console.log(ConfigService.getConfig());
 
     loadConfig().then(function(config_unparsed) {
-        console.log("loaded");
         config = JSON.parse(config_unparsed);
-        console.log(config);
-
         $scope.nodeName = findConfigEntryByName(config, "NODE_NAME");
-        $scope.nodePassword = findConfigEntryByName(config, "NODE_NAME");
+        $scope.nodePassword = findConfigEntryByName(config, "INITIAL_NODE_PASSWORD");
         $scope.nodeExtensionName = findConfigEntryByName(config, "EXTENSION_NAME");
         $scope.nodeExtensionFrontendDisable = findConfigEntryByName(config, "EXTENSION_FRONTEND_DISABLE");
         $scope.nodeDebug = findConfigEntryByName(config, "DEBUG");
@@ -72,10 +69,8 @@ RoseGuardenApp.controller('MasterConfigCtrl', function($scope, $q, Config, $loca
         $scope.interfaceDoor = findConfigEntryByName(config, "NODE_DOOR_AVAILABLE");
         $scope.interfaceDoorOpeningTime = findConfigEntryByName(config, "DOOR_OPENING_TIME");
         $scope.interfaceDoorKeymask = findConfigEntryByName(config, "DOOR_KEYMASK");
-        console.log($scope.interfaceDoorKeymask);
         $scope.interfaceDoorKeymaskForm = [];
         validKeyMask = parseInt($scope.interfaceDoorKeymask.value);
-        console.log(validKeyMask);
         for(var i = 0;i < 8; i++) {
             if ( ((0x01 << i) & validKeyMask) != 0)
                 $scope.interfaceDoorKeymaskForm.push(true);
@@ -113,10 +108,16 @@ RoseGuardenApp.controller('MasterConfigCtrl', function($scope, $q, Config, $loca
 
 
     $scope.saveConfig = function () {
-        console.log("function");
+        console.log($scope.interfaceDoorKeymask.value);
+        $scope.interfaceDoorKeymask.value = 0;
+        console.log($scope.interfaceDoorKeymask.value);
+        for(var i = 0;i < 8; i++) {
+            if($scope.interfaceDoorKeymaskForm[i] == true)
+                $scope.interfaceDoorKeymask.value += Math.pow(2,i);
+        }
+        console.log($scope.interfaceDoorKeymask.value);
 
         updateConfig(config).then(function(config_unparsed) {
-            console.log("fullfilled");
             $location.path("/master/setup" );
         }, function(response) {
             console.log("rejected");

@@ -1,4 +1,4 @@
-RoseGuardenApp.service('AuthService', AuthService = function($q, localStorageService, Session, User) {
+RoseGuardenApp.service('AuthService', AuthService = function($q, localStorageService,$location, Session, User) {
 
     var currentUser;
 
@@ -17,14 +17,17 @@ RoseGuardenApp.service('AuthService', AuthService = function($q, localStorageSer
 
     this.loadCurrentUser = function() {
         var me = this;
+        console.log("Test");
+
         deferred = $q.defer();
         User.get(this.getCurrentUserID(),true).then(function(user) {
             currentUser = user;
-
             //console.log(user);
-
             return deferred.resolve(user);
         }, function(response) {
+            console.log("Rejected");
+            localStorageService.clearAll();
+            $location.url("/");
             return deferred.reject(response);
         });
         return deferred.promise
@@ -77,7 +80,7 @@ RoseGuardenApp.service('AuthService', AuthService = function($q, localStorageSer
 
     this.getCurrentUserID = function () {
         return localStorageService.get('userid');
-    }
+    };
 
     this.getToken = function() {
         return localStorageService.get('token');

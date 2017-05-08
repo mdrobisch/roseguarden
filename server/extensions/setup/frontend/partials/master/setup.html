@@ -33,10 +33,17 @@
 
     </div>
 
+    <div ng-show="isFinished && !isFailed" class="alert alert-info" style="white-space : pre-line ; padding: 1px" role="alert">
+       Setup was succesfull. You can now finish the setup and node will be locked.
+        Afterwards you will be redirected to the final user interface.
+        <b> Login with the administrator account ( administrator : your-password ) </b>.
+
+    </div>
+
     <div class=""text-center>
         <p>
             <a href="#!/master/config" class="btn btn-warning btn-sm" role="button">Go back</a>
-            <a class="btn btn-success btn-lg btn-start text-center" ng-disabled="!isFinished" ng-click="finishSetup()" role="button">
+            <a class="btn btn-success btn-lg btn-start text-center" ng-disabled="!isFinished || isFailed" ng-click="finishSetup()" role="button">
                 Finish
                 <img ng-show="isLockPending" src="images/loading.gif" >
             </a>

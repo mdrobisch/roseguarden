@@ -1,4 +1,4 @@
-RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log, $q, User, RfidTag, InvalidateAuthCardRequest) {
+RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log, $q, User, RfidTag, InvalidateAuthCardRequest, $interval) {
 
     var firstnames = ['Thomas', 'Marcus', 'Lischen', 'Stephanie'];
     var lastnames = ['Müller', 'Drobisch', 'Meier', 'Lehmann'];
@@ -18,9 +18,11 @@ RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log, $q, Us
 
     $scope.message = 'This is the AdminSpaceCtrl message';
 
-    $scope.rfidtaginfo = "RFID tag. <br> Click to update.";
+    $scope.rfidTagInfo = "Reading RFID tag info. <br> Please put a tag on the reader.";
     $scope.rfidTagId = "";
     $scope.rfidTagUser = "";
+    $scope.rfidTagPending = true;
+    $scope.rfidTagInfoColor = "rfid-info-color-pending";
 
     $scope.isLoading = true;
     $scope.showError = false;
@@ -120,35 +122,31 @@ RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log, $q, Us
     //loadItemsDummy();
 
     $scope.updateRfidInfo = function updateRfidInfo() {
-        $scope.rfidtaginfo = "Request tag-info ..."
+
         deferred = $q.defer();
         RfidTag.getInfo(true).then(function(tagInfo) {
             console.log(tagInfo);
 
-
-            $scope.rfidTagUser = tagInfo.userInfo;
-            $scope.rfidTagId = tagInfo.tagId;
-
-            // debug setting
-            //console.error("Taginfo is in debug mode");
-            //$scope.rfidTagId = "192.12.2.34";
-
-            if($scope.rfidTagId == "")
-            {
-                $scope.rfidtaginfo = "No rfid-tag detected";
+            if(tagInfo.detected == true) {
+                $scope.rfidTagUserInfo = tagInfo.userInfo;
+                $scope.rfidTagId = tagInfo.tagId;
+                $scope.rfidTagPending = true;
+                $scope.rfidTagInfo = $scope.rfidTagId + " <br>  " + $scope.rfidTagUser;
+                $scope.rfidTagInfoColor = "rfid-info-color-primary";
+            } else{
+                $scope.rfidTagInfo = "Reading RFID tag info. <br> Please put a tag on the reader.";
+                $scope.rfidTagPending = true;
+                $scope.rfidTagInfoColor = "rfid-info-color-pending";
             }
-            else
-            {
-                $scope.rfidtaginfo = $scope.rfidTagId + " <br>  " + $scope.rfidTagUser;
-            }
-
             return deferred.resolve();
         }, function(response) {
-            $scope.rfidtaginfo = "Error while request tag-info";
+            $scope.rfidTagInfo = "Error while request tag-info. <br> Unable to connect to node.";
+            $scope.rfidTagInfoColor = "rfid-info-color-error";
+            $scope.rfidTagPending = true;
             return deferred.reject(response);
         });
         return deferred.promise;
-    }
+    };
 
     //add to the real data holder
     $scope.addRandomItem = function addRandomItem() {
@@ -425,7 +423,7 @@ RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log, $q, Us
         }, function () {
           $log.info('Modal dismissed at: ' + new Date());
         });
+    };
 
-
-    }
-})
+    $interval( function(){ $scope.updateRfidInfo(); }, 1000);
+});

@@ -8,12 +8,11 @@
     <p style="font-weight: bold; margin: 0"> Card</p>
     <hr style="margin-top: 2px">
 
-    <!-- Split button -->
-    <div class="btn-group" uib-dropdown>
 
-        <button id="split-button" type="button"  ng-click="updateRfidInfo()" class="btn btn-lg btn-rfid-tag btn-warning">
-            <span ng-bind-html = "rfidtaginfo | unsafeHTML"></span>
-        </button>
+    <div class="rfid-info row" ng-class="rfidTagInfoColor">
+            <span ng-bind-html = "rfidTagInfo | unsafeHTML"></span>
+            <br>
+            <img src="images/spinning-ball.gif" >
     </div>
 
     <p></p>
@@ -113,6 +112,7 @@
                         <br>
 
                         (
+                        <span ng-show="row.accessDaysMask == 0">No</span>
                         <span ng-show="row.accessDaysMask | bitwiseAndFilter : 1">Mo</span>
                         <span ng-show="row.accessDaysMask | bitwiseAndFilter : 2">Tu</span>
                         <span ng-show="row.accessDaysMask | bitwiseAndFilter : 4">We</span>
@@ -123,6 +123,7 @@
                         )
                 </td>
                 <td>
+                        <i ng-show="row.keyMask == 0 && row.licenseMask == 0">-</i>
                         <i ng-show="row.licenseMask | bitwiseAndFilter : 1"  class="glyphicon glyphicon-credit-card gliphicon-red" tooltip="red licence"></i>
                         <i ng-show="row.licenseMask | bitwiseAndFilter : 2"  class="glyphicon glyphicon-credit-card gliphicon-green" tooltip="green licence"></i>
                         <i ng-show="row.licenseMask | bitwiseAndFilter : 4"  class="glyphicon glyphicon-credit-card gliphicon-black" tooltip="black licence"></i>
@@ -145,16 +146,18 @@
                 </td>
                 <td>
                     <div class="btn-group" dropdown is-open="status.isopen">
-                        <button id="single-button" type="button"  class="btn btn-sm btn-danger" dropdown-toggle tooltip="configure user">
+                        <button id="single-button" type="button"  class="btn btn-sm btn-primary" dropdown-toggle tooltip="configure user">
                             <i class="glyphicon glyphicon-cog"></i>
                             <span class="caret"></span>
+                            <br>
+                            Edit
                         </button>
                         <ul class="dropdown-menu" role="menu">
-                            <li role="menuitem"><a ng-click="setupUserAccess(row)">Setup access validation</a></li>
-                            <li ng-show="row.role == 0" role="menuitem" ng-click="setUserToAdmin(row)"><a >Set admin role</a></li>
-                            <li ng-show="row.role == 0" role="menuitem" ng-click="setUserToSupervisor(row)"><a >Set supervisor role</a></li>
-                            <li ng-show="row.role == 1" role="menuitem" ng-click="resetUserRole(row)"><a >Remove admin rights</a></li>
-                            <li ng-show="row.role == 2" role="menuitem" ng-click="resetUserRole(row)"><a >Remove supervisor rights</a></li>
+                            <li role="menuitem"><a ng-click="setupUserAccess(row)">Setup access &amp; keys</a></li>
+                            <li ng-show="row.role == 0" role="menuitem" ng-click="setUserToAdmin(row)"><a >Set to admin</a></li>
+                            <li ng-show="row.role == 0" role="menuitem" ng-click="setUserToSupervisor(row)"><a >Set to supervisor</a></li>
+                            <li ng-show="row.role == 1" role="menuitem" ng-click="resetUserRole(row)"><a >Remove admin privileges</a></li>
+                            <li ng-show="row.role == 2" role="menuitem" ng-click="resetUserRole(row)"><a >Remove supervisor privileges</a></li>
                             <li ng-show="rfidTagId != '' && row.cardID == '' && rfidTagUser == ''" role="menuitem" ng-click="assignUserRfidTag(row)"><a >Assign RFID ({{rfidTagId}})</a></li>
                             <li ng-show="rfidTagId != '' && rfidTagId == row.cardID" role="menuitem" ng-click="withdrawUserRfidTag(row)"><a >Withdraw RFID ({{rfidTagId}})</a></li>
                             <li ng-show="row.cardID != '' && rfidTagId != row.cardID" role="menuitem" ng-click="invalidateUserRfidTag(row)"><a >Invalidate RFID / Auth. card</a></li>

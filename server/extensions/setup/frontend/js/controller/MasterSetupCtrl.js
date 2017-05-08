@@ -1,32 +1,52 @@
-RoseGuardenApp.controller('MasterSetupCtrl', function($scope, $q, Setup, $location, $interval) {
+RoseGuardenApp.controller('MasterSetupCtrl', function($scope, $q, Setup, $route, $window, $location,$timeout, $interval) {
 
     var i=0;
     i++;
     $scope.isLoading = true;
     $scope.isStatusRequestPending = false;
     $scope.isStarted = false;
-    $scope.isFinished = false;
+    $scope.isFinished = true;
+    $scope.isFailed = false;
     $scope.setupStatus = "Not started";
     $scope.setupBarColor = "";
     $scope.setupProgress = 100;
     $scope.isLockPending = false;
 
 
-    $scope.logs = [
-        {date : "2016", log : "Log"},
-        {date : "2016", log : "Log2"}
-    ];
+    $scope.logs = [];
 
     $scope.startSetup = function () {
-        $scope.isStarted = true;
-        $scope.setupStatus = "Started";
-        $scope.setupBarColor = "warning";
+        deferred = $q.defer();
+        Setup.start(null, true).then(function (status) {
+            $scope.isStarted = true;
+            $scope.setupStatus = "Started";
+            $scope.setupBarColor = "warning";
+            $scope.isFinished = false;
+            $scope.logs = [
+                {date :  moment().format("YYYY-MM-DD HH:mm:ss"), log : "Setup request sent to client ..."}
+            ];
 
-
+            return deferred.resolve(status);
+        }, function(response) {
+            console.log("rejected");
+            $scope.isStatusRequestPending = false;
+            return deferred.reject(response);
+        });
+        return deferred.promise
     };
 
     $scope.finishSetup = function () {
-        console.log("Test");
+        deferred = $q.defer();
+        Setup.lock(null, true).then(function (status) {
+            console.log("locked");
+            $timeout( function(){$window.location.reload(true); }, 2000);
+            return deferred.resolve(status);
+        }, function(response) {
+            console.log("rejected");
+            $scope.isStatusRequestPending = false;
+            return deferred.reject(response);
+        });
+        return deferred.promise
     };
 
     $scope.pollStatus = function(credentials) {
@@ -38,20 +58,25 @@ RoseGuardenApp.controller('MasterSetupCtrl', function($scope, $q, Setup, $locati
             else
                 currentStatus = JSON.parse(status);
             console.log(currentStatus);
-            console.log("got it");
-            $scope.isStatusRequestPending = false;
-            $scope.logs.unshift({date : moment(status.date).format("YYYY-MM-DD HH:mm:ss"), log : "Log"});
-            $scope.$broadcast('rebuild:statusbar');
-            if(status.progress < 100){
-                $scope.setupStatus = "" + status.progress + "%";
-                $scope.setupProgress = status.progress;
-            }
-            else {
-                $scope.setupStatus = "Finished"
-                $scope.setupBarColor = "success";
-                $scope.isFinished = true;
+            if (status.statusupdate == true) {
+                console.log("new status");
+                $scope.logs.unshift({date: moment(status.date).format("YYYY-MM-DD HH:mm:ss"), log: status.message});
+                $scope.$broadcast('rebuild:statusbar');
+                console.log(status.progress);
+                if (status.progress < 100) {
+                    $scope.setupStatus = "" + status.progress + "%";
+                    $scope.setupProgress = status.progress;
+                }
+                else {
+                    console.log("finished");
+                    $scope.setupStatus = "Finished";
+                    $scope.setupBarColor = "success";
+                    $scope.isFinished = true;
+                    $scope.setupProgress = 100;
+                }
             }
 
+            $scope.isStatusRequestPending = false;
             return deferred.resolve(status);
         }, function(response) {
             console.log("rejected");
@@ -63,7 +88,6 @@ RoseGuardenApp.controller('MasterSetupCtrl', function($scope, $q, Setup, $locati
 
 
     $scope.getStatus = function() {
-        console.log("$scope.callAtInterval - Interval occurred");
         if($scope.isStatusRequestPending == false) {
             if($scope.isStarted == true) {
                 if($scope.isFinished == false) {
@@ -74,6 +98,6 @@ RoseGuardenApp.controller('MasterSetupCtrl', function($scope, $q, Setup, $locati
         }
     };
 
-    $interval( function(){ $scope.getStatus(); }, 2000);
+    $interval( function(){ $scope.getStatus(); }, 1000);
 
 });

@@ -24,10 +24,10 @@
             </div>
         </form>
 
-        <form class="form-horizontal row">
+        <form name="form_password" class="form-horizontal row">
             <label class="col-xs-offset-1 col-xs-4 control-label">Node password</label>
             <div class="col-xs-3 text-center  small-padding">
-                <input type="password" name="password" id="password" class="inp-150px" ng-model="password" required />
+                <input type="password" name="password" id="password" class="inp-150px" ng-model="nodePassword.value" required />
             </div>
             <div class="col-xs-1 text-right">
               <button type="button" class="btn btn-default btn-circle text-left"  popover-placement="top" uib-popover="{{ nodeName.descryption }}">
@@ -43,7 +43,7 @@
             </div>
             <div class="row">
                 <div class="col-xs-offset-5 col-xs-3">
-                    <span class="msg-error text-center" ng-show="password != password2">Passwords don't match.</span>
+                    <span class="msg-error text-center" ng-show="nodePassword.value != password2">Passwords don't match.</span>
                 </div>
             </div>
         </form>
@@ -327,7 +327,7 @@
 
         <p>
             <a href="#!/start" class="btn btn-warning btn-sm" role="button">Go back</a>
-            <a class="btn btn-success btn-lg btn-start text-center" ng-click="saveConfig()" role="button">Save</a>
+            <a class="btn btn-success btn-lg btn-start text-center" ng-disabled="form_password.password.$dirty != true || nodePassword.value != password2" ng-click="saveConfig()" role="button">Save</a>
         </p>
 
     </div>

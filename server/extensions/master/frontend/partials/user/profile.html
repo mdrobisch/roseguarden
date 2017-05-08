@@ -27,6 +27,7 @@
         <div class="form-group">
             <label class="col-xs-3 control-label center-block">Keys</label>
             <div class="col-xs-8">
+                <label ng-show="user.keyMask == 0"  class="control-label" >-</label>
                 <a ng-show="user.keyMask | bitwiseAndFilter : 1" class="btn btn-default gliphicons-small" tooltip="red key" >
                     <i class="glyphicon glyphicon-thumbs-up gliphicon-red" ></i>
                 </a>

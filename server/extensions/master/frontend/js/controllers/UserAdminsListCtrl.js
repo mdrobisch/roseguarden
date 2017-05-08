@@ -18,7 +18,7 @@ RoseGuardenApp.controller('UserAdminsListCtrl', function($scope,$modal, $log, $q
 
     $scope.message = 'This is the AdminSpaceCtrl message';
 
-    $scope.rfidtaginfo = "RFID tag. <br> Click to update.";
+    $scope.rfidtaginfo = "RFID tag info. <br> Please put the tag on the reader.";
     $scope.rfidTagId = "";
     $scope.rfidTagUser = "";
 
@@ -120,7 +120,7 @@ RoseGuardenApp.controller('UserAdminsListCtrl', function($scope,$modal, $log, $q
     //loadItemsDummy();
 
     $scope.updateRfidInfo = function updateRfidInfo() {
-        $scope.rfidtaginfo = "Request tag-info ..."
+        $scope.rfidtaginfo = "Request tag-info ...";
         deferred = $q.defer();
         RfidTag.getInfo(true).then(function(tagInfo) {
             console.log(tagInfo);

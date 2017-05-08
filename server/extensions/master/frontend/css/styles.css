@@ -1,4 +1,31 @@
 
+.rfid-info {
+    display : inline-block;
+    vertical-align: middle;
+    position: relative;
+    border-radius: 25px;
+    color: #ffffff;
+    padding: 10px;
+    width: 350px;
+    font-size: 18px;
+}
+
+.rfid-info-color-primary {
+    background: #5cb85c;
+
+}
+
+.rfid-info-color-pending {
+    background: #f0ad4e;
+}
+
+.rfid-info-color-error {
+    background: #d9534f;
+
+}
+
+
+
 .center-form-block {
   display: inline-block;
   text-align: center;
