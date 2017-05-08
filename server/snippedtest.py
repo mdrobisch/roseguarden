@@ -6,6 +6,8 @@ import os
 import marshmallow
 import base64
 import time
+import Queue
+from collections import namedtuple
 
 #req = requests.get('http://' + '192.168.2.108' + ':5000' + '/request/doorinfo')
 
@@ -90,59 +92,66 @@ def environ_test():
     print os.environ.get('ROSEGUARDEN_GLOBAL_RFID_PASSWORD')
 
 
-userData = [0,0,0,2,2,1,4,5,2,3,4,8,13,1,10,99,9]
-userDataLowAction = []
-userDataMediumAction = []
-userDataHighAction = []
-userData.append(22)
-userData.sort()
+def thresholdTest():
+    userData = [0,0,0,2,2,1,4,5,2,3,4,8,13,1,10,99,9]
+    userDataLowAction = []
+    userDataMediumAction = []
+    userDataHighAction = []
+    userData.append(22)
+    userData.sort()
 
-noActionUsers = 0
-actionUsers = 0
+    noActionUsers = 0
+    actionUsers = 0
 
-lowThresholdIndex = 0
-highThresholdIndex = 0
+    lowThresholdIndex = 0
+    highThresholdIndex = 0
 
-lowThreshold = 0
-highThreshold = 0
+    lowThreshold = 0
+    highThreshold = 0
 
-for i in range(0, len(userData)):
-    print i
-    if userData[i] == 0:
-        noActionUsers += 1
-    else:
-        actionUsers = len(userData)
-        mediumThresholdIndex = noActionUsers + int(round((actionUsers - noActionUsers) * 0.5, 0))
-        if i > mediumThresholdIndex:
-            highThreshold += userData[i]
+    for i in range(0, len(userData)):
+        print i
+        if userData[i] == 0:
+            noActionUsers += 1
         else:
-            lowThreshold += userData[i]
+            actionUsers = len(userData)
+            mediumThresholdIndex = noActionUsers + int(round((actionUsers - noActionUsers) * 0.5, 0))
+            if i > mediumThresholdIndex:
+                highThreshold += userData[i]
+            else:
+                lowThreshold += userData[i]
 
-highThreshold = highThreshold / ((actionUsers - noActionUsers) * 0.5)
-lowThreshold  = lowThreshold / ((actionUsers - noActionUsers) * 0.5)
+    highThreshold = highThreshold / ((actionUsers - noActionUsers) * 0.5)
+    lowThreshold  = lowThreshold / ((actionUsers - noActionUsers) * 0.5)
 
-lowActionUserAccesses = 0
-mediumActionUserAccesses = 0
-highActionUserAccesses = 0
+    lowActionUserAccesses = 0
+    mediumActionUserAccesses = 0
+    highActionUserAccesses = 0
 
-for i in range(noActionUsers, len(userData)):
-    if userData[i] < lowThreshold:
-        userDataLowAction.append(userData[i])
-        lowActionUserAccesses += userData[i]
-    else:
-        if userData[i] < highThreshold:
-            userDataMediumAction.append(userData[i])
-            mediumActionUserAccesses += userData[i]
+    for i in range(noActionUsers, len(userData)):
+        if userData[i] < lowThreshold:
+            userDataLowAction.append(userData[i])
+            lowActionUserAccesses += userData[i]
         else:
-            userDataHighAction.append(userData[i])
-            highActionUserAccesses += userData[i]
+            if userData[i] < highThreshold:
+                userDataMediumAction.append(userData[i])
+                mediumActionUserAccesses += userData[i]
+            else:
+                userDataHighAction.append(userData[i])
+                highActionUserAccesses += userData[i]
 
-print userData
-print noActionUsers
-print mediumThresholdIndex
-print lowThreshold
-print highThreshold
-print str(lowActionUserAccesses) + " " + str(round(float(lowActionUserAccesses) / len(userDataLowAction),1)) + " " + str(userDataLowAction)
-print str(mediumActionUserAccesses) + " " + str(round(float(mediumActionUserAccesses) / len(userDataMediumAction),1)) + " " + str(userDataMediumAction)
-print str(highActionUserAccesses) + " " + str(round(float(highActionUserAccesses) / len(userDataHighAction),1)) + " " + str(userDataHighAction)
-#weekday_test()
+    print userData
+    print noActionUsers
+    print mediumThresholdIndex
+    print lowThreshold
+    print highThreshold
+    print str(lowActionUserAccesses) + " " + str(round(float(lowActionUserAccesses) / len(userDataLowAction),1)) + " " + str(userDataLowAction)
+    print str(mediumActionUserAccesses) + " " + str(round(float(mediumActionUserAccesses) / len(userDataMediumAction),1)) + " " + str(userDataMediumAction)
+    print str(highActionUserAccesses) + " " + str(round(float(highActionUserAccesses) / len(userDataHighAction),1)) + " " + str(userDataHighAction)
+    #weekday_test()
+
+QueueData = namedtuple('QueueData', ['x', 'y'])
+
+qu = Queue.Queue()
+qu.put(QueueData(x=1, y=2))
+print qu.qsize()
