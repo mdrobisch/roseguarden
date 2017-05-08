@@ -1,13 +1,13 @@
 __author__ = 'drobisch'
 
-import server.app.logging
-import server.app.platform
+import app.logging
+import app.platform
 
 
 class RFIDStateMockup:
 
     def __init__(self):
-        server.app.logging.log("RFID_LOG", "RFID: Init mockup")
+        app.logging.log("RFID_LOG", "RFID: Init mockup")
         return None
 
 
@@ -113,7 +113,7 @@ class RFIDWrapper:
     serNum = []
 
     def __init__(self):
-        server.app.logging.log("RFID_LOG", "RFID: Init wrapper")
+        app.logging.log("RFID_LOG", "RFID: Init wrapper")
         return None
 
     def MFRC522_Request(self, reqMode):
@@ -148,20 +148,20 @@ class RFIDWrapper:
 
     def MFRC522_Read(self, blockAddr):
         recvData = []
-        server.app.logging.log("RFID_LOG", "RFID Read")
+        app.logging.log("RFID_LOG", "RFID Read")
 
     def MFRC522_StopCrypto1(self):
-        server.app.logging.log("RFID_LOG", "RFID StopCrypto")
+        app.logging.log("RFID_LOG", "RFID StopCrypto")
 
 
-if server.app.platform.platform_getType() == server.app.platform.RASPBERRY_PI or server.app.platform.platform_getType() == server.app.platform.RASPBERRY_PI_2:
+if app.platform.platform_getType() == app.platform.RASPBERRY_PI or app.platform.platform_getType() == app.platform.RASPBERRY_PI_2:
     try:
-        import server.app.drivers.authentication.MFRC522.MFRC522 as RFID
+        import app.drivers.authentication.MFRC522.MFRC522 as RFID
         print "INFO: Using MFRC522 (with SPI) as RFID"
         RFIDReader = RFID.MFRC522()
         RFIDMockup = None
     except RuntimeError:
-        server.app.logging.log("RFID_LOG", "Error importing RPi.GPIO!  This is probably because you need superuser privileges.  You can achieve this by using 'sudo' to run your script")
+        app.logging.log("RFID_LOG", "Error importing RPi.GPIO!  This is probably because you need superuser privileges.  You can achieve this by using 'sudo' to run your script")
 else:
     print "RFID: Using RFIDWrapper as RFID"
     RFIDReader = RFIDWrapper()

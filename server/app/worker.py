@@ -5,7 +5,6 @@ __author__ = 'drobisch'
 import flask_alchemydumps
 import threading
 import time
-import config
 import base64
 import json
 import datetime
@@ -13,7 +12,8 @@ import helpers
 import security
 import os
 
-from extension import extension
+from config import ConfigManager
+from extension import ExtensionManager
 from models import User, Door, Action
 from server import app, db
 from serializers import LogSerializer, UserSyncSerializer
@@ -49,7 +49,7 @@ class BackgroundWorker():
         self.ledStateCounter = 0
 
         self.systemUp = True
-        if config.NODE_SYNC_ON_STARTUP == True:
+        if ConfigManager.NODE_SYNC_ON_STARTUP is True:
             self.forceSync = True
         else:
             self.forceSync = False
@@ -83,7 +83,7 @@ class BackgroundWorker():
         # if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
         self.thr = threading.Timer(1, self.timer_cycle)
 
-        if(extension.CONFIG_DISABLE_UPDATE_USER is False):
+        if(ExtensionManager.extension.CONFIG_DISABLE_UPDATE_USER is False):
             self.update_users_and_actions()
 
         self.thr.start()
@@ -92,10 +92,13 @@ class BackgroundWorker():
     def resetTagInfo(self):
         self.tagInfo.tagId = ""
         self.tagInfo.userInfo = ""
+        self.tagInfo.detected = False
+        self.tagInfo.error = False
+        self.tagInfo.errorInfo = ""
 
     def withdrawRFIDTag(self, user):
         while (self.lock == True):
-            if config.DEBUG == False:
+            if ConfigManager.DEBUG == False:
                 print "still locked (withdrawRFIDTag)"
             time.sleep(0.3)
 
@@ -327,6 +330,7 @@ class BackgroundWorker():
             if status == RFIDReader.MI_OK:
 
                 # Print UID
+                self.tagInfo.detected = True
                 self.tagInfo.tagId = str(uid[0]) + "." + str(uid[1]) + "." + str(uid[2]) + "." + str(uid[3])
                 self.tagInfo.userInfo = ""
 
@@ -391,10 +395,10 @@ class BackgroundWorker():
                     if readSecretString == user.cardSecret:
                         print "correct secret"
                         if security.checkUserAccessPrivleges(datetime.datetime.now(),user) == "Access granted.":
-                            if datetime.datetime.now() > user.lastAccessDateTime + datetime.timedelta(minutes=config.NODE_LOG_MERGE):
+                            if datetime.datetime.now() > user.lastAccessDateTime + datetime.timedelta(minutes=ConfigManager.NODE_LOG_MERGE):
                                 user.lastAccessDateTime = datetime.datetime.now()
 
-                                logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, user.firstName + ' ' + user.lastName,
+                                logentry = Action(datetime.datetime.utcnow(), ConfigManager.NODE_NAME, user.firstName + ' ' + user.lastName,
                                                user.email, 'Opening request (' + str(1) + ' attempts)', 'Opening request',
                                                'L2', 1, 'Card based', Action.ACTION_OPENING_REQUEST, 1)
                                 print "Log-entry created"
@@ -418,7 +422,7 @@ class BackgroundWorker():
                                         lastlogEntry.date = datetime.datetime.utcnow()
                                         lastlogEntry.actionParameter = 1
                                         lastlogEntry.logText = 'Opening request (' + str(lastlogEntry.actionParameter) + ' attempts)'
-                                print "Log-entry is in merge-range ts = " + str(datetime.datetime.now()) + " last = " + str(user.lastAccessDateTime) + " merge = " + str(config.NODE_LOG_MERGE) + " minutes"
+                                print "Log-entry is in merge-range ts = " + str(datetime.datetime.now()) + " last = " + str(user.lastAccessDateTime) + " merge = " + str(ConfigManager.NODE_LOG_MERGE) + " minutes"
                                 try:
                                     db.session.commit()
                                 except:
@@ -459,7 +463,7 @@ class BackgroundWorker():
     def cleanup_cycle(self):
         lasttime = self.lastCleanupTime
         now = datetime.datetime.now()
-        past = now - datetime.timedelta(days=config.CLEANUP_THRESHOLD)
+        past = now - datetime.timedelta(days=ConfigManager.CLEANUP_THRESHOLD)
 
         compare_time = lasttime.replace(hour=04, minute=55, second=0, microsecond=0)
         if compare_time > lasttime:
@@ -473,8 +477,8 @@ class BackgroundWorker():
             action_count = helpers.get_query_count(actions)
             print str(action_count) + ' items to cleanup'
             if action_count > 0:
-                logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, 'Sync Master',
-                               'syncmaster@roseguarden.org', 'Cleanup ' + str(action_count) + ' logs older than ' + str(config.CLEANUP_THRESHOLD) + ' days', 'Cleanup',
+                logentry = Action(datetime.datetime.utcnow(), ConfigManager.NODE_NAME, 'Sync Master',
+                               'syncmaster@roseguarden.org', 'Cleanup ' + str(action_count) + ' logs older than ' + str(ConfigManager.CLEANUP_THRESHOLD) + ' days', 'Cleanup',
                                'L1', 0, 'Internal')
                 db.session.add(logentry)
             actions.delete()
@@ -498,19 +502,19 @@ class BackgroundWorker():
             with app.app_context():
                 flask_alchemydumps.autoclean(True)
                 flask_alchemydumps.create()
-                if config.BACKUP_ENABLE_FTP == True:
+                if ConfigManager.BACKUP_ENABLE_FTP == True:
                     print 'Doing a additional FTP backup'
                     app.config['ALCHEMYDUMPS_FTP_SERVER'] = ''
                     app.config['ALCHEMYDUMPS_FTP_USER'] = ''
                     app.config['ALCHEMYDUMPS_FTP_PASSWORD'] = ''
                     app.config['ALCHEMYDUMPS_FTP_PATH'] = ''
                     flask_alchemydumps.create()
-                    app.config['ALCHEMYDUMPS_FTP_SERVER'] = config.ALCHEMYDUMPS_FTP_SERVER
-                    app.config['ALCHEMYDUMPS_FTP_USER'] = config.ALCHEMYDUMPS_FTP_USER
-                    app.config['ALCHEMYDUMPS_FTP_PASSWORD'] = config.ALCHEMYDUMPS_FTP_PASSWORD
-                    app.config['ALCHEMYDUMPS_FTP_PATH'] = config.ALCHEMYDUMPS_FTP_PATH
+                    app.config['ALCHEMYDUMPS_FTP_SERVER'] = ConfigManager.ALCHEMYDUMPS_FTP_SERVER
+                    app.config['ALCHEMYDUMPS_FTP_USER'] = ConfigManager.ALCHEMYDUMPS_FTP_USER
+                    app.config['ALCHEMYDUMPS_FTP_PASSWORD'] = ConfigManager.ALCHEMYDUMPS_FTP_PASSWORD
+                    app.config['ALCHEMYDUMPS_FTP_PATH'] = ConfigManager.ALCHEMYDUMPS_FTP_PATH
             print 'Next backup @' + str(next_time) + ' (' + str(datetime.datetime.now()) + ')'
-            logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, 'Sync Master',
+            logentry = Action(datetime.datetime.utcnow(), ConfigManager.NODE_NAME, 'Sync Master',
                            'syncmaster@roseguarden.org', 'Backup database', 'Backup',
                            'L1', 0, 'Internal')
             db.session.add(logentry)
@@ -641,7 +645,7 @@ class BackgroundWorker():
 
             db.session.commit()
 
-            if config.STATISTICS_ENABLE == True:
+            if ConfigManager.STATISTICS_ENABLE == True:
                 StatisticsManager.updateAccessesStat(statDict_Accesses)
                 StatisticsManager.updateUserCountStat(statDict_UserCount)
                 StatisticsManager.updateNodeAccessStat(statDict_NodeAccess)
@@ -660,7 +664,7 @@ class BackgroundWorker():
         headers = {'Authorization' : auth_token}
 
         if door.local != 1:
-            if str(door.name) == config.NODE_NAME:
+            if str(door.name) == ConfigManager.NODE_NAME:
                 print 'warning: the node have the same node name'
             else:
                 userList = User.query.filter_by(syncMaster=0).all()
@@ -681,7 +685,7 @@ class BackgroundWorker():
         headers = {'Authorization' : auth_token}
 
         if door.local != 1:
-            if str(door.name) == config.NODE_NAME:
+            if str(door.name) == ConfigManager.NODE_NAME:
                 print 'warning: the node have the same node name'
             else:
                 request_address = str(door.address) + ":5000" + '/actions/admin'
@@ -704,11 +708,11 @@ class BackgroundWorker():
     def sync_cycle(self):
         now = datetime.datetime.now()
         lasttime = self.lastSyncTime
-        if config.NODE_SYNC_CYCLIC == True:
-            compare_time = lasttime + datetime.timedelta(minutes=config.NODE_SYNC_CYCLE)
+        if ConfigManager.NODE_SYNC_CYCLIC == True:
+            compare_time = lasttime + datetime.timedelta(minutes=ConfigManager.NODE_SYNC_CYCLE)
             if now > compare_time:
                 self.lastSyncTime = now
-                print 'Next sync @' + str(self.lastSyncTime + datetime.timedelta(minutes=config.NODE_SYNC_CYCLE)) + ' (' + str(datetime.datetime.now()) + ')'
+                print 'Next sync @' + str(self.lastSyncTime + datetime.timedelta(minutes=ConfigManager.NODE_SYNC_CYCLE)) + ' (' + str(datetime.datetime.now()) + ')'
             else:
                 if self.forceSync == True:
                     self.forceSync = False
@@ -730,7 +734,7 @@ class BackgroundWorker():
                 else:
                     return
 
-        if config.NODE_MASTER == False:
+        if ConfigManager.NODE_IS_MASTER == False:
             return
 
         print "Doing a sync cycle"
@@ -746,7 +750,7 @@ class BackgroundWorker():
 
         print 'Update actions'
         self.update_users_and_actions()
-        logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, 'Sync Master', 'syncmaster@roseguarden.org',
+        logentry = Action(datetime.datetime.utcnow(), ConfigManager.NODE_NAME, 'Sync Master', 'syncmaster@roseguarden.org',
                         'Update & synchronized actions and users',
                         'Update & Sync.', 'L1', 0, 'Internal')
         logentry.synced = 1
@@ -761,7 +765,7 @@ class BackgroundWorker():
                 print 'Sync user of ' + doorSync.name
             self.sync_door_user(doorSync)
             if doorSync.local == 0:
-                logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, 'Sync Master', 'syncmaster@roseguarden.org',
+                logentry = Action(datetime.datetime.utcnow(), ConfigManager.NODE_NAME, 'Sync Master', 'syncmaster@roseguarden.org',
                                 'Synchronized ' + doorSync.displayName + ' (' + doorSync.name + ')',
                                 'Synchronization', 'L1', 0, 'Internal')
                 logentry.synced = 1
@@ -830,7 +834,7 @@ class BackgroundWorker():
             except Exception, e:
                 import traceback
                 print traceback.format_exc()
-                logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, 'Background Worker', 'background@roseguarden.org',
+                logentry = Action(datetime.datetime.utcnow(), ConfigManager.NODE_NAME, 'Background Worker', 'background@roseguarden.org',
                                 'Error: ' + str(traceback.format_exc()),
                                 'Error occured', 'L1', 0, 'Internal')
                 db.session.add(logentry)
@@ -844,7 +848,7 @@ class BackgroundWorker():
             except Exception, e:
                 import traceback
                 print traceback.format_exc()
-                logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, 'Sync Master', 'syncmaster@roseguarden.org',
+                logentry = Action(datetime.datetime.utcnow(), ConfigManager.NODE_NAME, 'Sync Master', 'syncmaster@roseguarden.org',
                                 'Error: ' + str(traceback.format_exc()),
                                 'Error occured', 'L1', 0, 'Internal')
                 db.session.add(logentry)
@@ -857,12 +861,12 @@ class BackgroundWorker():
             if self.forceSync == True:
                 time.sleep(1.0)
             try:
-                if(extension.CONFIG_DISABLE_SYNC_CYCLES == False):
+                if(ExtensionManager.extension.CONFIG_DISABLE_SYNC_CYCLES == False):
                     self.sync_cycle()
             except Exception, e:
                 import traceback
                 print traceback.format_exc()
-                logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, 'Sync Master', 'syncmaster@roseguarden.org',
+                logentry = Action(datetime.datetime.utcnow(), ConfigManager.NODE_NAME, 'Sync Master', 'syncmaster@roseguarden.org',
                                 'Error: ' + str(traceback.format_exc()),
                                 'Error occured', 'L1', 0, 'Internal')
                 db.session.add(logentry)
@@ -871,14 +875,14 @@ class BackgroundWorker():
         self.cleanupTimer +=1
         if self.cleanupTimer > 205:
             self.cleanupTimer = 0
-            if config.CLEANUP_EANBLE == True:
+            if ConfigManager.CLEANUP_EANBLE == True:
                 try:
-                    if (extension.CONFIG_DISABLE_CLEANUP_CYLCES == False):
+                    if (ExtensionManager.extension.CONFIG_DISABLE_CLEANUP_CYLCES == False):
                         self.cleanup_cycle()
                 except Exception, e:
                     import traceback
                     print traceback.format_exc()
-                    logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, 'Sync Master', 'syncmaster@roseguarden.org',
+                    logentry = Action(datetime.datetime.utcnow(), ConfigManager.NODE_NAME, 'Sync Master', 'syncmaster@roseguarden.org',
                                     'Error: ' + str(traceback.format_exc()),
                                     'Error occured', 'L1', 0, 'Internal')
                     db.session.add(logentry)
@@ -897,7 +901,7 @@ class BackgroundWorker():
             GPIO.output(GPIO_RELAY, GPIO.LOW)
 
             self.openingTimer += 1
-            if self.openingTimer >= config.DOOR_OPENING_TIME:
+            if self.openingTimer >= ConfigManager.DOOR_OPENING_TIME:
                 self.openingTimer = -1
                 print "Closing door"
                 GPIO.output(GPIO_RELAY, GPIO.HIGH)
@@ -913,7 +917,7 @@ class BackgroundWorker():
             except Exception, e:
                 import traceback
                 print traceback.format_exc()
-                logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, 'Sync Master', 'syncmaster@roseguarden.org',
+                logentry = Action(datetime.datetime.utcnow(), ConfigManager.NODE_NAME, 'Sync Master', 'syncmaster@roseguarden.org',
                                 'Error: ' + str(traceback.format_exc()),
                                 'Error occured', 'L1', 0, 'Internal')
                 db.session.add(logentry)

@@ -1,7 +1,8 @@
 __author__ = 'drobisch'
 
-from server import db, flask_bcrypt, orm
+from server import db, orm
 from wtforms.validators import Email
+from werkzeug.security import generate_password_hash, check_password_hash
 import random
 import base64
 import datetime
@@ -135,9 +136,9 @@ class User(db.Model):
         self.cardSecret = ''
         self.cardAuthKeyA = ''
         self.cardAuthKeyB = ''
-        self.role = role;
+        self.role = role
         self.email = email.lower()
-        self.password = flask_bcrypt.generate_password_hash(password)
+        self.password = generate_password_hash(unicode(password))
         self.firstName = firstName
         self.lastName = lastName
         self.association = association
@@ -301,6 +302,9 @@ class Door(db.Model):
         self.password = base64.b64encode(password)
 
 class RfidTagInfo(object):
-    def __init__(self, tagId, userInfo):
+    def __init__(self, tagId, userInfo, detected=False,error=False, errorInfo=''):
         self.userInfo = userInfo
+        self.detected = detected
         self.tagId = tagId
+        self.error = error
+        self.errorInfo = errorInfo

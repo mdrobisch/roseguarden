@@ -1,13 +1,11 @@
 __author__ = 'drobisch'
 
 import datetime
-import config
-import helpers
 from models import User, Action, Door, RfidTagInfo, Statistic, StatisticEntry
 from server import db
 import random
 
-class StatisticsManager(object):
+class StatisticsManagerClass(object):
 
     # Monthly stats.
     STATISTICS_STATID_USERCOUNT             =   1
@@ -49,8 +47,10 @@ class StatisticsManager(object):
     SERIES_SECURITY_FAILED_API_AUTH = 1
     SERIES_SECURITY_WORKER_ERRORS = 2
 
-    @staticmethod
-    def staticEntryAddOrUpdate(statTye, statId, label, value, month, year, binningId, series):
+    def __init__(self):
+        print "StatisticManager initialized"
+
+    def staticEntryAddOrUpdate(self,statTye, statId, label, value, month, year, binningId, series):
         statEntry = StatisticEntry.query.filter_by(statId = statId, label = label,series = series, month = month, year = year).first()
         if statEntry is None:
             newEntry = StatisticEntry(statId, label, value, series, month, year, binningId)
@@ -61,8 +61,7 @@ class StatisticsManager(object):
                 statEntry.value = float(value)
                 db.session.commit()
 
-    @staticmethod
-    def incrementalEntryAddOrUpdate(statTye, statId, label, value, month, year, binningId, series):
+    def incrementalEntryAddOrUpdate(self,statTye, statId, label, value, month, year, binningId, series):
         statEntry = StatisticEntry.query.filter_by(statId = statId, label = label,series = series, month = month, year = year).first()
         if statEntry is None:
             newEntry = StatisticEntry(statId, label, value, series, month, year, binningId)
@@ -72,8 +71,7 @@ class StatisticsManager(object):
         db.session.commit()
 
 
-    @staticmethod
-    def evaluateUserGroups(userData):
+    def evaluateUserGroups(self,userData):
         userDataLowAction = []
         userDataMediumAction = []
         userDataHighAction = []
@@ -141,12 +139,11 @@ class StatisticsManager(object):
 
         return result
 
-    @staticmethod
-    def updateUserCountStat(updateData):
+    def updateUserCountStat(self,updateData):
         print "Update UserCount stat"
-        stat = Statistic.query.filter(Statistic.statId == StatisticsManager.STATISTICS_STATID_USERCOUNT).first()
+        stat = Statistic.query.filter(Statistic.statId == self.STATISTICS_STATID_USERCOUNT).first()
         if stat == None:
-            newStat = Statistic("User total", StatisticsManager.STATISTICS_STATID_USERCOUNT, Statistic.STATTYPE_LINE_SERIES, 0, 3, "", 0, "Users", "Supervisors", "Admins")
+            newStat = Statistic("User total", self.STATISTICS_STATID_USERCOUNT, Statistic.STATTYPE_LINE_SERIES, 0, 3, "", 0, "Users", "Supervisors", "Admins")
             db.session.add(newStat)
             db.session.commit()
 
@@ -154,114 +151,107 @@ class StatisticsManager(object):
         month = now.month
         year = now.year
         for i in range(0, 3):
-            StatisticsManager.staticEntryAddOrUpdate(Statistic.STATTYPE_LINE_SERIES, StatisticsManager.STATISTICS_STATID_USERCOUNT, str(month) + "/" + str(year % 1000), updateData[i], month, year, StatisticsManager.BINNING_NONE, i)
+            self.staticEntryAddOrUpdate(Statistic.STATTYPE_LINE_SERIES, self.STATISTICS_STATID_USERCOUNT, str(month) + "/" + str(year % 1000), updateData[i], month, year, self.BINNING_NONE, i)
 
-    @staticmethod
-    def updateUserActivityGroups(userData):
+    def updateUserActivityGroups(self, userData):
         print "Update User Groups stat"
-        stat = Statistic.query.filter(Statistic.statId == StatisticsManager.STATISTICS_STATID_ACTIVITY_USER_GROUPS).first()
+        stat = Statistic.query.filter(Statistic.statId == self.STATISTICS_STATID_ACTIVITY_USER_GROUPS).first()
         if stat == None:
-            newStat = Statistic("User activity groups", StatisticsManager.STATISTICS_STATID_ACTIVITY_USER_GROUPS, Statistic.STATTYPE_YEARLY_BAR_SERIES, 0, 4, "", Statistic.STATDISPLAY_CONFIG_NO_TOTAL, "Zero activity users", "Low activity users", "Medium activity users", "High activity users")
+            newStat = Statistic("User activity groups", self.STATISTICS_STATID_ACTIVITY_USER_GROUPS, Statistic.STATTYPE_YEARLY_BAR_SERIES, 0, 4, "", Statistic.STATDISPLAY_CONFIG_NO_TOTAL, "Zero activity users", "Low activity users", "Medium activity users", "High activity users")
             db.session.add(newStat)
             db.session.commit()
 
-        result = StatisticsManager.evaluateUserGroups(userData)
+        result = self.evaluateUserGroups(userData)
 
         now = datetime.datetime.now()
         month = now.month
         year = now.year
 
-        StatisticsManager.staticEntryAddOrUpdate(Statistic.STATTYPE_YEARLY_BAR_SERIES, StatisticsManager.STATISTICS_STATID_ACTIVITY_USER_GROUPS, str(month) + "/" + str(year % 1000), result[0], month, year, StatisticsManager.BINNING_NONE, StatisticsManager.SERIES_GROUPS_NO_ACTIVITY)
-        StatisticsManager.staticEntryAddOrUpdate(Statistic.STATTYPE_YEARLY_BAR_SERIES, StatisticsManager.STATISTICS_STATID_ACTIVITY_USER_GROUPS, str(month) + "/" + str(year % 1000), result[1], month, year, StatisticsManager.BINNING_NONE, StatisticsManager.SERIES_GROUPS_LOW_ACTIVITY)
-        StatisticsManager.staticEntryAddOrUpdate(Statistic.STATTYPE_YEARLY_BAR_SERIES, StatisticsManager.STATISTICS_STATID_ACTIVITY_USER_GROUPS, str(month) + "/" + str(year % 1000), result[2], month, year, StatisticsManager.BINNING_NONE, StatisticsManager.SERIES_GROUPS_MEDIUM_ACTIVITY)
-        StatisticsManager.staticEntryAddOrUpdate(Statistic.STATTYPE_YEARLY_BAR_SERIES, StatisticsManager.STATISTICS_STATID_ACTIVITY_USER_GROUPS, str(month) + "/" + str(year % 1000), result[3], month, year, StatisticsManager.BINNING_NONE, StatisticsManager.SERIES_GROUPS_HIGH_ACTIVITY)
+        self.staticEntryAddOrUpdate(Statistic.STATTYPE_YEARLY_BAR_SERIES, self.STATISTICS_STATID_ACTIVITY_USER_GROUPS, str(month) + "/" + str(year % 1000), result[0], month, year, self.BINNING_NONE, self.SERIES_GROUPS_NO_ACTIVITY)
+        self.staticEntryAddOrUpdate(Statistic.STATTYPE_YEARLY_BAR_SERIES, self.STATISTICS_STATID_ACTIVITY_USER_GROUPS, str(month) + "/" + str(year % 1000), result[1], month, year, self.BINNING_NONE, self.SERIES_GROUPS_LOW_ACTIVITY)
+        self.staticEntryAddOrUpdate(Statistic.STATTYPE_YEARLY_BAR_SERIES, self.STATISTICS_STATID_ACTIVITY_USER_GROUPS, str(month) + "/" + str(year % 1000), result[2], month, year, self.BINNING_NONE, self.SERIES_GROUPS_MEDIUM_ACTIVITY)
+        self.staticEntryAddOrUpdate(Statistic.STATTYPE_YEARLY_BAR_SERIES, self.STATISTICS_STATID_ACTIVITY_USER_GROUPS, str(month) + "/" + str(year % 1000), result[3], month, year, self.BINNING_NONE, self.SERIES_GROUPS_HIGH_ACTIVITY)
 
-    @staticmethod
-    def updateUserActivityGroupAccesses(userData):
+    def updateUserActivityGroupAccesses(self, userData):
         print "Update User Group Accesses stat"
-        stat = Statistic.query.filter(Statistic.statId == StatisticsManager.STATISTICS_STATID_USER_GROUPS_ACCESSES).first()
+        stat = Statistic.query.filter(Statistic.statId == self.STATISTICS_STATID_USER_GROUPS_ACCESSES).first()
         if stat == None:
-            newStat = Statistic("Average accesses of user groups", StatisticsManager.STATISTICS_STATID_USER_GROUPS_ACCESSES, Statistic.STATTYPE_LINE_SERIES, 0, 3, "",  Statistic.STATDISPLAY_CONFIG_NO_TOTAL, "Low activity users", "Medium activity users", "High activity users")
+            newStat = Statistic("Average accesses of user groups", self.STATISTICS_STATID_USER_GROUPS_ACCESSES, Statistic.STATTYPE_LINE_SERIES, 0, 3, "",  Statistic.STATDISPLAY_CONFIG_NO_TOTAL, "Low activity users", "Medium activity users", "High activity users")
             db.session.add(newStat)
             db.session.commit()
 
-        result = StatisticsManager.evaluateUserGroups(userData)
+        result = self.evaluateUserGroups(userData)
 
         now = datetime.datetime.now()
         month = now.month
         year = now.year
 
-        StatisticsManager.staticEntryAddOrUpdate(Statistic.STATTYPE_LINE_SERIES, StatisticsManager.STATISTICS_STATID_USER_GROUPS_ACCESSES, str(month) + "/" + str(year % 1000), result[4], month, year, StatisticsManager.BINNING_NONE, StatisticsManager.SERIES_GROUP_BY_LOW_ACTIVITY)
-        StatisticsManager.staticEntryAddOrUpdate(Statistic.STATTYPE_LINE_SERIES, StatisticsManager.STATISTICS_STATID_USER_GROUPS_ACCESSES, str(month) + "/" + str(year % 1000), result[5], month, year, StatisticsManager.BINNING_NONE, StatisticsManager.SERIES_GROUP_BY_MEDIUM_ACTIVITY)
-        StatisticsManager.staticEntryAddOrUpdate(Statistic.STATTYPE_LINE_SERIES, StatisticsManager.STATISTICS_STATID_USER_GROUPS_ACCESSES, str(month) + "/" + str(year % 1000), result[6], month, year, StatisticsManager.BINNING_NONE, StatisticsManager.SERIES_GROUP_BY_HIGH_ACTIVITY)
+        self.staticEntryAddOrUpdate(Statistic.STATTYPE_LINE_SERIES, self.STATISTICS_STATID_USER_GROUPS_ACCESSES, str(month) + "/" + str(year % 1000), result[4], month, year, self.BINNING_NONE, self.SERIES_GROUP_BY_LOW_ACTIVITY)
+        self.staticEntryAddOrUpdate(Statistic.STATTYPE_LINE_SERIES, self.STATISTICS_STATID_USER_GROUPS_ACCESSES, str(month) + "/" + str(year % 1000), result[5], month, year, self.BINNING_NONE, self.SERIES_GROUP_BY_MEDIUM_ACTIVITY)
+        self.staticEntryAddOrUpdate(Statistic.STATTYPE_LINE_SERIES, self.STATISTICS_STATID_USER_GROUPS_ACCESSES, str(month) + "/" + str(year % 1000), result[6], month, year, self.BINNING_NONE, self.SERIES_GROUP_BY_HIGH_ACTIVITY)
 
 
-    @staticmethod
-    def updateUserActivityGroupAverages(userData):
+    def updateUserActivityGroupAverages(self, userData):
         print "Update User Group Accesses stat"
-        stat = Statistic.query.filter(Statistic.statId == StatisticsManager.STATISTICS_STATID_USER_GROUPS_AVERAGE).first()
+        stat = Statistic.query.filter(Statistic.statId == self.STATISTICS_STATID_USER_GROUPS_AVERAGE).first()
         if stat == None:
-            newStat = Statistic("Total accesses of user groups", StatisticsManager.STATISTICS_STATID_USER_GROUPS_AVERAGE, Statistic.STATTYPE_YEARLY_BAR_SERIES, 0, 3, "", Statistic.STATDISPLAY_CONFIG_NO_TOTAL, "Low activity users", "Medium activity users", "High activity users")
+            newStat = Statistic("Total accesses of user groups", self.STATISTICS_STATID_USER_GROUPS_AVERAGE, Statistic.STATTYPE_YEARLY_BAR_SERIES, 0, 3, "", Statistic.STATDISPLAY_CONFIG_NO_TOTAL, "Low activity users", "Medium activity users", "High activity users")
             db.session.add(newStat)
             db.session.commit()
 
-        result = StatisticsManager.evaluateUserGroups(userData)
+        result = self.evaluateUserGroups(userData)
 
         now = datetime.datetime.now()
         month = now.month
         year = now.year
 
-        StatisticsManager.staticEntryAddOrUpdate(Statistic.STATTYPE_LINE_SERIES, StatisticsManager.STATISTICS_STATID_USER_GROUPS_AVERAGE, str(month) + "/" + str(year % 1000), result[7], month, year, StatisticsManager.BINNING_NONE, StatisticsManager.SERIES_GROUP_BY_LOW_ACTIVITY)
-        StatisticsManager.staticEntryAddOrUpdate(Statistic.STATTYPE_LINE_SERIES, StatisticsManager.STATISTICS_STATID_USER_GROUPS_AVERAGE, str(month) + "/" + str(year % 1000), result[8], month, year, StatisticsManager.BINNING_NONE, StatisticsManager.SERIES_GROUP_BY_MEDIUM_ACTIVITY)
-        StatisticsManager.staticEntryAddOrUpdate(Statistic.STATTYPE_LINE_SERIES, StatisticsManager.STATISTICS_STATID_USER_GROUPS_AVERAGE, str(month) + "/" + str(year % 1000), result[9], month, year, StatisticsManager.BINNING_NONE, StatisticsManager.SERIES_GROUP_BY_HIGH_ACTIVITY)
+        self.staticEntryAddOrUpdate(Statistic.STATTYPE_LINE_SERIES, self.STATISTICS_STATID_USER_GROUPS_AVERAGE, str(month) + "/" + str(year % 1000), result[7], month, year, self.BINNING_NONE, self.SERIES_GROUP_BY_LOW_ACTIVITY)
+        self.staticEntryAddOrUpdate(Statistic.STATTYPE_LINE_SERIES, self.STATISTICS_STATID_USER_GROUPS_AVERAGE, str(month) + "/" + str(year % 1000), result[8], month, year, self.BINNING_NONE, self.SERIES_GROUP_BY_MEDIUM_ACTIVITY)
+        self.staticEntryAddOrUpdate(Statistic.STATTYPE_LINE_SERIES, self.STATISTICS_STATID_USER_GROUPS_AVERAGE, str(month) + "/" + str(year % 1000), result[9], month, year, self.BINNING_NONE, self.SERIES_GROUP_BY_HIGH_ACTIVITY)
 
 
-    @staticmethod
-    def updateAccessesStat(updateData):
+    def updateAccessesStat(self, updateData):
         print "Update Accesses stat"
-        stat = Statistic.query.filter(Statistic.statId == StatisticsManager.STATISTICS_STATID_ACCESSES).first()
+        stat = Statistic.query.filter(Statistic.statId == self.STATISTICS_STATID_ACCESSES).first()
         if stat == None:
-            newStat = Statistic("Accesses total", StatisticsManager.STATISTICS_STATID_ACCESSES, Statistic.STATTYPE_LINE_SERIES, 0, 2, "", 0, "Card auth.", "Web auth.")
+            newStat = Statistic("Accesses total", self.STATISTICS_STATID_ACCESSES, Statistic.STATTYPE_LINE_SERIES, 0, 2, "", 0, "Card auth.", "Web auth.")
             db.session.add(newStat)
             db.session.commit()
 
         for year in updateData:
             for month in updateData[year]:
                 for seriesIndex in range(len(updateData[year][month])):
-                    StatisticsManager.incrementalEntryAddOrUpdate(Statistic.STATTYPE_LINE_SERIES, StatisticsManager.STATISTICS_STATID_ACCESSES, str(month) + "/" + str(year % 1000), updateData[year][month][seriesIndex], month, year, StatisticsManager.BINNING_NONE, seriesIndex)
+                    self.incrementalEntryAddOrUpdate(Statistic.STATTYPE_LINE_SERIES, self.STATISTICS_STATID_ACCESSES, str(month) + "/" + str(year % 1000), updateData[year][month][seriesIndex], month, year, self.BINNING_NONE, seriesIndex)
 
-    @staticmethod
-    def updateWeekdaysStat(updateData):
+    def updateWeekdaysStat(self, updateData):
         print "Update Weekdate stat"
-        stat = Statistic.query.filter(Statistic.statId == StatisticsManager.STATISTICS_STATID_WEEKDAYS).first()
+        stat = Statistic.query.filter(Statistic.statId == self.STATISTICS_STATID_WEEKDAYS).first()
         if stat == None:
-            newStat = Statistic("Accesses per weekday", StatisticsManager.STATISTICS_STATID_WEEKDAYS, Statistic.STATTYPE_RADAR_SERIES, 7, 1, "", 0, "Weekdays")
+            newStat = Statistic("Accesses per weekday", self.STATISTICS_STATID_WEEKDAYS, Statistic.STATTYPE_RADAR_SERIES, 7, 1, "", 0, "Weekdays")
             db.session.add(newStat)
             db.session.commit()
 
         for day in range(0,7):
             daynamesList = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
             dayname = daynamesList[day]
-            #dayEntry = StatisticEntry(StatisticsManager.STATISTICS_STATID_WEEKDAYS,dayname,random.randrange(10,100), 0, 0, 0, day)
-            StatisticsManager.incrementalEntryAddOrUpdate(Statistic.STATTYPE_RADAR_SERIES,StatisticsManager.STATISTICS_STATID_WEEKDAYS,dayname,updateData[day], 0, 0, day, 0)
+            #dayEntry = StatisticEntry(self.STATISTICS_STATID_WEEKDAYS,dayname,random.randrange(10,100), 0, 0, 0, day)
+            self.incrementalEntryAddOrUpdate(Statistic.STATTYPE_RADAR_SERIES,self.STATISTICS_STATID_WEEKDAYS,dayname,updateData[day], 0, 0, day, 0)
 
-    @staticmethod
-    def updateNodeAccessStat(updateData):
+    def updateNodeAccessStat(self, updateData):
         print "Update node accesses stat"
-        stat = Statistic.query.filter(Statistic.statId == StatisticsManager.STATISTICS_STATID_NODE_ACCESSES).first()
+        stat = Statistic.query.filter(Statistic.statId == self.STATISTICS_STATID_NODE_ACCESSES).first()
         if stat == None:
-            newStat = Statistic("Accesses per node", StatisticsManager.STATISTICS_STATID_NODE_ACCESSES, Statistic.STATTYPE_DOUGHNUT_CLASSES, 0, 0)
+            newStat = Statistic("Accesses per node", self.STATISTICS_STATID_NODE_ACCESSES, Statistic.STATTYPE_DOUGHNUT_CLASSES, 0, 0)
             db.session.add(newStat)
             db.session.commit()
 
         for nodeName in updateData:
-            StatisticsManager.incrementalEntryAddOrUpdate(Statistic.STATTYPE_DOUGHNUT_CLASSES, StatisticsManager.STATISTICS_STATID_NODE_ACCESSES,nodeName,updateData[nodeName],0,0,0,0)
+            self.incrementalEntryAddOrUpdate(Statistic.STATTYPE_DOUGHNUT_CLASSES, self.STATISTICS_STATID_NODE_ACCESSES,nodeName,updateData[nodeName],0,0,0,0)
 
-    @staticmethod
-    def updateLoginStat():
+    def updateLoginStat(self):
         print "Update Login stat"
 
-    @staticmethod
-    def updateSecurityStat():
+    def updateSecurityStat(self):
         print "Update Security stat"
 
+StatisticsManager = StatisticsManagerClass()

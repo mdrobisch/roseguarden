@@ -3,15 +3,17 @@ from email import send_email
 from flask import g, render_template, make_response, jsonify, request
 from flask_restful import Resource, fields, marshal_with
 from server import api, db, flask_bcrypt, auth, mail
+from config import ConfigManager
 from models import User, Action, Door, RfidTagInfo, Statistic, StatisticEntry, Setting
 from serializers import LogSerializer, UserSyncSerializer, AdminsListSerializer, UserListForSupervisorsSerializer, UserListSerializer, \
     UserSerializer, SessionInfoSerializer, DoorSerializer, RfidTagInfoSerializer, StatisticListSerializer, SettingsListSerializer, StatisticEntryListSerializer
 from forms import UserPatchForm, DoorRegistrationForm, SessionCreateForm, LostPasswordForm, RegisterUserForm, \
     UserDeleteForm, RFIDTagAssignForm, RFIDTagWithdrawForm, SettingPatchForm
+from werkzeug.security import generate_password_hash, check_password_hash
 from worker import backgroundWorker
 from sqlalchemy.exc import IntegrityError
+import setup as Setup
 import settings
-import config
 import json
 import random
 import requests
@@ -26,7 +28,7 @@ def verify_password(email, password):
     if not user:
         return False
     g.user = user
-    return flask_bcrypt.check_password_hash(user.password, password)
+    return check_password_hash(user.password, password)
 
 
 class UserView(Resource):
@@ -44,7 +46,7 @@ class UserView(Resource):
         if user != None:
             print 'delete user ' + user.firstName + ' ' + user.lastName + ' (' + user.email + ') from database'
 
-            logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
+            logentry = Action(datetime.datetime.utcnow(), ConfigManager.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
                            g.user.email, 'User ' + user.firstName + ' on ' + user.lastName + ' removed', 'User removed',
                            'L2', 1, 'Web based')
             db.session.add(logentry)
@@ -68,14 +70,14 @@ class UserView(Resource):
 
         if form.newpassword.data != None and form.newpassword.data != '':
             oldpwd = base64.decodestring(form.oldpassword.data)
-            if not flask_bcrypt.check_password_hash(user.password, oldpwd):
+            if not check_password_hash(user.password, oldpwd):
                 print 'incoorect old password'
                 return make_response(jsonify({'error': 'Not authorized'}), 403)
             print 'correct old password'
             if log_text != '':
                 log_text += '; '
             log_text += 'Changed password'
-            user.password = flask_bcrypt.generate_password_hash(base64.decodestring(form.newpassword.data))
+            user.password = generate_password_hash(base64.decodestring(form.newpassword.data))
             db.session.commit()
 
         if form.lastName.data != None and form.lastName.data != '':
@@ -202,7 +204,7 @@ class UserView(Resource):
             user.accessTimeEnd = dateutil.parser.parse(form.accessTimeEnd.data).replace(tzinfo=None)
 
         log_text = 'Update of ' + user.firstName + ' ' + user.lastName + ' (' + user.email + ')' + ' with the following changes: ' + log_text
-        logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
+        logentry = Action(datetime.datetime.utcnow(), ConfigManager.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
                        g.user.email, log_text, 'User updated',
                        'L2', 0, 'Web based')
         db.session.add(logentry)
@@ -286,7 +288,7 @@ class RegisterUserView(Resource):
         pwd = base64.decodestring(form.password.data)
         user = User(email=form.email.data, password=pwd, firstName=form.firstName.data, lastName=form.lastName.data,
                     phone=form.phone.data, association=form.association.data)
-        logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, user.firstName + ' ' + user.lastName, user.email,
+        logentry = Action(datetime.datetime.utcnow(), ConfigManager.NODE_NAME, user.firstName + ' ' + user.lastName, user.email,
                        'User registered ' + user.firstName + ' ' + user.lastName + ' ' + user.email, 'User registered',
                        'L2', 1, 'Web based')
 
@@ -305,7 +307,7 @@ class RegisterUserView(Resource):
                 print 'try to send welcome mail'
                 try:
                     send_email("Welcome to %s. You successfully registered" % 'RoseGuarden',
-                               config.MAIL_USERNAME,
+                               ConfigManager.MAIL_USERNAME,
                                [user.email],
                                render_template("welcome_mail.txt",
                                                user=user),
@@ -323,10 +325,11 @@ class SessionView(Resource):
         if not form.validate_on_submit():
             return form.errors, 422
 
-        user = User.query.filter_by(email=form.email.data).first()
-        if user and flask_bcrypt.check_password_hash(user.password, form.password.data):
-            if datetime.datetime.now() > user.lastLoginDateTime + datetime.timedelta(minutes=config.NODE_LOG_MERGE):
-                logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, user.firstName + ' ' + user.lastName,
+        user = User.query.filter_by(email=form.email.data.lower()).first()
+        tmp_pwd_hash = generate_password_hash(form.password.data)
+        if user and check_password_hash(user.password, form.password.data):
+            if datetime.datetime.now() > user.lastLoginDateTime + datetime.timedelta(minutes=ConfigManager.NODE_LOG_MERGE):
+                logentry = Action(datetime.datetime.utcnow(), ConfigManager.NODE_NAME, user.firstName + ' ' + user.lastName,
                                user.email, 'User login', 'User login', 'L2', 0, 'Web based')
                 user.lastLoginDateTime = datetime.datetime.now()
 
@@ -339,7 +342,7 @@ class SessionView(Resource):
 
                 print "Log-entry created"
             else:
-                print "Log-entry is in merge-range ts = " + str(datetime.datetime.utcnow()) + " last = " + str(user.lastLoginDateTime) + " merge = " + str(config.NODE_LOG_MERGE) + " minutes"
+                print "Log-entry is in merge-range ts = " + str(datetime.datetime.utcnow()) + " last = " + str(user.lastLoginDateTime) + " merge = " + str(ConfigManager.NODE_LOG_MERGE) + " minutes"
 
             return SessionInfoSerializer().dump(user).data, 201
         else:
@@ -355,7 +358,7 @@ class SessionView(Resource):
                     addNewlogEntry = False
 
             if addNewlogEntry == True:
-                logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, 'Security warning', form.email.data,
+                logentry = Action(datetime.datetime.utcnow(), ConfigManager.NODE_NAME, 'Security warning', form.email.data,
                                 'Failed login for ' + form.email.data + ' ( 1 invalid attempts)',
                                 'Failed login attempt', 'L1', 0, 'Internal', Action.ACTION_LOGONLY, 1)
                 db.session.add(logentry)
@@ -379,7 +382,7 @@ class LostPasswordView(Resource):
         user.password = flask_bcrypt.generate_password_hash(new_password)
         db.session.commit()
         send_email("%s: A new password has been generated" % 'RoseGuarden',
-                   config.MAIL_USERNAME,
+                   ConfigManager.MAIL_USERNAME,
                    [user.email],
                    render_template("lostpassword_mail.txt",
                                    user=user, password=new_password),
@@ -412,9 +415,9 @@ class OpeningRequestView(Resource):
         checkAccessResult = security.checkUserAccessPrivleges(datetime.datetime.now(),g.user)
         print "Check user privileges for opening request: " + checkAccessResult
         if (checkAccessResult == "Access granted."):
-            if datetime.datetime.now() > g.user.lastAccessDateTime + datetime.timedelta(minutes=config.NODE_LOG_MERGE):
+            if datetime.datetime.now() > g.user.lastAccessDateTime + datetime.timedelta(minutes=ConfigManager.NODE_LOG_MERGE):
                 g.user.lastAccessDateTime = datetime.datetime.now()
-                logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
+                logentry = Action(datetime.datetime.utcnow(), ConfigManager.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
                                g.user.email, 'Opening request ( ' + str(1) + ' attempts)', 'Opening request', 'L2', 0, 'Web based', Action.ACTION_OPENING_REQUEST, 1)
                 print "Log-entry created"
 
@@ -445,7 +448,7 @@ class OpeningRequestView(Resource):
                 else:
                     print "is None"
 
-                print "Log-entry is in merge-range ts = " + str(datetime.datetime.now()) + " last = " + str(g.user.lastAccessDateTime) + " merge = " + str(config.NODE_LOG_MERGE) + " minutes"
+                print "Log-entry is in merge-range ts = " + str(datetime.datetime.now()) + " last = " + str(g.user.lastAccessDateTime) + " merge = " + str(ConfigManager.NODE_LOG_MERGE) + " minutes"
 
                 try:
                     db.session.commit()
@@ -459,8 +462,6 @@ class OpeningRequestView(Resource):
         else:
             print "Check user privileges for opening request: " + checkAccessResult
             return checkAccessResult, 201
-        return '', 201
-
 
 class DoorView(Resource):
     @auth.login_required
@@ -469,7 +470,7 @@ class DoorView(Resource):
         door = Door.query.filter_by(id=id).first()
         if door != None:
             print 'delete door ' + door.name + ' ' + door.address + ' (id=' + str(door.id) + ') from database'
-            logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
+            logentry = Action(datetime.datetime.utcnow(), ConfigManager.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
                            g.user.email, 'Door (' + door.name + ' on ' + door.address + ') removed', 'Door removed',
                            'L2', 1, 'Web based')
             try:
@@ -508,7 +509,7 @@ class DoorRegistrationView(Resource):
         response_data = json.loads(response.content)
         newDoor = Door(name=response_data["name"], displayName= form.name.data, keyMask=response_data["keyMask"], address='http://' + form.address.data,
                        local=0, password = pwd)
-        logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
+        logentry = Action(datetime.datetime.utcnow(), ConfigManager.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
                        g.user.email, 'Door ' + newDoor.name + ' on ' + newDoor.address + ' checked and registered',
                        'Door registered', 'L2', 1, 'Web based')
         try:
@@ -536,7 +537,7 @@ class DoorInfoView(Resource):
 class DoorListView(Resource):
     @auth.login_required
     def get(self):
-        if config.NODE_DOOR_AVAILABLE == True:
+        if ConfigManager.NODE_DOOR_AVAILABLE == True:
             posts = Door.query.filter_by(local=0).all()
         else:
             posts = Door.query.all()
@@ -566,7 +567,7 @@ class LogAdminView(Resource):
 
         print 'action-log deletetion requested'
         Action.query.delete()
-        logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
+        logentry = Action(datetime.datetime.utcnow(), ConfigManager.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
                        '', 'Removed all actions after syncing', 'Remove actions after sync',
                        'L1', 0, 'Web based')
         db.session.add(logentry)
@@ -593,7 +594,7 @@ class InvalidateAuthCardView(Resource):
             return '', 401
 
         user.cardID = ""
-        logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
+        logentry = Action(datetime.datetime.utcnow(), ConfigManager.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
                        g.user.email, 'Invalidate auth. card of ' + user.firstName + ' ' + user.lastName + ' (' + user.email + ')',
                        'Invalidate auth. card', 'L2', 0, 'Web based', Action.ACTION_LOGONLY)
         try:
@@ -603,6 +604,34 @@ class InvalidateAuthCardView(Resource):
             db.session.rollback()
             return '', 401
         return '', 201
+
+class SetupStartView(Resource):
+    def post(self):
+        if Setup.SetupRunning is False:
+            Setup.startSetup()
+            return '', 201
+        else:
+            return '', 409
+
+class SetupLockView(Resource):
+    def post(self):
+        Setup.lock()
+        return '', 201
+
+class SetupStatusView(Resource):
+    def get(self):
+        if Setup.setupStatusQueue.unfinished_tasks == 0:
+            return make_response(jsonify({'running': True, 'statusupdate': False}), 201)
+        else:
+            status = Setup.setupStatusQueue.get()
+            Setup.setupStatusQueue.task_done()
+            return make_response(jsonify({'running': True, 'statusupdate': True, 'date':  datetime.datetime.now().isoformat(), 'progress': status.progress, 'message': status.message}), 201)
+
+        #form = DoorRegistrationForm()
+        #print 'Door registration request received'
+        #if not form.validate_on_submit():
+        #    return form.errors, 422
+
 
 class HardwareTestView(Resource):
     def post(self):
@@ -651,7 +680,7 @@ class RfidTagAssignView(Resource):
             user.cardSecret = secretString
             user.cardAuthBlock = 1
             user.cardAuthSector = 4
-            user.cardAuthKeyA = config.RFID_GLOBAL_PASSWORD
+            user.cardAuthKeyA = ConfigManager.RFID_GLOBAL_PASSWORD
             user.cardAuthKeyB = "FF-FF-FF-FF-FF-FF"
 
             print "User-secret: >" + str(user.cardSecret) + "<"
@@ -663,7 +692,7 @@ class RfidTagAssignView(Resource):
                 db.session.rollback()
                 return make_response(jsonify({'error': 'user not found'}), 400)
             else:
-                logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
+                logentry = Action(datetime.datetime.utcnow(), ConfigManager.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
                                g.user.email, 'Assign RFID-tag ' + form.rfidTagId.data + ' to ' + user.firstName + ' ' + user.lastName, 'Card administration',
                                'L2', 0, 'Card based')
                 db.session.add(logentry)
@@ -701,7 +730,7 @@ class RfidTagWitdrawView(Resource):
                 user.cardAuthKeyB = ''
                 db.session.commit()
                 print 'Withdraw cardID ' + form.rfidTagId.data + ' from ' + user.firstName + ' ' + user.lastName
-                logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
+                logentry = Action(datetime.datetime.utcnow(), ConfigManager.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
                                g.user.email, 'Withdraw cardID-tag ' + form.rfidTagId.data + ' from ' + user.firstName + ' ' + user.lastName, 'Card administration',
                                'L2', 0, 'Web based')
                 db.session.add(logentry)
@@ -725,7 +754,7 @@ class SettingView(Resource):
         if setting is None:
             return '', 405
 
-        logentry = Action(datetime.datetime.utcnow(), config.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
+        logentry = Action(datetime.datetime.utcnow(), ConfigManager.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
                        g.user.email, "Changed setting " + str(setting.name) + " from " + str(setting.value) + " to " + str(form.value.data), 'Changed setting',
                        'L2', 0, 'Web based')
         db.session.add(logentry)
@@ -736,7 +765,10 @@ class SettingView(Resource):
 
 class ConfigView(Resource):
     def get(self):
-        return jsonify(json.dumps(config.getConfigJSON(), indent=2))
+        return jsonify(json.dumps(ConfigManager.getConfigJSON(), indent=2))
+    def post(self):
+        ConfigManager.updateConfigByJSON(request.get_json())
+        return '', 201
 
 class SettingsListView(Resource):
     @auth.login_required
@@ -811,6 +843,10 @@ api.add_resource(LostPasswordView, '/api/v1/request/password')
 api.add_resource(DoorInfoView, '/api/v1/request/doorinfo')
 api.add_resource(InvalidateAuthCardView, '/api/v1/request/invalidateAuthCard/<int:id>')
 api.add_resource(SyncRequestView, '/api/v1/request/sync')
+
+api.add_resource(SetupStatusView, '/api/v1/setup/status')
+api.add_resource(SetupStartView, '/api/v1/setup/start')
+api.add_resource(SetupLockView, '/api/v1/setup/lock')
 
 api.add_resource(HardwareTestView, '/api/v1/hardwaretest')
 

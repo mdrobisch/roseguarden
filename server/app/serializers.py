@@ -90,6 +90,9 @@ class SessionInfoSerializer(Schema):
 class RfidTagInfoSerializer(Schema):
     userInfo = fields.String()
     tagId = fields.String()
+    error = fields.Bool()
+    errorInfo = fields.String()
+    detected = fields.Bool()
 
 class DoorSerializer(Schema):
     class Meta:
