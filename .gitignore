@@ -4,6 +4,9 @@
 *.stl
 server/database/roseGuarden.db
 server/config.ini
+server/config.lock
+server/config.master_template.ini
+server/config.slave_template.ini
 server/alchemydumps
 *.lyx~
 *.lyx#
