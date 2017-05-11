@@ -94,9 +94,9 @@ class RfidTagInfoSerializer(Schema):
     errorInfo = fields.String()
     detected = fields.Bool()
 
-class DoorSerializer(Schema):
+class NodeLinkSerializer(Schema):
     class Meta:
-        fields = ("id", "name", "displayName", "keyMask", "address", "local")
+        fields = ("id", "name", "displayName", "keyMask", "address", "local", "type")
 
 class LogSerializer(Schema):
     class Meta:

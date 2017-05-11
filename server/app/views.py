@@ -4,7 +4,7 @@ from flask import g, render_template, make_response, jsonify, request
 from flask_restful import Resource, fields, marshal_with
 from server import api, db, flask_bcrypt, auth, mail
 from config import ConfigManager
-from models import User, Action, Door, RfidTagInfo, Statistic, StatisticEntry, Setting
+from models import User, Action, NodeLink, RfidTagInfo, Statistic, StatisticEntry, Setting
 from serializers import LogSerializer, UserSyncSerializer, AdminsListSerializer, UserListForSupervisorsSerializer, UserListSerializer, \
     UserSerializer, SessionInfoSerializer, DoorSerializer, RfidTagInfoSerializer, StatisticListSerializer, SettingsListSerializer, StatisticEntryListSerializer
 from forms import UserPatchForm, DoorRegistrationForm, SessionCreateForm, LostPasswordForm, RegisterUserForm, \
@@ -467,7 +467,7 @@ class DoorView(Resource):
     @auth.login_required
     def delete(self, id):
         print "requested door remove " + str(id)
-        door = Door.query.filter_by(id=id).first()
+        door = NodeLink.query.filter_by(id=id).first()
         if door != None:
             print 'delete door ' + door.name + ' ' + door.address + ' (id=' + str(door.id) + ') from database'
             logentry = Action(datetime.datetime.utcnow(), ConfigManager.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
@@ -476,7 +476,7 @@ class DoorView(Resource):
             try:
                 db.session.add(logentry)
                 db.session.commit()
-                Door.query.filter(Door.id == id).delete()
+                NodeLink.query.filter(NodeLink.id == id).delete()
                 db.session.commit()
             except:
                 return '', 401
@@ -507,8 +507,8 @@ class DoorRegistrationView(Resource):
             return 'requested door unreachable', 400
 
         response_data = json.loads(response.content)
-        newDoor = Door(name=response_data["name"], displayName= form.name.data, keyMask=response_data["keyMask"], address='http://' + form.address.data,
-                       local=0, password = pwd)
+        newDoor = NodeLink(name=response_data["name"], displayName= form.name.data, keyMask=response_data["keyMask"], address='http://' + form.address.data,
+                           local=0, password = pwd)
         logentry = Action(datetime.datetime.utcnow(), ConfigManager.NODE_NAME, g.user.firstName + ' ' + g.user.lastName,
                        g.user.email, 'Door ' + newDoor.name + ' on ' + newDoor.address + ' checked and registered',
                        'Door registered', 'L2', 1, 'Web based')
@@ -530,7 +530,7 @@ class DoorInfoView(Resource):
     @auth.login_required
     def get(self):
         print 'Door info request'
-        localdoor = Door.query.filter_by(local=1).first()
+        localdoor = NodeLink.query.filter_by(local=1).first()
         return DoorSerializer().dump(localdoor).data
 
 
@@ -538,9 +538,9 @@ class DoorListView(Resource):
     @auth.login_required
     def get(self):
         if ConfigManager.NODE_DOOR_AVAILABLE == True:
-            posts = Door.query.filter_by(local=0).all()
+            posts = NodeLink.query.filter_by(local=0, type=NodeLink.NODETYPE_DOOR).all()
         else:
-            posts = Door.query.all()
+            posts = NodeLink.query.filter_by(type=NodeLink.NODETYPE_DOOR)
         return DoorSerializer().dump(posts, many=True).data
 
 class LogDebugView(Resource):

@@ -1,5 +1,5 @@
 __author__ = 'drobisch'
-from models import User, Action, Door, RfidTagInfo, Statistic, StatisticEntry
+from models import User, Action, NodeLink, RfidTagInfo, Statistic, StatisticEntry
 from server import db
 
 

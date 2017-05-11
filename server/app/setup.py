@@ -1,6 +1,6 @@
 from server import db
 from server import app as flask
-from models import User, Action, Door, Setting, Statistic, StatisticEntry
+from models import User, Action, NodeLink, Setting, Statistic, StatisticEntry
 from statistics import StatisticsManager
 from config import ConfigManager
 from Queue import Queue
@@ -201,10 +201,10 @@ def create_db():
     # db.session.add(Door(id = 0, name = 'front door', address = 'http://192.168.2.139', keyMask = 0x01, local = 0x00 ))
 
     print "Add local door"
-    Door.query.delete()
+    NodeLink.query.delete()
     db.session.add(
-        Door(name=ConfigManager.NODE_NAME, displayName='Local', address='http://localhost', keyMask=0x03, local=0x01,
-             password=ConfigManager.INITIAL_NODE_PASSWORD))
+        NodeLink(name=ConfigManager.NODE_NAME, displayName='Local', address='http://localhost', keyMask=0x03, local=0x01,
+                 password=ConfigManager.INITIAL_NODE_PASSWORD))
 
     setupStatusQueue.put(
         SetupLog(progress=60, date=datetime.datetime.now().isoformat(), message='Local door added ...', error=False))

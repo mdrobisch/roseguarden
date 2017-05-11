@@ -14,7 +14,7 @@ import os
 
 from config import ConfigManager
 from extension import ExtensionManager
-from models import User, Door, Action
+from models import User, NodeLink, Action
 from server import app, db
 from serializers import LogSerializer, UserSyncSerializer
 from statistics import StatisticsManager
@@ -739,14 +739,14 @@ class BackgroundWorker():
 
         print "Doing a sync cycle"
 
-        doorList = Door.query.all()
+        linkedNodesList = NodeLink.query.all()
 
-        for doorSync in doorList:
-            if doorSync.local == 1:
-                print 'Sync actions of ' + doorSync.name + ' (local)'
+        for linkedNode in linkedNodesList:
+            if linkedNode.local == 1:
+                print 'Sync actions of ' + linkedNode.name + ' (local)'
             else:
-                print 'Sync actions of ' + doorSync.name
-            self.sync_door_log(doorSync)
+                print 'Sync actions of ' + linkedNode.name
+            self.sync_door_log(linkedNode)
 
         print 'Update actions'
         self.update_users_and_actions()
@@ -758,15 +758,15 @@ class BackgroundWorker():
         db.session.commit()
 
         # sync user of all doors
-        for doorSync in doorList:
-            if doorSync.local == 1:
-                print 'Sync user of ' + doorSync.name + ' (local)'
+        for linkedNode in linkedNodesList:
+            if linkedNode.local == 1:
+                print 'Sync user of ' + linkedNode.name + ' (local)'
             else:
-                print 'Sync user of ' + doorSync.name
-            self.sync_door_user(doorSync)
-            if doorSync.local == 0:
+                print 'Sync user of ' + linkedNode.name
+            self.sync_door_user(linkedNode)
+            if linkedNode.local == 0:
                 logentry = Action(datetime.datetime.utcnow(), ConfigManager.NODE_NAME, 'Sync Master', 'syncmaster@roseguarden.org',
-                                'Synchronized ' + doorSync.displayName + ' (' + doorSync.name + ')',
+                                'Synchronized ' + linkedNode.displayName + ' (' + linkedNode.name + ')',
                                 'Synchronization', 'L1', 0, 'Internal')
                 logentry.synced = 1
                 db.session.add(logentry)

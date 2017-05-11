@@ -284,22 +284,27 @@ class Statistic(db.Model):
         self.seriesName7 = seriesName7
         self.seriesName8 = seriesName8
 
-class Door(db.Model):
+class NodeLink(db.Model):
+    NODETYPE_MASTER = 0
+    NODETYPE_DOOR = 1
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text)
     displayName = db.Column(db.Text)
     keyMask = db.Column(db.Integer)
     address = db.Column(db.Text)
     local = db.Column(db.Integer)
+    type = db.Column(db.Integer)
     password = db.Column(db.Text)
 
-    def __init__(self, name, displayName, keyMask, address, local, password = ''):
+    def __init__(self, name, displayName, keyMask, address, local, password = '', type=NODETYPE_DOOR):
         self.name = name
         self.displayName = displayName
         self.keyMask = keyMask
         self.address = address
         self.local = local
         self.password = base64.b64encode(password)
+        self.type = type
 
 class RfidTagInfo(object):
     def __init__(self, tagId, userInfo, detected=False,error=False, errorInfo=''):
