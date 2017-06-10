@@ -425,5 +425,12 @@ RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log, $q, Us
         });
     };
 
-    $interval( function(){ $scope.updateRfidInfo(); }, 1000);
+    intervalpromise = $interval( function(){ $scope.updateRfidInfo(); }, 1000);
+
+    $scope.$on('$destroy',function(){
+        if(intervalpromise) {
+            $log.info('Cancel interval');
+            $interval.cancel(intervalpromise);
+        }
+    });
 });
