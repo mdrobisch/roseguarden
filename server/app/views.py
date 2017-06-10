@@ -6,7 +6,7 @@ from server import api, db, flask_bcrypt, auth, mail
 from config import ConfigManager
 from models import User, Action, NodeLink, RfidTagInfo, Statistic, StatisticEntry, Setting
 from serializers import LogSerializer, UserSyncSerializer, AdminsListSerializer, UserListForSupervisorsSerializer, UserListSerializer, \
-    UserSerializer, SessionInfoSerializer, DoorSerializer, RfidTagInfoSerializer, StatisticListSerializer, SettingsListSerializer, StatisticEntryListSerializer
+    UserSerializer, SessionInfoSerializer, NodeLinkSerializer, RfidTagInfoSerializer, StatisticListSerializer, SettingsListSerializer, StatisticEntryListSerializer
 from forms import UserPatchForm, DoorRegistrationForm, SessionCreateForm, LostPasswordForm, RegisterUserForm, \
     UserDeleteForm, RFIDTagAssignForm, RFIDTagWithdrawForm, SettingPatchForm
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -501,7 +501,7 @@ class DoorRegistrationView(Resource):
         headers = {'Authorization' : auth_token}
 
         try:
-            response = requests.get('http://' + form.address.data + ':5000' + '/request/doorinfo', timeout=6, headers = headers)
+            response = requests.get('http://' + form.address.data + ':80' + '/api/v1/request/doorinfo', timeout=6, headers = headers)
         except:
             print "requested door unreachable"
             return 'requested door unreachable', 400
@@ -538,10 +538,10 @@ class DoorListView(Resource):
     @auth.login_required
     def get(self):
         if ConfigManager.NODE_DOOR_AVAILABLE == True:
-            posts = NodeLink.query.filter_by(local=0, type=NodeLink.NODETYPE_DOOR).all()
+            nodeLink = NodeLink.query.filter_by(local=0, type=NodeLink.NODETYPE_DOOR).all()
         else:
-            posts = NodeLink.query.filter_by(type=NodeLink.NODETYPE_DOOR)
-        return DoorSerializer().dump(posts, many=True).data
+            nodeLink = NodeLink.query.filter_by(type=NodeLink.NODETYPE_DOOR)
+        return NodeLinkSerializer().dump(nodeLink, many=True).data
 
 class LogDebugView(Resource):
     @auth.login_required
