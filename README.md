@@ -71,7 +71,7 @@ First of all update and upgrade your raspberry pi os
 Install basic dependecies
 -------------------------
 
-3. `sudo apt-get install git`
+3. `sudo apt-get install git swig`
 
 
 Install RoseGuarden
