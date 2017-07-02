@@ -7,9 +7,11 @@ Important news
 ==============
 
 **I strongly recommend to wait for the new release of RoseGuarden.**
-**The setup will be a lot more fun and new features wait for you.**
-**The release date is set to 30th of June 2017.** 
-**Please be patient with me till then.**
+**The setup will be a lot more fun and new features await you.**
+**~~The release date is set to 30th of June 2017.~~**
+**Caused by more time needed to refactor and features. The date could not be hold.**
+**The actual work is in the 0.9.0-branch for early tests.**
+**Till now I cann't give a new valid date for the release.**
 
 **The progress can be followed on:** https://github.com/mdrobisch/roseguarden/tree/0.9.0 
 
