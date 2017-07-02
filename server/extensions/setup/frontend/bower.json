@@ -13,12 +13,12 @@
     "tests"
   ],
   "dependencies": {
-    "angular-route": "~1.6.2",
+    "angular-route": "~1.6.1",
     "angular-bootstrap": "~1.2.3",
     "angular-local-storage": "~0.2.3",
     "bootstrap": "~3.2.0",
     "restangular": "~1.4.0",
-    "angularjs": "~1.6.2",
+    "angularjs": "~1.6.1",
     "angular-base64": "~2.0.5",
     "moment": "~2.10.6",
     "angular-sanitize": "~1.6.2",
