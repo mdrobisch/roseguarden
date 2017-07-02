@@ -1,5 +1,6 @@
 
 <div class="text-center">
+
     <h3>Welcome to RoseGuarden</h3>
 
     <p>This user interface will guide you through the setup of your RoseGuarden-node.
@@ -8,7 +9,7 @@
         a helping hand on the projects github-page.
     </p>
     <div class="alert alert-danger" role="alert">
-       Please recheck, that your host system have a static IP-address. <br> A DHCP-IP could lead to malfunction or data-loss.
+       Please recheck, that your host system have a static IP-address. <br> A changing IP (e.g. DHCP) could lead to malfunction or data-loss.
     </div>
 
     <h3>
@@ -28,15 +29,21 @@
     </form>
 
     <form class="form-horizontal">
-      <div class="form-group">
+      <div class="form-group" >
         <label for="inputEmail3" class="col-xs-offset-2 col-xs-3 control-label">RFID</label>
         <div class="col-xs-3 text-right">
-          <button type="button" class="btn btn-success btn-100px">Read</button>
-          <button type="button" class="btn btn-default btn-circle text-left" popover-placement="top" uib-popover="Will read out the UUID, of a rfid tag on the reader.">
-              <i class="glyphicon glyphicon-info-sign"></i>
-          </button>
+            <div class="btn-group" uib-dropdown is-open="status.isopen">
+              <button id="single-button" type="button" class="btn btn-success btn-100px" uib-dropdown-toggle ng-disabled="disabled">
+                Read  <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="single-button">
+                <li role="menuitem"><a href="#">With RC522 module on SPI</a></li>
+              </ul>
+            </div>
+            <button type="button" class="btn btn-default btn-circle text-left" popover-placement="top" uib-popover="Will read out the UUID, of a rfid tag on the reader.">
+                <i class="glyphicon glyphicon-info-sign"></i>
+            </button>
         </div>
-
       </div>
     </form>
 

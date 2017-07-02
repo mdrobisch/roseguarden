@@ -28,7 +28,7 @@ RoseGuardenApp.controller('SlaveConfigCtrl', function($scope, $q, Config, $locat
             }
         }
       }
-};
+    }
 
     //console.log(ConfigService.getConfig());
 
@@ -38,7 +38,7 @@ RoseGuardenApp.controller('SlaveConfigCtrl', function($scope, $q, Config, $locat
         console.log(config);
 
         $scope.nodeName = findConfigEntryByName(config, "NODE_NAME");
-        $scope.nodePassword = findConfigEntryByName(config, "NODE_NAME");
+        $scope.nodePassword = findConfigEntryByName(config, "INITIAL_NODE_PASSWORD");
         $scope.nodeExtensionName = findConfigEntryByName(config, "EXTENSION_NAME");
         $scope.nodeExtensionName.value = "slave";
         $scope.nodeExtensionFrontendDisable = findConfigEntryByName(config, "EXTENSION_FRONTEND_DISABLE");
@@ -58,12 +58,16 @@ RoseGuardenApp.controller('SlaveConfigCtrl', function($scope, $q, Config, $locat
         $scope.interfaceDoor = findConfigEntryByName(config, "NODE_DOOR_AVAILABLE");
         $scope.interfaceDoorOpeningTime = findConfigEntryByName(config, "DOOR_OPENING_TIME");
 
-        $scope.advancedMailServer = findConfigEntryByName(config, "MAIL_SERVER");
-        $scope.advancedMailPort = findConfigEntryByName(config, "MAIL_PORT");
-        $scope.advancedMailUseTLS = findConfigEntryByName(config, "MAIL_USE_TLS");
-        $scope.advancedMailUseSSL = findConfigEntryByName(config, "MAIL_USE_SSL");
-        $scope.advancedMailUsername = findConfigEntryByName(config, "MAIL_USERNAME");
-        $scope.advancedMailPassword = findConfigEntryByName(config, "MAIL_PASSWORD");
+        $scope.interfaceDoorKeymask = findConfigEntryByName(config, "DOOR_KEYMASK");
+        $scope.interfaceDoorKeymaskForm = [];
+        validKeyMask = parseInt($scope.interfaceDoorKeymask.value);
+        for(var i = 0;i < 8; i++) {
+            if ( ((0x01 << i) & validKeyMask) != 0)
+                $scope.interfaceDoorKeymaskForm.push(true);
+            else
+                $scope.interfaceDoorKeymaskForm.push(false);
+        }
+
 
         $scope.isLoading = false;
 
@@ -84,6 +88,38 @@ RoseGuardenApp.controller('SlaveConfigCtrl', function($scope, $q, Config, $locat
                 token += "-";
         }
         $scope.masterGlobalRfidKey.value = token;
+    };
+
+    function updateConfig(configUpdate) {
+        var me = this;
+        deferred = $q.defer();
+        console.log("request");
+        Config.update(configUpdate, true).then(function(config) {
+            console.log("updated");
+            return deferred.resolve(config);
+        }, function(response) {
+            console.log("rejected");
+            return deferred.reject(response);
+        });
+        return deferred.promise
+    }
+
+    $scope.saveConfig = function () {
+        console.log($scope.interfaceDoorKeymask.value);
+        $scope.interfaceDoorKeymask.value = 0;
+        console.log($scope.interfaceDoorKeymask.value);
+        for(var i = 0;i < 8; i++) {
+            if($scope.interfaceDoorKeymaskForm[i] == true)
+                $scope.interfaceDoorKeymask.value += Math.pow(2,i);
+        }
+        console.log($scope.interfaceDoorKeymask.value);
+
+        updateConfig(config).then(function(config_unparsed) {
+            $location.path("/slave/setup" );
+        }, function(response) {
+            console.log("rejected");
+
+        });
     };
 
     $scope.log = function () {

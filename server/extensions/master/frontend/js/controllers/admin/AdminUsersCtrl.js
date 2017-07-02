@@ -429,7 +429,6 @@ RoseGuardenApp.controller('AdminUsersCtrl', function($scope,$modal, $log, $q, Us
 
     $scope.$on('$destroy',function(){
         if(intervalpromise) {
-            $log.info('Cancel interval');
             $interval.cancel(intervalpromise);
         }
     });

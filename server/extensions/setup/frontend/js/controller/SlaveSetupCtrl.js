@@ -1,4 +1,4 @@
-RoseGuardenApp.controller('MasterSetupCtrl', function($scope, $q, Setup, $route, $window, $location,$timeout, $interval) {
+RoseGuardenApp.controller('SlaveSetupCtrl', function($scope, $q, Setup, $route, $window, $location,$timeout, $interval) {
 
     var i=0;
     i++;

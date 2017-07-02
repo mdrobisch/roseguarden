@@ -1,0 +1,105 @@
+
+<div class="text-center">
+
+    <div>
+        <h3>Setup node:</h3>
+        <a class="btn btn-success btn-lg btn-start text-center" ng-click="startSetup()" role="button">Start</a>
+    </div>
+
+    <div class="text-left">
+
+        <div class="row">
+            <div class="col-xs-2 vcenter">
+                <h3>Log:</h3>
+            </div>
+
+            <div class="col-xs-offset-6 col-xs-4 vbottom" style="width: 32%">
+                <uib-progressbar class="progress-striped" style="margin-bottom: 10px; margin-left: 10px" value="setupProgress" type="{{ setupBarColor }}">{{ setupStatus }}</uib-progressbar>
+            </div>
+
+        </div>
+
+        <div class="well text-left">
+          <div class="log-scroll-height" ng-scrollbar is-bar-shown="barShown" rebuild-on="rebuild:statusbar">
+            <p ng-repeat="log in logs">
+              <b>{{log.date}}:</b>  {{log.log}}
+            </p>
+          </div>
+        </div>
+
+        <div class="row">
+
+        </div>
+
+    </div>
+
+
+    <h3>Connect with master-node:</h3>
+
+    <form class="form-horizontal row">
+        <label class="col-xs-offset-1 col-xs-4 control-label">Master node IP:</label>
+        <div class="col-xs-3 text-center  small-padding">
+          <input  type="text" ng-model="nodeName.value" class="inp-150px" />
+        </div>
+        <div class="col-xs-1 text-right">
+          <button type="button" class="btn btn-default btn-circle text-left"  popover-placement="top" uib-popover="IP-address of the master-node.">
+              <i class="glyphicon glyphicon-info-sign"></i>
+          </button>
+        </div>
+    </form>
+
+    <form name="form_password" class="form-horizontal row">
+        <label class="col-xs-offset-1 col-xs-4 control-label">Master node password:</label>
+        <div class="col-xs-3 text-center  small-padding">
+            <input type="password" name="password" id="password" class="inp-150px" ng-model="masterNodePassword.value" required />
+        </div>
+        <div class="col-xs-1 text-right">
+          <button type="button" class="btn btn-default btn-circle text-left"  popover-placement="top" uib-popover="Password of the master node.">
+              <i class="glyphicon glyphicon-info-sign"></i>
+          </button>
+        </div>
+    </form>
+
+    <form class="form-horizontal row">
+        <label class="col-xs-offset-1 col-xs-4 control-label"></label>
+        <div class="col-xs-3 text-center  small-padding">
+            <a class="btn btn-success btn-lg btn-start text-center" ng-click="connectToMaster()" role="button">Connect</a>
+        </div>
+        <div class="col-xs-1 text-right">
+        </div>
+    </form>
+
+    <div>
+    </div>
+
+    <br>
+
+    <div ng-show="true" class="alert alert-success" style="white-space : pre-line" role="alert">
+       Connection with the master node was successfull. Link is established.
+    </div>
+
+    <div ng-show="true" class="alert alert-danger" style="white-space : pre-line" role="alert">
+       Unable to set up connection to master node. Please recheck your network and password. ( {{ error }} ).
+    </div>
+
+    <br>
+
+    <div ng-show="isFinished && !isFailed" class="alert alert-info" style="white-space : pre-line ; padding: 1px" role="alert">
+       Setup and link wit master was succesfull. You can now finish the setup and node will be locked.
+        Afterwards you will be redirected to the final user interface.
+        <b> Login with the administrator account ( administrator : your-password ) </b>.
+
+    </div>
+
+    <div class=""text-center>
+        <p>
+            <a href="#!/master/config" class="btn btn-warning btn-sm" role="button">Go back</a>
+            <a class="btn btn-success btn-lg btn-start text-center" ng-disabled="!isFinished || isFailed || !isConnected" ng-click="finishSetup()" role="button">
+                Finish
+                <img ng-show="isLockPending" src="images/loading.gif" >
+            </a>
+        </p>
+
+    </div>
+
+</div>

@@ -15,10 +15,12 @@ RoseGuardenApp.config(function($routeProvider, RestangularProvider) {
 
     $routeProvider.
       when('/', {
-        templateUrl: 'partials/welcome.html'
-      }).
+        templateUrl: 'partials/welcome.html',
+        controller: 'ApplicationCtrl'
+    }).
       when('/start', {
-        templateUrl: 'partials/start.html'
+        templateUrl: 'partials/start.html',
+        controller: 'ApplicationCtrl'
       }).
       when('/master/config', {
       templateUrl: 'partials/master/config.html',
@@ -31,6 +33,10 @@ RoseGuardenApp.config(function($routeProvider, RestangularProvider) {
       when('/slave/config', {
       templateUrl: 'partials/slave/config.html',
       controller: 'SlaveConfigCtrl'
+      }).
+      when('/slave/setup', {
+      templateUrl: 'partials/slave/setup.html',
+      controller: 'SlaveSetupCtrl'
       }).
       otherwise({
         redirectTo: '/'
