@@ -6,14 +6,11 @@ A remote door api and web application for Raspberry Pi, Odroid, Orange Pi or Bea
 Important news
 ==============
 
-**I strongly recommend to wait for the new release of RoseGuarden.**
-**The setup will be a lot more fun and new features await you.**
-**~~The release date is set to 30th of June 2017.~~**
-**Caused by more time needed to refactor and features. The date could not be hold.**
-**The actual work is in the 0.9.0-branch for early tests.**
+**Because of issues in the very base of the system design, we decided to make a compelete rework of roseguarden**
+**Ther will be no bugfixes or features in this version of roseguarden**
+**The progress can be followed on:** https://gitlab.com/roseguarden/roseguarden
 **Till now I cann't give a new valid date for the release.**
 
-**The progress can be followed on:** https://github.com/mdrobisch/roseguarden/tree/0.9.0 
 
 Features
 ========
