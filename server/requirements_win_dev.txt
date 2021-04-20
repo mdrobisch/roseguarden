@@ -17,7 +17,7 @@ SQLAlchemy-Utils==0.26.9
 WTForms==2.0.1
 WTForms-Alchemy==0.12.8
 WTForms-Components==0.9.5
-Werkzeug==0.9.6
+Werkzeug==0.15.3
 aniso8601==0.83
 decorator==3.4.0
 infinity==1.3
