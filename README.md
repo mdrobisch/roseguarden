@@ -8,8 +8,6 @@ Important news
 
 **Because of issues in the very base of the system design, we decided to make a compelete rework of roseguarden**
 **Ther will be no bugfixes or features in this version of roseguarden**
-**The progress can be followed on:** https://gitlab.com/roseguarden/roseguarden
-**Till now I cann't give a new valid date for the release.**
 
 
 Features
