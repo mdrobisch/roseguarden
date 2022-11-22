@@ -30,5 +30,5 @@ six==1.7.3
 validators==0.6.0
 wsgiref==0.1.2
 RPi.GPIO==0.6.3
-Pillow==3.4.2
+Pillow==9.3.0
 requests==2.8.1
